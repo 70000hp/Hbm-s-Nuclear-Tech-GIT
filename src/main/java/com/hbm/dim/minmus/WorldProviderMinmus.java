@@ -1,6 +1,7 @@
 package com.hbm.dim.minmus;
 
 import com.hbm.dim.WorldChunkManagerCelestial.BiomeGenLayers;
+import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.WorldChunkManagerCelestial;
 import com.hbm.dim.WorldProviderCelestial;
 import com.hbm.dim.minmus.GenLayerMinmus.GenLayerDiversifyMinmus;
@@ -9,7 +10,6 @@ import com.hbm.dim.minmus.GenLayerMinmus.GenLayerMinmusBiomes;
 import com.hbm.dim.minmus.GenLayerMinmus.GenLayerMinmusPlains;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.GenLayerFuzzyZoom;
@@ -36,7 +36,7 @@ public class WorldProviderMinmus extends WorldProviderCelestial {
 
 	@Override
 	public Block getStone() {
-		return Blocks.snow;
+		return ModBlocks.minmus_stone;
 	}
 
 	private static BiomeGenLayers createBiomeGenerators(long seed) {

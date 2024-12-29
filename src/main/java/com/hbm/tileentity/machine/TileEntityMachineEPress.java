@@ -10,7 +10,7 @@ import com.hbm.inventory.recipes.PressRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.items.machine.ItemStamp;
 import com.hbm.lib.Library;
-import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.toclient.AuxElectricityPacket;
 import com.hbm.packet.PacketDispatcher;
 //import com.hbm.packet.TEPressPacket;
 import com.hbm.tileentity.IGUIProvider;
@@ -23,7 +23,6 @@ import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -264,7 +263,7 @@ public class TileEntityMachineEPress extends TileEntityMachineBase implements IE
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineEPress(player.inventory, this);
 	}
 

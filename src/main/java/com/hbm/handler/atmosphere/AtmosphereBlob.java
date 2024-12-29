@@ -1,6 +1,7 @@
 package com.hbm.handler.atmosphere;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -10,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.config.GeneralConfig;
 import com.hbm.dim.trait.CBT_Atmosphere;
 import com.hbm.handler.ThreeInts;
 import com.hbm.inventory.fluid.FluidType;
@@ -18,6 +20,7 @@ import com.hbm.util.AdjacencyGraph;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFarmland;
+import net.minecraft.block.BlockFence;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -39,6 +42,8 @@ public class AtmosphereBlob implements Runnable {
 
 
 	private static ThreadPoolExecutor pool = new ThreadPoolExecutor(2, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(32));
+	
+	private static HashMap<Block, Boolean> fullBounds = new HashMap<Block, Boolean>();
 
 	
 	private boolean executing;
@@ -69,6 +74,7 @@ public class AtmosphereBlob implements Runnable {
 
 		if(block.isAir(world, x, y, z)) return false; // Air obviously doesn't seal
 		if(block instanceof BlockFarmland) return false;
+		if(block instanceof BlockFence) return false;
 		if(block instanceof IBlockSealable) { // Custom semi-sealables, like doors
 			return ((IBlockSealable)block).isSealed(world, x, y, z);
 		}
@@ -78,9 +84,21 @@ public class AtmosphereBlob implements Runnable {
 		if(material.isLiquid() || !material.isSolid()) return false; // Liquids need to know what pressurized atmosphere they're in to determine evaporation
 		if(material == Material.leaves) return false; // Leaves never block air
 
-		AxisAlignedBB bb = block.getCollisionBoundingBoxFromPool(world, x, y, z);
+		Boolean isFull = fullBounds.get(block);
+		if(isFull != null) return isFull;
 
-		if(bb == null) return false; // No collision, can't seal (like lamps)
+		AxisAlignedBB bb = null;
+		try {
+			// In the most common case, blocks don't use the passed World, only when they need to check neighbours to modify their bounding box
+			// we just want to check that it attempts to change its bounding box at all, resulting in null if it does so by checking neighbours
+			// anything that modifies its own bounding box safely (like half slabs) will still work as normal
+			bb = block.getCollisionBoundingBoxFromPool(null, x, y, z);
+		} catch(Exception ex) {}
+
+		if(bb == null) {
+			fullBounds.put(block, false);
+			return false; // No collision, can't seal (like lamps)
+		}
 
 		// size * 100 to correct rounding errors
 		int minX = (int) ((bb.minX - x) * 100);
@@ -90,7 +108,11 @@ public class AtmosphereBlob implements Runnable {
 		int maxY = (int) ((bb.maxY - y) * 100);
 		int maxZ = (int) ((bb.maxZ - z) * 100);
 
-		return minX == 0 && minY == 0 && minZ == 0 && maxX == 100 && maxY == 100 && maxZ == 100;
+		isFull = minX == 0 && minY == 0 && minZ == 0 && maxX == 100 && maxY == 100 && maxZ == 100;
+
+		fullBounds.put(block, isFull);
+
+		return isFull;
 	}
 	
 	public int getBlobMaxRadius() {
@@ -129,10 +151,14 @@ public class AtmosphereBlob implements Runnable {
 				this.blockPos = blockPos;
 				executing = true;
 				
-				try {
-					pool.execute(this);
-				} catch (RejectedExecutionException e) {
-					MainRegistry.logger.warn("Atmosphere calculation at " + this.getRootPosition() + " aborted due to oversize queue!");
+				if(GeneralConfig.enableThreadedAtmospheres) {
+					try {
+						pool.execute(this);
+					} catch (RejectedExecutionException e) {
+						MainRegistry.logger.warn("Atmosphere calculation at " + this.getRootPosition() + " aborted due to oversize queue!");
+					}
+				} else {
+					this.run();
 				}
 			}
 		}

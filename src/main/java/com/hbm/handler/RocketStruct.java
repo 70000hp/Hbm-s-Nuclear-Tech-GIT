@@ -8,7 +8,7 @@ import java.util.Map;
 import com.hbm.dim.CelestialBody;
 import com.hbm.dim.SolarSystem;
 import com.hbm.inventory.fluid.FluidType;
-import com.hbm.items.weapon.ItemCustomMissilePart;
+import com.hbm.items.ModItems;
 import com.hbm.items.weapon.ItemCustomMissilePart.FuelType;
 import com.hbm.items.weapon.ItemCustomMissilePart.PartType;
 import com.hbm.items.weapon.ItemCustomMissilePart.WarheadType;
@@ -29,6 +29,7 @@ public class RocketStruct {
 	
 	public MissilePart capsule;
 	public ArrayList<RocketStage> stages = new ArrayList<>();
+	public int satFreq = 0;
 
 	public List<String> extraIssues = new ArrayList<>();
 
@@ -62,7 +63,10 @@ public class RocketStruct {
 		if(extraIssues.size() > 0)
 			return false;
 
-		if(capsule == null || capsule.type != PartType.WARHEAD || ((ItemCustomMissilePart)capsule.part).attributes[0] != WarheadType.APOLLO)
+		if(capsule == null || capsule.type != PartType.WARHEAD)
+			return false;
+
+		if(capsule.part.attributes[0] != WarheadType.APOLLO && capsule.part.attributes[0] != WarheadType.SATELLITE)
 			return false;
 		
 		if(stages.size() == 0)
@@ -86,14 +90,25 @@ public class RocketStruct {
 	}
 
 	// Lists any validation issues so the player can rectify easily
-	public List<String> findIssues(int stageNum, CelestialBody from, CelestialBody to) {
+	public List<String> findIssues(int stageNum, CelestialBody from, CelestialBody to, boolean fromOrbit, boolean toOrbit) {
 		List<String> issues = new ArrayList<String>();
 
 		// If we have no parts, we have no worries
 		if(capsule == null && stages.size() == 0) return issues;
 
-		if(capsule != null && capsule.part.attributes[0] != WarheadType.APOLLO)
-			issues.add(EnumChatFormatting.RED + "Invalid Capsule");
+		if(capsule == null || (capsule.part.attributes[0] != WarheadType.APOLLO && capsule.part.attributes[0] != WarheadType.SATELLITE))
+			issues.add(EnumChatFormatting.RED + "Invalid Capsule/Satellite");
+
+		// Current stage stats
+		if(stageNum < stages.size()) {
+			RocketStage stage = stages.get(stageNum);
+			issues.add("Dry mass: " + getLaunchMass(stageNum) + "kg");
+			issues.add("Wet mass: " + getWetMass(stageNum) + "kg");
+			if(stage.thruster != null) {
+				issues.add("Thrust: " + getThrust(stage) + "N");
+				issues.add("ISP: " + getISP(stage) + "s");
+			}
+		}
 
 		for(int i = 0; i < stages.size(); i++) {
 			RocketStage stage = stages.get(i);
@@ -123,11 +138,13 @@ public class RocketStruct {
 		}
 
 		if(from != null && to != null) {
-			int fuelRequirement = getFuelRequired(stageNum, from, to);
+			int fuelRequirement = getFuelRequired(stageNum, from, to, fromOrbit, toOrbit);
 			int fuelCapacity = getFuelCapacity(stageNum);
 
-			if(fuelCapacity < fuelRequirement) {
-				issues.add(EnumChatFormatting.YELLOW + "Insufficient fuel capacity " + fuelCapacity + "/" + fuelRequirement + "mB");
+			if(fuelRequirement == Integer.MAX_VALUE) {
+				issues.add(EnumChatFormatting.YELLOW + "Insufficient thrust");
+			} else if(fuelCapacity < fuelRequirement) {
+				issues.add(EnumChatFormatting.YELLOW + "Insufficient fuel: " + fuelCapacity + "/" + fuelRequirement + "mB");
 			} else if(fuelCapacity > 0 && fuelRequirement > 0) {
 				issues.add(EnumChatFormatting.GREEN + "Trip possible! " + fuelCapacity + "/" + fuelRequirement + "mB");
 			}
@@ -164,8 +181,16 @@ public class RocketStruct {
 		return tanks;
 	}
 
-	public boolean hasSufficientFuel(CelestialBody from, CelestialBody to) {
-		int fuelRequirement = getFuelRequired(0, from, to);
+	public boolean hasSufficientFuel(CelestialBody from, CelestialBody to, boolean fromOrbit, boolean toOrbit) {
+		if(capsule.part == ModItems.rp_pod_20) {
+			return from == to && (fromOrbit || toOrbit); // Pods can transfer, fall to orbited body, and return to station, but NOT hop on the surface
+		}
+
+		if(stages.size() == 0) {
+			return from == to && fromOrbit && !toOrbit; // Capsules can return to orbited body from orbit only
+		}
+
+		int fuelRequirement = getFuelRequired(0, from, to, fromOrbit, toOrbit);
 		int fuelCapacity = getFuelCapacity(0);
 
 		return fuelCapacity >= fuelRequirement;
@@ -181,7 +206,7 @@ public class RocketStruct {
 		return stage.fuselage.part.getTankSize() * stage.fuselageCount;
 	}
 
-	private int getFuelRequired(int stageNum, CelestialBody from, CelestialBody to) {
+	private int getFuelRequired(int stageNum, CelestialBody from, CelestialBody to, boolean fromOrbit, boolean toOrbit) {
 		if(stageNum >= stages.size()) return -1;
 
 		RocketStage stage = stages.get(stageNum);
@@ -189,19 +214,35 @@ public class RocketStruct {
 		if(stage.fuselage == null || stage.thruster == null) return -1;
 		
 		int rocketMass = getLaunchMass(stageNum);
-		int thrust = stage.thruster.part.getThrust() * stage.thrusterCount;
-		int isp = stage.thruster.part.getISP();
+		int thrust = getThrust(stage);
+		int isp = getISP(stage);
 
-		return SolarSystem.getCostBetween(from, to, rocketMass, thrust, isp);
+		return SolarSystem.getCostBetween(from, to, rocketMass, thrust, isp, fromOrbit, toOrbit);
+	}
+
+	private int getThrust(RocketStage stage) {
+		return stage.thruster.part.getThrust() * stage.thrusterCount;
+	}
+	
+	private int getISP(RocketStage stage) {
+		return stage.thruster.part.getISP();
 	}
 
 	// Gets the dry mass of the active stage + the wet mass of the stages above it
 	public int getLaunchMass() {
-		return getLaunchMass(0);
+		return getMass(0, false);
 	}
 
-	// Gets the dry mass of the current stage + the wet mass of the stages above it
+	// Gets the dry mass of the selected stage + the wet mass of the stages above it
 	public int getLaunchMass(int stageNum) {
+		return getMass(stageNum, false);
+	}
+
+	public int getWetMass(int stageNum) {
+		return getMass(stageNum, true);
+	}
+
+	private int getMass(int stageNum, boolean wet) {
 		int mass = 0;
 
 		if(capsule != null) mass += capsule.part.mass;
@@ -211,12 +252,12 @@ public class RocketStruct {
 			if(stage.fuselage != null) mass += stage.fuselage.part.mass * stage.fuselageCount;
 			if(stage.thruster != null) mass += stage.thruster.part.mass * stage.thrusterCount;
 
-			if(stage.fuselage != null && i > stageNum) {
-				mass += stage.fuselage.part.getTankSize() * stage.fuselageCount;
+			if(stage.fuselage != null && (i > stageNum || wet)) {
+				mass += stage.fuselage.part.getTankSize() * stage.fuselageCount / 4; // Reduced fuel weight to improve multi-stages
 			}
 		}
 
-		return MathHelper.ceiling_float_int(mass * 0.1F);
+		return MathHelper.ceiling_float_int(mass);
 	}
 
 	public double getHeight() {
@@ -320,6 +361,8 @@ public class RocketStruct {
 			stagesTag.appendTag(stageTag);
 		}
 		nbt.setTag("stages", stagesTag);
+
+		nbt.setInteger("freq", satFreq);
 	}
 
 	public static RocketStruct readFromNBT(NBTTagCompound nbt) {

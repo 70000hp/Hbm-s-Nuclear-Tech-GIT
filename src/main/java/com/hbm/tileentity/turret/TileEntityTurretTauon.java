@@ -3,17 +3,16 @@ package com.hbm.tileentity.turret;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hbm.handler.BulletConfigSyncingUtil;
-import com.hbm.handler.BulletConfiguration;
 import com.hbm.inventory.gui.GUITurretTauon;
+import com.hbm.items.weapon.sedna.BulletConfig;
+import com.hbm.items.weapon.sedna.factory.XFactoryAccelerator;
 import com.hbm.lib.ModDamageSource;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
@@ -24,7 +23,7 @@ public class TileEntityTurretTauon extends TileEntityTurretBaseNT {
 	static List<Integer> configs = new ArrayList();
 	
 	static {
-		configs.add(BulletConfigSyncingUtil.SPECIAL_GAUSS);
+		configs.add(XFactoryAccelerator.tau_uranium.id);
 	}
 	
 	@Override
@@ -124,7 +123,7 @@ public class TileEntityTurretTauon extends TileEntityTurretBaseNT {
 		
 		if(timer % 5 == 0) {
 			
-			BulletConfiguration conf = this.getFirstConfigLoaded();
+			BulletConfig conf = this.getFirstConfigLoaded();
 			
 			if(conf != null && this.target != null) {
 				this.target.attackEntityFrom(ModDamageSource.electricity, 30F + worldObj.rand.nextInt(11));
@@ -159,7 +158,7 @@ public class TileEntityTurretTauon extends TileEntityTurretBaseNT {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUITurretTauon(player.inventory, this);
 	}
 }

@@ -16,7 +16,6 @@ import api.hbm.fluid.IFluidStandardReceiver;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -62,9 +61,9 @@ public class TileEntityMachineIGenerator extends TileEntityMachineBase implement
 	public TileEntityMachineIGenerator() {
 		super(21);
 		tanks = new FluidTank[3];
-		tanks[0] = new FluidTank(Fluids.WATER, waterCap, 0);
-		tanks[1] = new FluidTank(Fluids.HEATINGOIL, oilCap, 1);
-		tanks[2] = new FluidTank(Fluids.LUBRICANT, lubeCap, 2);
+		tanks[0] = new FluidTank(Fluids.WATER, waterCap);
+		tanks[1] = new FluidTank(Fluids.HEATINGOIL, oilCap);
+		tanks[2] = new FluidTank(Fluids.LUBRICANT, lubeCap);
 	}
 
 	@Override
@@ -287,7 +286,7 @@ public class TileEntityMachineIGenerator extends TileEntityMachineBase implement
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIIGenerator(player.inventory, this);
 	}
 

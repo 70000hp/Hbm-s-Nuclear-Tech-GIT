@@ -3,18 +3,20 @@ package com.hbm.tileentity;
 import java.util.List;
 
 import com.hbm.dim.CelestialBody;
+import com.hbm.dim.orbit.WorldProviderOrbit;
 import com.hbm.dim.trait.CBT_Atmosphere;
 import com.hbm.handler.atmosphere.AtmosphereBlob;
 import com.hbm.handler.atmosphere.ChunkAtmosphereManager;
 import com.hbm.inventory.fluid.Fluids;
-import com.hbm.packet.AuxGaugePacket;
-import com.hbm.packet.BufPacket;
-import com.hbm.packet.NBTPacket;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxGaugePacket;
+import com.hbm.packet.toclient.BufPacket;
+import com.hbm.packet.toclient.NBTPacket;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -29,6 +31,9 @@ public abstract class TileEntityMachineBase extends TileEntityLoadedBase impleme
 	public ItemStack slots[];
 	
 	private String customName;
+	
+	private NBTTagCompound lastPackedNBT = null;
+	private ByteBuf lastPackedBuf = null;
 	
 	public TileEntityMachineBase(int slotCount) {
 		slots = new ItemStack[slotCount];
@@ -164,7 +169,18 @@ public abstract class TileEntityMachineBase extends TileEntityLoadedBase impleme
 	
 	@Deprecated public void networkPack(NBTTagCompound nbt, int range) {
 		nbt.setBoolean("muffled", muffled);
-		if(!worldObj.isRemote) PacketDispatcher.wrapper.sendToAllAround(new NBTPacket(nbt, xCoord, yCoord, zCoord), new TargetPoint(this.worldObj.provider.dimensionId, xCoord, yCoord, zCoord, range));
+
+		if(worldObj.isRemote) {
+			return;
+		}
+
+		// Same as networkPackNT
+		if (lastPackedNBT != null && lastPackedNBT.equals(nbt) && worldObj.getWorldTime() % 20 != 0) {
+			return;
+		}
+		this.lastPackedNBT = nbt;
+
+		PacketDispatcher.wrapper.sendToAllAround(new NBTPacket(nbt, xCoord, yCoord, zCoord), new TargetPoint(this.worldObj.provider.dimensionId, xCoord, yCoord, zCoord, range));
 	}
 	
 	@Deprecated
@@ -174,7 +190,27 @@ public abstract class TileEntityMachineBase extends TileEntityLoadedBase impleme
 	
 	/** Sends a sync packet that uses ByteBuf for efficient information-cramming */
 	public void networkPackNT(int range) {
-		if(!worldObj.isRemote) PacketDispatcher.wrapper.sendToAllAround(new BufPacket(xCoord, yCoord, zCoord, this), new TargetPoint(this.worldObj.provider.dimensionId, xCoord, yCoord, zCoord, range));
+		if(worldObj.isRemote) {
+			return;
+		}
+
+		BufPacket packet = new BufPacket(xCoord, yCoord, zCoord, this);
+		ByteBuf buf = Unpooled.buffer();
+		packet.toBytes(buf);
+
+		// Don't send unnecessary packets, except for maybe one every second or so.
+		// If we stop sending duplicate packets entirely, this causes issues when
+		// a client unloads and then loads back a chunk with an unchanged tile entity.
+		// For that client, the tile entity will appear default until anything changes about it.
+		// In my testing, this can be reliably reproduced with a full fluid barrel, for instance.
+		// I think it might be fixable by doing something with getDescriptionPacket() and onDataPacket(),
+		// but this sidesteps the problem for the mean time.
+		if (lastPackedBuf != null && buf.equals(lastPackedBuf) && worldObj.getWorldTime() % 20 != 0) {
+			return;
+		}
+		this.lastPackedBuf = buf;
+
+		PacketDispatcher.wrapper.sendToAllAround(packet, new TargetPoint(this.worldObj.provider.dimensionId, xCoord, yCoord, zCoord, range));
 	}
 
 	@Override public void serialize(ByteBuf buf) {
@@ -247,7 +283,7 @@ public abstract class TileEntityMachineBase extends TileEntityLoadedBase impleme
 
 	// TODO: Consume air from connected tanks if available	
 	public boolean breatheAir(int amount) {
-		CBT_Atmosphere atmosphere = CelestialBody.getTrait(worldObj, CBT_Atmosphere.class);
+		CBT_Atmosphere atmosphere = worldObj.provider instanceof WorldProviderOrbit ? null : CelestialBody.getTrait(worldObj, CBT_Atmosphere.class);
 		if(atmosphere != null) {
 			if(atmosphere.hasFluid(Fluids.AIR, 0.19) || atmosphere.hasFluid(Fluids.OXYGEN, 0.09)) {
 				return true;

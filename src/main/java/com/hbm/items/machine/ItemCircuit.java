@@ -36,12 +36,19 @@ public class ItemCircuit extends ItemEnumMulti {
 		list.add(new ItemStack(item, 1, EnumCircuitType.BISMOID.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.AVIONICS.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.AERO.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.GAAS.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.QUANTUM.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.CONTROLLER_CHASSIS.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.CONTROLLER.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.CONTROLLER_ADVANCED.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.CONTROLLER_QUANTUM.ordinal()));
 		list.add(new ItemStack(item, 1, EnumCircuitType.CAPACITOR_LANTHANIUM.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.PROCESST1.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.PROCESST2.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.PROCESST3.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.GASCHIP.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.HFCHIP.ordinal()));
+		list.add(new ItemStack(item, 1, EnumCircuitType.MOLYCHIP.ordinal()));
 	}
 
 	public static enum EnumCircuitType {
@@ -50,6 +57,7 @@ public class ItemCircuit extends ItemEnumMulti {
 		CAPACITOR_TANTALIUM,
 		PCB,
 		SILICON,
+		GAAS,
 		CHIP,
 		CHIP_BISMOID,
 		ANALOG,
@@ -67,6 +75,12 @@ public class ItemCircuit extends ItemEnumMulti {
 		CONTROLLER_QUANTUM,
 		ATOMIC_CLOCK,
 		CAPACITOR_LANTHANIUM,
+		PROCESST1,
+		PROCESST2,
+		PROCESST3,
+		GASCHIP,
+		HFCHIP,
+		MOLYCHIP,
 	}
 	
 	@Override

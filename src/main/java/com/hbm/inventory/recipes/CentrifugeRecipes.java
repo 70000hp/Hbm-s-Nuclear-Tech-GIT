@@ -15,10 +15,12 @@ import com.hbm.config.GeneralConfig;
 import com.hbm.handler.imc.IMCCentrifuge;
 import static com.hbm.inventory.OreDictManager.*;
 import com.hbm.inventory.OreDictManager.DictFrame;
+import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
+import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ItemEnums.EnumChunkType;
@@ -448,7 +450,7 @@ public class CentrifugeRecipes extends SerializableRecipe {
 				lbs ? new ItemStack(ModItems.nugget_ra226, 2) : new ItemStack(ModItems.nugget_ra226, 1),
 				new ItemStack(Blocks.gravel, 1) });
 		
-		recipes.put(new OreDictStack(TH232.ore()), new ItemStack[] {
+		for(String ore : OreDictManager.TH232.all(MaterialShapes.ORE)) recipes.put(new OreDictStack(ore), new ItemStack[] {
 				new ItemStack(ModItems.powder_thorium, 1),
 				new ItemStack(ModItems.powder_thorium, 1),
 				new ItemStack(ModItems.powder_uranium, 1),
@@ -496,11 +498,11 @@ public class CentrifugeRecipes extends SerializableRecipe {
 				new ItemStack(ModItems.ingot_phosphorus),
 				new ItemStack(Blocks.netherrack) });
 
-		recipes.put(new ComparableStack(ModBlocks.ore_fire), new ItemStack[] {
+		recipes.put(new OreDictStack(P_RED.ore()), new ItemStack[] {
 				new ItemStack(Items.blaze_powder, 2),
 				new ItemStack(ModItems.powder_fire, 2),
 				new ItemStack(ModItems.ingot_phosphorus),
-				new ItemStack(Blocks.netherrack) });
+				new ItemStack(Blocks.gravel) });
 		
 		recipes.put(new OreDictStack(CO.ore()), new ItemStack[] {
 				new ItemStack(ModItems.powder_cobalt, 2),
@@ -521,39 +523,39 @@ public class CentrifugeRecipes extends SerializableRecipe {
 				new ItemStack(ModItems.dust) });
 		//nitric acid needs air chem to use, something that c
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 0), new ItemStack[] { //peroxide, easy to use and get
-				new ItemStack(ModItems.powder_iron, 4),
-				new ItemStack(ModItems.powder_aluminium, 3),
-				new ItemStack(ModItems.powder_copper, 3), 
-				new ItemStack(ModItems.nugget_beryllium, 1) });
+				new ItemStack(ModItems.powder_niobium, 4),
+				new ItemStack(ModItems.powder_cobalt, 2),
+				new ItemStack(ModItems.powder_zirconium, 1), 
+				new ItemStack(ModItems.powder_beryllium, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 1), new ItemStack[] { //nitric acid, harder and energy expensive
-				new ItemStack(ModItems.powder_asbestos, 2),
+				new ItemStack(ModItems.powder_gallium, 4),
 				new ItemStack(ModItems.powder_beryllium, 2),
-				new ItemStack(ModItems.nugget_mercury, 3), //temp
-				new ItemStack(ModItems.nugget_hafnium, 2) });
+				new ItemStack(ModItems.powder_niobium, 1), 
+				new ItemStack(ModItems.fragment_lanthanium, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 2), new ItemStack[] { //sulfuric acid, less harder
-				new ItemStack(ModItems.powder_beryllium, 2),
-				new ItemStack(ModItems.powder_aluminium, 3),
-				new ItemStack(ModItems.powder_nickel, 3), //temp
-				new ItemStack(ModItems.powder_calcium, 1) });
+				new ItemStack(ModItems.powder_beryllium, 4),
+				new ItemStack(ModItems.powder_niobium, 2),
+				new ItemStack(ModItems.powder_gallium, 1), 
+				new ItemStack(ModItems.fragment_lanthanium, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 3), new ItemStack[] {// solvent uses *oil* something that sulfuric doesnt
-				new ItemStack(ModItems.nugget_gallium, 1),
-				new ItemStack(ModItems.powder_boron, 2),
-				new ItemStack(ModItems.powder_cobalt, 1), //temp
-				new ItemStack(ModItems.powder_lithium, 6) });
+				new ItemStack(ModItems.powder_cobalt, 4),
+				new ItemStack(ModItems.powder_gallium, 2),
+				new ItemStack(ModItems.powder_niobium, 1),
+				new ItemStack(ModItems.powder_coltan, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 4), new ItemStack[] {  // chlorine is important mid-lategame. since it makes Plastics
-				new ItemStack(ModItems.powder_neodymium, 1),
-				new ItemStack(ModItems.powder_niobium, 2),
-				new ItemStack(ModItems.powder_gallium_tiny, 2), //temp
-				new ItemStack(ModItems.powder_lithium, 1) });
+				new ItemStack(ModItems.powder_zirconium, 4),
+				new ItemStack(ModItems.powder_neodymium, 2),
+				new ItemStack(ModItems.powder_niobium, 1), 
+				new ItemStack(ModItems.powder_cobalt, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.mineral_fragment, 1, 5), new ItemStack[] { // shchrab acid can go fuck itself
 				new ItemStack(ModItems.powder_co60, 1),
 				new ItemStack(ModItems.nugget_bismuth, 1),
-				new ItemStack(ModItems.powder_asbestos, 6), //temp
+				new ItemStack(ModItems.powder_asbestos, 6),
 				new ItemStack(ModItems.nugget_technetium, 1) });
 		
 		recipes.put(new ComparableStack(ModItems.powder_ash, 1, EnumAshType.COAL.ordinal()), new ItemStack[] {
@@ -623,13 +625,13 @@ public class CentrifugeRecipes extends SerializableRecipe {
 			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_SOLVENT, type)), new ItemStack[] {ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NOSOLVENT, type, 2), ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_BYPRODUCT, type, 2), ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_BYPRODUCT, type, 2)});
 			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_RAD, type)), new ItemStack[] {ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NORAD, type, 2), ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_BYPRODUCT, type, 2), ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_BYPRODUCT, type, 2), ItemBedrockOreNew.make(BedrockOreGrade.RAD_BYPRODUCT, type, 2)});
 
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_ROASTED, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NOSULFURIC, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NOSOLVENT, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NORAD, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_FIRST, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type, 2)});
-			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_SECOND, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.extract(type.primary2), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type, 2)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_ROASTED, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NOSULFURIC, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NOSOLVENT, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_NORAD, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_FIRST, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type, 2)});
+			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_SECOND, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.primary1, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.extract(type.primary2, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type, 2)});
 
 			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_WASHED, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.byproductAcid1, 1), ItemBedrockOreNew.extract(type.byproductAcid2, 1), ItemBedrockOreNew.extract(type.byproductAcid3, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
 			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_WASHED, type)), new ItemStack[] {ItemBedrockOreNew.extract(type.byproductSolvent1, 1), ItemBedrockOreNew.extract(type.byproductSolvent2, 1), ItemBedrockOreNew.extract(type.byproductSolvent3, 1), ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)});
@@ -681,8 +683,8 @@ public class CentrifugeRecipes extends SerializableRecipe {
 		recipes.put(new ComparableStack(ModItems.crystal_cobalt), new ItemStack[] { new ItemStack(ModItems.powder_cobalt, 2), new ItemStack(ModItems.powder_iron, 3), new ItemStack(ModItems.powder_copper, 3), new ItemStack(ModItems.powder_lithium_tiny, 1) });
 		recipes.put(new ComparableStack(ModItems.crystal_mineral), new ItemStack[] { new ItemStack(ModItems.mineral_dust, 2), new ItemStack(ModItems.powder_iron, 2), new ItemStack(ModItems.powder_aluminium, 2), new ItemStack(ModItems.powder_lithium_tiny, 1) });
 		recipes.put(new ComparableStack(ModItems.crystal_nickel), new ItemStack[] { new ItemStack(ModItems.powder_nickel, 2), new ItemStack(ModItems.powder_nickel, 2), new ItemStack(ModItems.powder_iron, 2), new ItemStack(ModItems.powder_titanium, 1) });
-		}
-	
+		recipes.put(new ComparableStack(ModItems.crystal_niobium), new ItemStack[] { new ItemStack(ModItems.powder_niobium, 2), new ItemStack(ModItems.powder_niobium, 2), new ItemStack(ModItems.powder_iron, 2), new ItemStack(ModItems.nugget_hafnium, 1) }); //THERE WE GO
+	}
 
 	
 	

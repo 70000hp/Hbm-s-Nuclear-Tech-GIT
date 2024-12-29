@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.hbm.handler.MultiblockHandlerXR;
 import com.hbm.handler.ThreeInts;
+import com.hbm.interfaces.ICopiable;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.IPersistentNBT;
 
@@ -15,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -32,7 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class BlockDummyable extends BlockContainer implements ICustomBlockHighlight {
+public abstract class BlockDummyable extends BlockContainer implements ICustomBlockHighlight, ICopiable {
 
 	public BlockDummyable(Material mat) {
 		super(mat);
@@ -93,6 +95,22 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 
 		super.updateTick(world, x, y, z, rand);
 
+		if(!internalPlayers.isEmpty()) {
+			boolean anyStillInside = false;
+			for(EntityPlayer player : internalPlayers) {
+				if(isPlayerInside(world, player)) {
+					anyStillInside = true;
+					break;
+				}
+			}
+
+			if(anyStillInside) {
+				world.scheduleBlockUpdate(x, y, z, this, 1);
+			} else {
+				internalPlayers.clear();
+			}
+		}
+
 		if(world.isRemote)
 			return;
 
@@ -116,7 +134,7 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		return findCoreRec(world, x, y, z);
 	}
 
-	List<ThreeInts> positions = new ArrayList();
+	List<ThreeInts> positions = new ArrayList<>();
 
 	public int[] findCoreRec(World world, int x, int y, int z) {
 
@@ -149,10 +167,17 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 	}
 
 	@Override
+	public int onBlockPlaced(World world, int x, int y, int z, int side, float fX, float fY, float fZ, int meta) {
+		return side;
+	}
+
+	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
 
 		if(!(player instanceof EntityPlayer))
 			return;
+
+		ForgeDirection placedSide = ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z));
 
 		safeRem = true;
 		world.setBlockToAir(x, y, z);
@@ -161,27 +186,41 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		EntityPlayer pl = (EntityPlayer) player;
 
 		int i = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-		int o = -getOffset();
-		y += getHeightOffset();
 
-		ForgeDirection dir = ForgeDirection.NORTH;
+		// The direction the player is facing, for offsetting the block away from the player
+		ForgeDirection facingDir = ForgeDirection.NORTH;
 
-		if(i == 0) {
-			dir = ForgeDirection.getOrientation(2);
-		}
-		if(i == 1) {
-			dir = ForgeDirection.getOrientation(5);
-		}
-		if(i == 2) {
-			dir = ForgeDirection.getOrientation(3);
-		}
-		if(i == 3) {
-			dir = ForgeDirection.getOrientation(4);
+		if(placedSide == ForgeDirection.UP || placedSide == ForgeDirection.DOWN) {
+			if(i == 0) facingDir = ForgeDirection.getOrientation(2);
+			if(i == 1) facingDir = ForgeDirection.getOrientation(5);
+			if(i == 2) facingDir = ForgeDirection.getOrientation(3);
+			if(i == 3) facingDir = ForgeDirection.getOrientation(4);
+		} else {
+			facingDir = placedSide;
 		}
 		
-		dir = getDirModified(dir);
+		// The direction the final multiblock will be facing
+		ForgeDirection dir = getDirModified(facingDir);
 
-		if(!checkRequirement(world, x, y, z, dir, o)) {
+		int o = -getOffset();
+
+		int ox = x + facingDir.offsetX * o;
+		int oy = y + getHeightOffset();
+		int oz = z + facingDir.offsetZ * o;
+
+		// Modify offsets to handle differing rotations and placing blocks on walls
+		if(placedSide == ForgeDirection.DOWN) {
+			int[] dim = getDimensions();
+			oy -= dim[0] + dim[1];
+		} else if(placedSide != ForgeDirection.UP) {
+			int[] rotDim = MultiblockHandlerXR.rotate(getDimensions(), dir);
+			if(rotDim != null) {
+				ox = x + placedSide.offsetX * rotDim[placedSide.getOpposite().ordinal()];
+				oz = z + placedSide.offsetZ * rotDim[placedSide.getOpposite().ordinal()];
+			}
+		}
+
+		if(!checkRequirement(world, ox, oy, oz, dir, 0)) {
 
 			if(!pl.capabilities.isCreativeMode) {
 				ItemStack stack = pl.inventory.mainInventory[pl.inventory.currentItem];
@@ -203,23 +242,28 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 
 		if(!world.isRemote) {
 			//this is separate because the multiblock rotation and the final meta might not be the same
-			int meta = getMetaForCore(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, (EntityPlayer) player, dir.ordinal() + offset);
-			//lastCore = new BlockPos(x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o);
-			world.setBlock(x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, this, meta, 3);
-			IPersistentNBT.restoreData(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, itemStack);
-			fillSpace(world, x, y, z, dir, o);
+			int meta = getMetaForCore(world, ox, oy, oz, pl, dir.ordinal() + offset);
+
+			world.setBlock(ox, oy, oz, this, meta, 3);
+			IPersistentNBT.restoreData(world, ox, oy, oz, itemStack);
+			fillSpace(world, ox - dir.offsetX * o, oy, oz - dir.offsetZ * o, dir, o);
 		}
-		y -= getHeightOffset();
+
+		// Check if the placing player is inside the placed multiblock
+		if(isPlayerInside(world, pl)) internalPlayers.add(pl);
+
 		world.scheduleBlockUpdate(x, y, z, this, 1);
 		world.scheduleBlockUpdate(x, y, z, this, 2);
 
 		super.onBlockPlacedBy(world, x, y, z, player, itemStack);
 	}
 
-	/*@Override
-	public void onBlockAdded(World world, int x, int y, int z) {
-		lastBlockSet = new BlockPos(x, y, z);
-	}*/
+	private boolean isPlayerInside(World world, EntityPlayer player) {
+		int x = MathHelper.floor_double(player.posX);
+		int y = MathHelper.floor_double(player.posY + 0.1D);
+		int z = MathHelper.floor_double(player.posZ);
+		return world.getBlock(x, y, z) == this || world.getBlock(x, y + 1, z) == this;
+	}
 	
 	/**
 	 * A bit more advanced than the dir modifier, but it is important that the resulting direction meta is in the core range.
@@ -267,9 +311,9 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 			return;
 
 		// world.setBlockMetadataWithNotify(x, y, z, meta + extra, 3);
-		this.safeRem = true;
+		safeRem = true;
 		world.setBlock(x, y, z, this, meta + extra, 3);
-		this.safeRem = false;
+		safeRem = false;
 	}
 	
 	public void removeExtra(World world, int x, int y, int z) {
@@ -283,9 +327,9 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 			return;
 
 		// world.setBlockMetadataWithNotify(x, y, z, meta + extra, 3);
-		this.safeRem = true;
+		safeRem = true;
 		world.setBlock(x, y, z, this, meta - extra, 3);
-		this.safeRem = false;
+		safeRem = false;
 	}
 
 	// checks if the dummy metadata is within the extra range
@@ -423,10 +467,16 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		return !bounding.isEmpty();
 	}
 	
-	public List<AxisAlignedBB> bounding = new ArrayList();
+	public List<AxisAlignedBB> bounding = new ArrayList<>();
 
+	// players currently inside instances of this block
+	private List<EntityPlayer> internalPlayers = new ArrayList<>();
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB entityBounding, List list, Entity entity) {
+		if(!internalPlayers.isEmpty() && internalPlayers.contains(entity))
+			return;
 		
 		if(!this.useDetailedHitbox()) {
 			super.addCollisionBoxesToList(world, x, y, z, entityBounding, list, entity);
@@ -443,7 +493,7 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		z = pos[2];
 		
 		for(AxisAlignedBB aabb :this.bounding) {
-			AxisAlignedBB boxlet = getAABBRotationOffset(aabb, x + 0.5, y, z + 0.5, ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z) - this.offset).getRotation(ForgeDirection.UP));
+			AxisAlignedBB boxlet = getAABBRotationOffset(aabb, x + 0.5, y, z + 0.5, ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z) - offset).getRotation(ForgeDirection.UP));
 			
 			if(entityBounding.intersectsWith(boxlet)) {
 				list.add(boxlet);
@@ -504,7 +554,34 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		int meta = world.getBlockMetadata(x, y, z);
 
 		ICustomBlockHighlight.setup();
-		for(AxisAlignedBB aabb : this.bounding) event.context.drawOutlinedBoundingBox(getAABBRotationOffset(aabb.expand(exp, exp, exp), 0, 0, 0, ForgeDirection.getOrientation(meta - offset).getRotation(ForgeDirection.UP)).getOffsetBoundingBox(x - dX + 0.5, y - dY, z - dZ + 0.5), -1);
+		for(AxisAlignedBB aabb : this.bounding) RenderGlobal.drawOutlinedBoundingBox(getAABBRotationOffset(aabb.expand(exp, exp, exp), 0, 0, 0, ForgeDirection.getOrientation(meta - offset).getRotation(ForgeDirection.UP)).getOffsetBoundingBox(x - dX + 0.5, y - dY, z - dZ + 0.5), -1);
 		ICustomBlockHighlight.cleanup();
+	}
+
+	@Override
+	public NBTTagCompound getSettings(World world, int x, int y, int z) {
+		int[] pos = findCore(world, x, y, z);
+		TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+		if (tile instanceof ICopiable)
+			return ((ICopiable) tile).getSettings(world, pos[0], pos[1], pos[2]);
+		else
+			return null;
+	}
+
+	@Override
+	public void pasteSettings(NBTTagCompound nbt, int index, World world, EntityPlayer player, int x, int y, int z) {
+		int[] pos = findCore(world, x, y, z);
+		TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+		if (tile instanceof ICopiable)
+			((ICopiable) tile).pasteSettings(nbt, index, world, player, pos[0], pos[1], pos[2]);
+	}
+
+	@Override
+	public String[] infoForDisplay(World world, int x, int y, int z) {
+		int[] pos = findCore(world, x, y, z);
+		TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+		if (tile instanceof ICopiable)
+			return ((ICopiable) tile).infoForDisplay(world, x, y, z);
+		return null;
 	}
 }

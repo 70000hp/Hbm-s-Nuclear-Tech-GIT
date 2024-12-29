@@ -16,7 +16,7 @@ public abstract class BiomeGenBaseEve extends BiomeGenBaseCelestial {
 	public static final BiomeGenBase eveOcean = new BiomeGenEveOcean(SpaceConfig.eveOceanBiome).setTemperatureRainfall(1.0F, 0.5F);
 	public static final BiomeGenBase eveMountains = new BiomeGenEveMountains(SpaceConfig.eveMountainsBiome).setTemperatureRainfall(1.0F, 0.5F);
 	public static final BiomeGenBase eveSeismicPlains = new BiomeGenEveSeismicPlains(SpaceConfig.eveSeismicBiome).setTemperatureRainfall(1.0F, 0.5F);
-	public static final BiomeGenBase eveRiver = new BiomeGenEveRiver(128).setTemperatureRainfall(1.0F, 0.5F);
+	public static final BiomeGenBase eveRiver = new BiomeGenEveRiver(SpaceConfig.eveRiverBiome).setTemperatureRainfall(1.0F, 0.5F);
 
 	public BiomeGenBaseEve(int id) {
 		super(id);

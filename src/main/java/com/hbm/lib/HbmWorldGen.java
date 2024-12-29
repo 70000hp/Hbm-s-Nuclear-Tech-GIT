@@ -4,7 +4,6 @@ import java.util.Random;
 
 import com.hbm.blocks.BlockEnums.EnumStoneType;
 import com.hbm.blocks.ModBlocks;
-import com.hbm.blocks.generic.BlockMotherOfAllOres;
 import com.hbm.blocks.generic.BlockNTMFlower.EnumFlowerType;
 import com.hbm.config.GeneralConfig;
 import com.hbm.config.MobConfig;
@@ -51,6 +50,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBeach;
 import net.minecraft.world.biome.BiomeGenForest;
 import net.minecraft.world.biome.BiomeGenJungle;
+import net.minecraft.world.biome.BiomeGenPlains;
 import net.minecraft.world.biome.BiomeGenRiver;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
@@ -123,6 +123,9 @@ public class HbmWorldGen implements IWorldGenerator {
 			if(rand.nextInt(64) == 0) {
 				DungeonToolbox.generateFlowers(world, rand, i, j, ModBlocks.plant_flower, EnumFlowerType.WEED.ordinal());
 			}
+			if(biome instanceof BiomeGenPlains && rand.nextInt(16) == 0) {
+				DungeonToolbox.generateFlowers(world, rand, i, j, ModBlocks.plant_flower, EnumFlowerType.STRAWBERRY.ordinal());
+			}
 			if(biome instanceof BiomeGenRiver && rand.nextInt(4) == 0) {
 				DungeonToolbox.generateFlowers(world, rand, i, j, ModBlocks.reeds, 0);
 			}
@@ -131,18 +134,14 @@ public class HbmWorldGen implements IWorldGenerator {
 			}
 		}
 
-		if(WorldConfig.alexandriteSpawn > 0 && rand.nextInt(WorldConfig.alexandriteSpawn) == 0) {
-			DungeonToolbox.generateOre(world, rand, i, j, 1, 3, 10, 5, ModBlocks.ore_alexandrite);
-		}
-		
-		if(WorldConfig.oilcoalSpawn > 0 && rand.nextInt(WorldConfig.oilcoalSpawn) == 0)
-			DungeonToolbox.generateOre(world, rand, i, j, 1, 64, 32, 32, ModBlocks.ore_coal_oil);
-
 		if(WorldConfig.gasbubbleSpawn > 0 && rand.nextInt(WorldConfig.gasbubbleSpawn) == 0)
 			DungeonToolbox.generateOre(world, rand, i, j, 1, 32, 30, 10, ModBlocks.gas_flammable, 1);
 
 		if(WorldConfig.explosivebubbleSpawn > 0 && rand.nextInt(WorldConfig.explosivebubbleSpawn) == 0)
 			DungeonToolbox.generateOre(world, rand, i, j, 1, 32, 30, 10, ModBlocks.gas_explosive, 1);
+			
+		if(WorldConfig.alexandriteSpawn > 0 && rand.nextInt(WorldConfig.alexandriteSpawn) == 0)
+			DungeonToolbox.generateOre(world, rand, i, j, 1, 3, 10, 5, ModBlocks.ore_alexandrite);
 
 		if(WorldConfig.overworldOre) {
 
@@ -170,7 +169,7 @@ public class HbmWorldGen implements IWorldGenerator {
 			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.copperSpawn, 6, 5, 45, ModBlocks.ore_copper);
 			// DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.nickelSpawn, 6, 5, 10, ModBlocks.ore_nickel);
 			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.zincSpawn, 6, 5, 32, ModBlocks.ore_zinc);
-			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.mineralSpawn, 10, 12, 32, ModBlocks.ore_mineral);
+			// DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.mineralSpawn, 10, 12, 32, ModBlocks.ore_mineral);
 			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.fluoriteSpawn, 4, 5, 45, ModBlocks.ore_fluorite);
 			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.niterSpawn, 6, 5, 30, ModBlocks.ore_niter);
 			DungeonToolbox.generateOre(world, rand, i, j, WorldConfig.tungstenSpawn, 8, 5, 30, ModBlocks.ore_tungsten);
@@ -216,14 +215,6 @@ public class HbmWorldGen implements IWorldGenerator {
 				int randPosZ = j + rand.nextInt(2) + 8;
 				BedrockOre.generate(world, randPosX, randPosZ, def.stack, def.acid, def.color, def.tier);
 			}
-
-			// }
-
-			for(int k = 0; k < WorldConfig.randomSpawn; k++) {
-				BlockMotherOfAllOres.shuffleOverride(rand);
-				DungeonToolbox.generateOre(world, rand, i, j, 1, 10, 4, 30, ModBlocks.ore_random);
-			}
-			BlockMotherOfAllOres.resetOverride();
 			
 			if(GeneralConfig.enable528ColtanSpawn) {
 				DungeonToolbox.generateOre(world, rand, i, j, GeneralConfig.coltanRate, 4, 15, 40, ModBlocks.ore_coltan);
@@ -426,14 +417,16 @@ public class HbmWorldGen implements IWorldGenerator {
 				int x = i + rand.nextInt(16) + 8;
 				int z = j + rand.nextInt(16) + 8;
 				int y = world.getHeightValue(x, z);
-
-				if(world.getBlock(x, y - 1, z).canPlaceTorchOnTop(world, x, y - 1, z)) {
-					world.setBlock(x, y, z, ModBlocks.mine_ap);
-					TileEntityLandmine landmine = (TileEntityLandmine) world.getTileEntity(x, y, z);
-					landmine.waitingForPlayer = true;
-
-					if(GeneralConfig.enableDebugMode)
-						MainRegistry.logger.info("[Debug] Successfully spawned landmine at " + x + " " + (y) + " " + z);
+				
+				for(int g = y + 2; g >= y; g--) {
+	
+					if(world.getBlock(x, g - 1, z).canPlaceTorchOnTop(world, x, g - 1, z)) {
+						world.setBlock(x, g, z, ModBlocks.mine_ap);
+						TileEntityLandmine landmine = (TileEntityLandmine) world.getTileEntity(x, g, z);
+						landmine.waitingForPlayer = true;
+						if(GeneralConfig.enableDebugMode) MainRegistry.logger.info("[Debug] Successfully spawned landmine at " + x + " " + g + " " + z);
+						break;
+					}
 				}
 			}
 

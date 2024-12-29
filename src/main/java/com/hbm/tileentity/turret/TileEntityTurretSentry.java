@@ -3,19 +3,18 @@ package com.hbm.tileentity.turret;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hbm.handler.BulletConfigSyncingUtil;
-import com.hbm.handler.BulletConfiguration;
 import com.hbm.handler.CasingEjector;
 import com.hbm.inventory.container.ContainerTurretBase;
 import com.hbm.inventory.gui.GUITurretSentry;
-import com.hbm.packet.AuxParticlePacketNT;
+import com.hbm.items.weapon.sedna.BulletConfig;
+import com.hbm.items.weapon.sedna.factory.XFactory9mm;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.tileentity.IGUIProvider;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -38,11 +37,10 @@ public class TileEntityTurretSentry extends TileEntityTurretBaseNT implements IG
 	static List<Integer> configs = new ArrayList();
 	
 	static {
-		configs.add(BulletConfigSyncingUtil.R5_NORMAL);
-		configs.add(BulletConfigSyncingUtil.R5_EXPLOSIVE);
-		configs.add(BulletConfigSyncingUtil.R5_DU);
-		configs.add(BulletConfigSyncingUtil.R5_STAR);
-		configs.add(BulletConfigSyncingUtil.CHL_R5);
+		configs.add(XFactory9mm.p9_sp.id);
+		configs.add(XFactory9mm.p9_fmj.id);
+		configs.add(XFactory9mm.p9_jhp.id);
+		configs.add(XFactory9mm.p9_ap.id);
 	}
 	
 	@Override
@@ -162,11 +160,11 @@ public class TileEntityTurretSentry extends TileEntityTurretBaseNT implements IG
 		
 		if(timer % 10 == 0) {
 			
-			BulletConfiguration conf = this.getFirstConfigLoaded();
+			BulletConfig conf = this.getFirstConfigLoaded();
 			
 			if(conf != null) {
-				this.cachedCasingConfig = conf.spentCasing;
-				this.spawnBullet(conf);
+				this.cachedCasingConfig = conf.casing;
+				this.spawnBullet(conf, 5F);
 				this.conusmeAmmo(conf.ammo);
 				this.worldObj.playSoundEffect(xCoord, yCoord, zCoord, "hbm:turret.sentry_fire", 2.0F, 1.0F);
 				
@@ -256,7 +254,7 @@ public class TileEntityTurretSentry extends TileEntityTurretBaseNT implements IG
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUITurretSentry(player.inventory, this);
 	}
 }

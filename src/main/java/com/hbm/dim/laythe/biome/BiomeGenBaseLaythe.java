@@ -21,13 +21,13 @@ public abstract class BiomeGenBaseLaythe extends BiomeGenBaseCelestial {
 
 	public static final BiomeGenBase laytheIsland = new BiomeGenLaytheIslands(SpaceConfig.laytheBiome).setTemperatureRainfall(0.2F, 0.2F);
 	public static final BiomeGenBase laytheOcean = new BiomeGenLaytheOcean(SpaceConfig.laytheOceanBiome).setTemperatureRainfall(0.2F, 0.2F);
-	
-	@SuppressWarnings("unchecked")
+	public static final BiomeGenBase laythePolar = new BiomeGenLaythePolar(SpaceConfig.laythePolarBiome).setTemperatureRainfall(0.2F, 0.2F);
+
 	public BiomeGenBaseLaythe(int id) {
 		super(id);
 		this.waterColorMultiplier = 0x5b009a;
 
-        this.spawnableWaterCreatureList.add(new BiomeGenBase.SpawnListEntry(EntityScutterfish.class, 10, 4, 4));
+        this.waterCreatures.add(new BiomeGenBase.SpawnListEntry(EntityScutterfish.class, 10, 4, 4));
 
 		BiomeDecoratorCelestial decorator = new BiomeDecoratorCelestial(Blocks.stone);
 		decorator.waterPlantsPerChunk = 32;

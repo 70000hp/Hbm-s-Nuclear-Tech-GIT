@@ -1,8 +1,14 @@
 package com.hbm.dim;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.hbm.util.Compat;
+import com.hbm.world.WorldUtil;
+import com.hbm.world.biome.BiomeGenCraterBase;
+
+import cpw.mods.fml.common.Loader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
@@ -11,8 +17,10 @@ import net.minecraft.util.IProgressUpdate;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
+import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGenerator;
@@ -307,10 +315,16 @@ public abstract class ChunkProviderCelestial implements IChunkProvider {
 		BlockMetaBuffer ablock = getChunkPrimer(x, z);
 		Chunk chunk = new Chunk(worldObj, ablock.blocks, ablock.metas, x, z);
 
-		byte[] abyte1 = chunk.getBiomeArray();
-
-		for(int k = 0; k < abyte1.length; ++k) {
-			abyte1[k] = (byte) biomesForGeneration[k].biomeID;
+		if(Loader.isModLoaded(Compat.MOD_EIDS)) {
+			short[] biomes = WorldUtil.getBiomeShortArray(chunk);
+			for(int k = 0; k < biomes.length; ++k) {
+				biomes[k] = (short) biomesForGeneration[k].biomeID;
+			}
+		} else {
+			byte[] biomes = chunk.getBiomeArray();
+			for(int k = 0; k < biomes.length; ++k) {
+				biomes[k] = (byte) biomesForGeneration[k].biomeID;
+			}
 		}
 
 		chunk.generateSkylightMap();
@@ -341,6 +355,8 @@ public abstract class ChunkProviderCelestial implements IChunkProvider {
 		rand.setSeed((long) x * i1 + (long) z * j1 ^ worldObj.getSeed());
 
 		biomegenbase.decorate(worldObj, rand, k, l);
+
+		SpawnerAnimals.performWorldGenSpawning(this.worldObj, biomegenbase, k + 8, l + 8, 16, 16, this.rand);
 
 		BlockFalling.fallInstantly = false;
 	}
@@ -388,6 +404,7 @@ public abstract class ChunkProviderCelestial implements IChunkProvider {
 	@Override
 	public List getPossibleCreatures(EnumCreatureType creatureType, int x, int y, int z) {
         BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(x, z);
+		if(biomegenbase instanceof BiomeGenCraterBase) return new ArrayList<SpawnListEntry>();
         return biomegenbase.getSpawnableList(creatureType);
 	}
 

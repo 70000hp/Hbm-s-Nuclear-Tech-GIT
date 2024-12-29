@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.BiomeGenBaseCelestial;
+import com.hbm.entity.mob.EntityMoonCow;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,8 +18,10 @@ public class BiomeGenMoon extends BiomeGenBaseCelestial {
 
 	public BiomeGenMoon(int id) {
 		super(id);
-		this.setBiomeName("Moon");
+		this.setBiomeName("Mun");
 		this.setDisableRain();
+
+        this.creatures.add(new BiomeGenBase.SpawnListEntry(EntityMoonCow.class, 10, 4, 4));
 
 		this.theBiomeDecorator.generateLakes = false;
 
@@ -28,6 +31,12 @@ public class BiomeGenMoon extends BiomeGenBaseCelestial {
 		this.fillerBlock = ModBlocks.moon_rock;
 	}
 
+	@Override
+	public float getSpawningChance() {
+        return 0.008F;
+    }
+
+	@Override
 	public void genTerrainBlocks(World world, Random rand, Block[] blocks, byte[] meta, int x, int z, double noise) {
 		// boolean flag = true;
 		Block block = this.topBlock;

@@ -2,10 +2,12 @@ package com.hbm.items.armor;
 
 import java.util.List;
 
+import com.hbm.dim.CelestialBody;
 import com.hbm.extprop.HbmPlayerProps;
 import com.hbm.inventory.fluid.FluidType;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
+import com.hbm.util.AstronomyUtil;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
@@ -16,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class JetpackBreak extends JetpackBase {
+public class JetpackBreak extends JetpackFueledBase {
 
 	public static int maxFuel = 1200;
 
@@ -45,12 +47,14 @@ public class JetpackBreak extends JetpackBase {
 		}
 
 		if(getFuel(stack) > 0) {
+			float gravity = Math.max(CelestialBody.getBody(world).getSurfaceGravity(), AstronomyUtil.STANDARD_GRAVITY);
+			float thrustMultiplier = gravity * AstronomyUtil.PLAYER_GRAVITY_MODIFIER;
 			
 			if(props.isJetpackActive()) {
 				player.fallDistance = 0;
 				
 				if(player.motionY < 0.4D)
-					player.motionY += 0.1D;
+					player.motionY += 0.1D * thrustMultiplier;
 				
 				world.playSoundEffect(player.posX, player.posY, player.posZ, "hbm:weapon.flamethrowerShoot", 0.25F, 1.5F);
 				this.useUpFuel(player, stack, 5);
@@ -58,10 +62,10 @@ public class JetpackBreak extends JetpackBase {
 			} else if(!player.isSneaking() && !player.onGround && props.enableBackpack) {
 				player.fallDistance = 0;
 				
-				if(player.motionY < -1)
-					player.motionY += 0.2D;
-				else if(player.motionY < -0.1)
-					player.motionY += 0.1D;
+				if(player.motionY < -1 * thrustMultiplier)
+					player.motionY += 0.2D * thrustMultiplier;
+				else if(player.motionY < -0.1 * thrustMultiplier)
+					player.motionY += 0.1D * thrustMultiplier;
 				else if(player.motionY < 0)
 					player.motionY = 0;
 

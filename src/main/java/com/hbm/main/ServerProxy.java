@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.render.util.MissilePart;
 import com.hbm.saveddata.TomSaveData;
 import com.hbm.sound.AudioWrapper;
 
@@ -28,12 +29,14 @@ public class ServerProxy {
 	public static final int ID_TOOLABILITY = 9;
 	public static final int ID_GUN_MODE = 10;
 	public static final int ID_GAS_HAZARD = 11;
-	
+
+	public void registerPreRenderInfo() { }
 	public void registerRenderInfo() { }
 	public void registerTileEntitySpecialRenderer() { }
 	public void registerItemRenderer() { }
 	public void registerEntityRenderer() { }
 	public void registerBlockRenderer() { }
+	public void registerGunCfg() { }
 	public void handleNHNEICompat() { }
 	
 	public void particleControl(double x, double y, double z, int type) { }
@@ -42,7 +45,9 @@ public class ServerProxy {
 	
 	public void effectNT(NBTTagCompound data) { }
 
-	public void registerMissileItems() { }
+	public void registerMissileItems() {
+		MissilePart.registerAllPartsServer();
+	}
 
 	public AudioWrapper getLoopedSound(String sound, float x, float y, float z, float volume, float range, float pitch) { return null; }
 	public AudioWrapper getLoopedSound(String sound, float x, float y, float z, float volume, float range, float pitch, int keepAlive) { return null; }
@@ -84,9 +89,6 @@ public class ServerProxy {
 	
 	public boolean getImpact(World world) {
 		return TomSaveData.forWorld(world).impact;
-	}
-	public int getCTime(World world) {
-		return ModEventHandler.chargetime;
 	}
 
 	public void playSoundClient(double x, double y, double z, String sound, float volume, float pitch) { }

@@ -31,20 +31,6 @@ public class TileEntityMachineOrbus extends TileEntityBarrel implements IOverpre
 	@Override
 	public void checkFluidInteraction() { } //NO!
 
-	@Override
-	public void fillFluidInit(FluidType type) {
-		
-		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - BlockDummyable.offset).getOpposite();
-		ForgeDirection rot = dir.getRotation(ForgeDirection.DOWN);
-
-		for(int i = -1; i < 6; i += 6) {
-			this.fillFluid(xCoord, yCoord + i, zCoord, this.getTact(), this.tank.getTankType());
-			this.fillFluid(xCoord + dir.offsetX, yCoord + i, zCoord + dir.offsetZ, this.getTact(), this.tank.getTankType());
-			this.fillFluid(xCoord + rot.offsetX, yCoord + i, zCoord + rot.offsetZ, this.getTact(), this.tank.getTankType());
-			this.fillFluid(xCoord + dir.offsetX + rot.offsetX, yCoord + i, zCoord + dir.offsetZ + rot.offsetZ, this.getTact(), this.tank.getTankType());
-		}
-	}
-	
 	protected DirPos[] conPos;
 	
 	@Override
@@ -97,40 +83,43 @@ public class TileEntityMachineOrbus extends TileEntityBarrel implements IOverpre
 	// apathy is a tragedy and boredom is a crime
 	@Override
 	public void explode(World world, int x, int y, int z) {
-    	float amat = Math.min(this.getFluidFill(Fluids.AMAT)/100,90);
-    	float aschrab = Math.min(this.getFluidFill(Fluids.ASCHRAB)/100,90);
-    	if(!worldObj.isRemote) {
-		if(amat>0)
-		{
-			if(amat >= 25)
-			{
-				EntityBalefire bf = new EntityBalefire(worldObj);
-				bf.antimatter();
-	    		bf.setPosition(xCoord, yCoord, zCoord);
-				bf.destructionRange = (int) amat;
-				worldObj.spawnEntityInWorld(bf);
-				EntityNukeTorex.startFacAnti(worldObj, xCoord, yCoord, zCoord, amat * 1.5F);
-				return;
-			}
-			else
-			{
-				new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, amat).makeAmat().explode();
-			}
+		if(tank.getTankType() == Fluids.AMAT || tank.getTankType() == Fluids.ASCHRAB) {
+		//if(this.hasExploded) return;
+	    	float amat = Math.min(tank.getFill()/100,90);
+	    	float aschrab = Math.min(tank.getFill()/100,90);
+	    	if(this.hasExploded && !worldObj.isRemote) {
+	    		if(amat>0)
+	    		{
+	    			if(amat >= 25)
+	    			{
+	    				EntityBalefire bf = new EntityBalefire(worldObj);
+	    				bf.antimatter();
+	    	    		bf.setPosition(xCoord, yCoord, zCoord);
+	    				bf.destructionRange = (int) amat;
+	    				worldObj.spawnEntityInWorld(bf);
+	    				EntityNukeTorex.startFacAnti(worldObj, xCoord, yCoord, zCoord, amat * 1.5F);
+	    				return;
+	    			}
+	    			else
+	    			{
+	    				new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, amat).makeAmat().explode();
+	    			}
+	    		}
+	    		if(aschrab>0)
+	    		{
+	    			EntityNukeExplosionMK3 ex = EntityNukeExplosionMK3.statFacFleija(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, (int) aschrab);
+	    			if(!ex.isDead) {
+	    				worldObj.spawnEntityInWorld(ex);
+	    	
+	    				EntityCloudFleija cloud = new EntityCloudFleija(worldObj, (int) aschrab);
+	    				cloud.setPosition(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+	    				worldObj.spawnEntityInWorld(cloud);
+	    			}
+	    			return;			
+	    		}	
+	    	}
 		}
-		if(aschrab>0)
-		{
-			EntityNukeExplosionMK3 ex = EntityNukeExplosionMK3.statFacFleija(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, (int) aschrab);
-			if(!ex.isDead) {
-				worldObj.spawnEntityInWorld(ex);
-	
-				EntityCloudFleija cloud = new EntityCloudFleija(worldObj, (int) aschrab);
-				cloud.setPosition(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
-				worldObj.spawnEntityInWorld(cloud);
-			}
-			return;			
-		}
-		this.markChanged();
-    }
-		
+	    	this.markChanged();
+	    			
 	}
 }

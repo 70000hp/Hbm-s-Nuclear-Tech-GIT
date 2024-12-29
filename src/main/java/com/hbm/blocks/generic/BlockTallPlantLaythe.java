@@ -32,6 +32,7 @@ import net.minecraftforge.common.IPlantable;
 
 public class BlockTallPlantLaythe extends BlockEnumMulti implements IPlantable, IGrowable {
 	
+	//ngl i dont know why i did this....
 	public BlockTallPlantLaythe() {
 		super(Material.water, EnumTallFlowerLaythe.class, true, true);
 		this.setTickRandomly(true);
@@ -111,7 +112,7 @@ public class BlockTallPlantLaythe extends BlockEnumMulti implements IPlantable, 
 			if(world.getBlockMetadata(x, y, z) < 8) {
 				this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
 			}
-			world.setBlock(x, y, z, Blocks.air, 0, 3);
+			world.setBlock(x, y, z, Blocks.water, 0, 3);
 		}
 		
 		if(!detectCut) return;
@@ -123,7 +124,7 @@ public class BlockTallPlantLaythe extends BlockEnumMulti implements IPlantable, 
 		if(ownMeta < 8 && (meta != ownMeta + 8 || block != this) && ModBlocks.plant_flower.canBlockStay(world, x, y, z)) {
 
 			if(ownMeta == EnumTallFlowerLaythe.LAYTHE.ordinal())
-				world.setBlock(x, y, z, Blocks.air);
+				world.setBlock(x, y, z, Blocks.water);
 			else
 				world.setBlock(x, y, z, ModBlocks.plant_flower, EnumFlowerType.CD0.ordinal(), 3);
 		}
@@ -270,7 +271,18 @@ public class BlockTallPlantLaythe extends BlockEnumMulti implements IPlantable, 
 	public int getPlantMetadata(IBlockAccess world, int x, int y, int z) {
 		return world.getBlockMetadata(x, y, z);
 	}
-	
+    @Override
+    public int quantityDropped(int parMetadata, int parFortune, Random parRand)
+    {
+       return (parRand.nextInt(4));	
+    	
+    }
+
+    @Override
+    public Item getItemDropped(int parMetadata, Random parRand, int parFortune)  
+    {
+       return (ModItems.saltleaf);
+    }
 
 	@Override
 	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {

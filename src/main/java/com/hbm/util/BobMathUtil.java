@@ -4,11 +4,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.ToIntFunction;
 
 import javax.annotation.Nonnegative;
@@ -94,7 +90,7 @@ public class BobMathUtil {
 	public static ForgeDirection[] getShuffledDirs() {
 		
 		ForgeDirection[] dirs = new ForgeDirection[6];
-		List<Integer> indices = new ArrayList() {{ add(0); add(1); add(2); add(3); add(4); add(5); }};
+		List<Integer> indices = new ArrayList<Integer>() {{ add(0); add(1); add(2); add(3); add(4); add(5); }};
 		Collections.shuffle(indices);
 		
 		for(int i = 0; i < 6; i++) {
@@ -220,6 +216,7 @@ public class BobMathUtil {
 
 	// I am sick of trying to remember the ridiculous quirks of Java 8
 	// so I wrote this thing that can shit any int-ish list-ish into a regular fucking int[]
+	// made by mellow, thrown here by 70k
 	public static int[] intCollectionToArray(Collection<Integer> in) {
 		return intCollectionToArray(in, i -> (int)i);
 	}
@@ -232,4 +229,73 @@ public class BobMathUtil {
 		return Arrays.stream(in.toArray()).mapToInt(mapper).toArray();
 	}
 
+	public static int floor(double value) {
+		int i = (int)value;
+		return value < (double)i ? i - 1 : i;
+	}
+
+	public static long lfloor(double value) {
+		long l = (long)value;
+		return value < (double)l ? l - 1L : l;
+	}
+
+	public static double perlinFade(double value) {
+		return value * value * value * (value * (value * 6.0D - 15.0D) + 10.0D);
+	}
+
+	public static double perlinFadeDerivative(double value) {
+		return 30.0D * value * value * (value - 1.0D) * (value - 1.0D);
+	}
+
+	public static double lerp(double delta, double start, double end) {
+		return start + delta * (end - start);
+	}
+
+	public static double clerp(double delta, double start, double end) {
+		double angle = ((((end - start) % 360) + 540) % 360) - 180;
+		return start + angle * delta;
+	}
+
+	public static double lerp2(double deltaX, double deltaY, double x0y0, double x1y0, double x0y1, double x1y1) {
+		return lerp(deltaY, lerp(deltaX, x0y0, x1y0), lerp(deltaX, x0y1, x1y1));
+	}
+
+	public static double lerp3(double deltaX, double deltaY, double deltaZ, double x0y0z0, double x1y0z0, double x0y1z0, double x1y1z0, double x0y0z1, double x1y0z1, double x0y1z1, double x1y1z1) {
+		return lerp(deltaZ, lerp2(deltaX, deltaY, x0y0z0, x1y0z0, x0y1z0, x1y1z0), lerp2(deltaX, deltaY, x0y0z1, x1y0z1, x0y1z1, x1y1z1));
+	}
+
+	public static double clamp(double value, double min, double max) {
+		if (value < min) {
+			return min;
+		} else {
+			return value > max ? max : value;
+		}
+	}
+
+	public static double getLerpProgress(double value, double start, double end) {
+		return (value - start) / (end - start);
+	}
+
+	public static double lerpFromProgress(double lerpValue, double lerpStart, double lerpEnd, double start, double end) {
+		return lerp(getLerpProgress(lerpValue, lerpStart, lerpEnd), start, end);
+	}
+
+	public static double clampedLerp(double start, double end, double delta) {
+		if (delta < 0.0D) {
+			return start;
+		} else {
+			return delta > 1.0D ? end : lerp(delta, start, end);
+		}
+	}
+
+	/** Soft peak sine */
+	public static double sps(double x) {
+		return Math.sin(Math.PI / 2D * Math.cos(x));
+	}
+	
+	/** Square wave sine, make sure squarination is [0;1] */
+	public static double sws(double x, double squarination) {
+		double s = Math.sin(x);
+		return Math.pow(Math.abs(s), 2 - squarination) / s;
+	}
 }

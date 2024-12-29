@@ -19,10 +19,19 @@ public class BeamPronter {
 	}
 	
 	private static boolean depthMask = false;
+
+	public static void prontBeamwithDepth(Vec3 skeleton, EnumWaveType wave, EnumBeamType beam, int outerColor, int innerColor, int start, int segments, float size, int layers, float thickness) {
+		prontBeamwithDepth(skeleton, wave, beam, outerColor, innerColor, start, segments, size, layers, thickness, 1F);
+	}
+
 	public static void prontBeamwithDepth(Vec3 skeleton, EnumWaveType wave, EnumBeamType beam, int outerColor, int innerColor, int start, int segments, float size, int layers, float thickness, float alpha) {
 		depthMask = true;
 		prontBeam(skeleton, wave, beam, outerColor, innerColor, start, segments, size, layers, thickness, alpha);
 		depthMask = false;
+	}
+
+	public static void prontBeam(Vec3 skeleton, EnumWaveType wave, EnumBeamType beam, int outerColor, int innerColor, int start, int segments, float size, int layers, float thickness) {
+		prontBeam(skeleton, wave, beam, outerColor, innerColor, start, segments, size, layers, thickness, 1F);
 	}
 
 	public static void prontBeam(Vec3 skeleton, EnumWaveType wave, EnumBeamType beam, int outerColor, int innerColor, int start, int segments, float size, int layers, float thickness, float alpha) {

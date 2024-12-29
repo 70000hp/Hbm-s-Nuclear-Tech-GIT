@@ -7,6 +7,7 @@ import com.hbm.dim.laythe.GenLayerLaythe.GenLayerDiversifyLaythe;
 import com.hbm.dim.laythe.GenLayerLaythe.GenLayerLaytheBiomes;
 import com.hbm.dim.laythe.GenLayerLaythe.GenLayerLaytheIslands;
 import com.hbm.dim.laythe.GenLayerLaythe.GenLayerLaytheOceans;
+import com.hbm.dim.laythe.GenLayerLaythe.GenLayerLaythePolar;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -70,16 +71,32 @@ public class WorldProviderLaythe extends WorldProviderCelestial {
 
 	private static BiomeGenLayers createBiomeGenerators(long seed) {
 		GenLayer biomes = new GenLayerLaytheBiomes(seed);
-
+		GenLayer polar = new GenLayerLaythePolar(1000L, biomes);
+		
+		
+		
 		biomes = new GenLayerFuzzyZoom(2000L, biomes);
+
 		biomes = new GenLayerZoom(2001L, biomes);
+		
+		
+		polar = new GenLayerZoom(1000L, polar);
+		GenLayer polarmag = GenLayerZoom.magnify(1000L, polar, 1);
+		biomes = new GenLayerLaythePolar(1000L, polarmag);
+		
 		biomes = new GenLayerDiversifyLaythe(1000L, biomes);
+		
 		biomes = new GenLayerZoom(1000L, biomes);
 		biomes = new GenLayerZoom(1001L, biomes);
+
 		biomes = new GenLayerLaytheOceans(4000L, biomes);
 		biomes = new GenLayerLaytheOceans(4000L, biomes);
 		biomes = new GenLayerLaytheOceans(4000L, biomes);
 		biomes = new GenLayerLaytheOceans(4000L, biomes);
+		
+		GenLayer oceanGenLayer = new GenLayerLaytheOceans(4000L, biomes);
+		oceanGenLayer = GenLayerZoom.magnify(4000L, biomes, 0);
+		
 		biomes = new GenLayerZoom(1003L, biomes);
 		biomes = new GenLayerSmooth(700L, biomes);
 		biomes = new GenLayerLaytheIslands(200L, biomes);

@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.model.ModelChicken;
+import net.minecraft.client.model.ModelCow;
 import net.minecraft.client.particle.EntityAuraFX;
 import net.minecraft.client.particle.EntityBlockDustFX;
 import net.minecraft.client.particle.EntityCloudFX;
@@ -50,11 +51,11 @@ import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.BlockVolcanoV2.TileEntityLightningVolcano;
-import com.hbm.blocks.bomb.BlockVolcano.TileEntityVolcanoCore;
 import com.hbm.blocks.generic.BlockBobble.TileEntityBobble;
 import com.hbm.blocks.generic.BlockEmitter.TileEntityEmitter;
 import com.hbm.blocks.generic.BlockLoot.TileEntityLoot;
 import com.hbm.blocks.generic.BlockPedestal.TileEntityPedestal;
+import com.hbm.blocks.generic.BlockPlushie.TileEntityPlushie;
 import com.hbm.blocks.generic.BlockSnowglobe.TileEntitySnowglobe;
 import com.hbm.blocks.machine.Floodlight.TileEntityFloodlight;
 import com.hbm.blocks.machine.MachineFan.TileEntityFan;
@@ -88,10 +89,10 @@ import com.hbm.handler.ImpactWorldHandler;
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
 import com.hbm.items.IAnimatedItem;
 import com.hbm.items.ModItems;
+import com.hbm.items.weapon.sedna.factory.GunFactoryClient;
 import com.hbm.lib.RefStrings;
 import com.hbm.particle.*;
-import com.hbm.particle.helper.ExplosionCreator;
-import com.hbm.particle.helper.IParticleCreator;
+import com.hbm.particle.helper.*;
 import com.hbm.particle.psys.engine.EventHandlerParticleEngine;
 import com.hbm.render.anim.*;
 import com.hbm.render.anim.HbmAnimations.Animation;
@@ -107,6 +108,7 @@ import com.hbm.render.item.ItemRenderMissileGeneric.RenderMissileType;
 import com.hbm.render.item.block.*;
 import com.hbm.render.item.weapon.*;
 import com.hbm.render.loader.HmfModelLoader;
+import com.hbm.render.model.ModelMoonCow;
 import com.hbm.render.model.ModelPigeon;
 import com.hbm.render.model.ModelScutter;
 import com.hbm.render.tileentity.*;
@@ -119,7 +121,6 @@ import com.hbm.sound.AudioWrapper;
 import com.hbm.sound.AudioWrapperClient;
 import com.hbm.tileentity.TileEntityDoorGeneric;
 import com.hbm.tileentity.bomb.*;
-import com.hbm.tileentity.conductor.*;
 import com.hbm.tileentity.deco.*;
 import com.hbm.tileentity.machine.*;
 import com.hbm.tileentity.machine.oil.*;
@@ -141,6 +142,13 @@ public class ClientProxy extends ServerProxy {
 	
 	public RenderInfoSystem theInfoSystem = new RenderInfoSystem();
 	
+	/** Runs just before item an block init */
+	@Override
+	public void registerPreRenderInfo() {
+		AdvancedModelLoader.registerModelHandler(new HmfModelLoader());
+	}
+	
+	/** Runs right after item and block init */
 	@Override
 	public void registerRenderInfo() {
 
@@ -148,8 +156,6 @@ public class ClientProxy extends ServerProxy {
 		registerClientEventHandler(new ModEventHandlerRenderer());
 		registerClientEventHandler(new EventHandlerParticleEngine());
 		registerClientEventHandler(theInfoSystem);
-
-		AdvancedModelLoader.registerModelHandler(new HmfModelLoader());
 
 		registerTileEntitySpecialRenderer();
 		registerItemRenderer();
@@ -173,6 +179,11 @@ public class ClientProxy extends ServerProxy {
 	public void handleNHNEICompat(){
 		IMCHandlerNHNEI.IMCSender();
 	}
+	
+	@Override
+	public void registerGunCfg() {
+		GunFactoryClient.init();
+	}
 
 	@Override
 	public void registerTileEntitySpecialRenderer() {
@@ -186,6 +197,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRadioRec.class, new RenderDecoBlock());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRadiobox.class, new RenderDecoBlock());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineSatDock.class, new RenderDecoBlock());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineGasDock.class, new RenderDecoBlock());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTransporterRocket.class, new RenderDecoBlock());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDecoBlockAlt.class, new RenderDecoBlockAlt());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDecoBlockAltG.class, new RenderDecoBlockAlt());
@@ -197,6 +209,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPedestal.class, new RenderPedestalTile());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBobble.class, new RenderBobble());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySnowglobe.class, new RenderSnowglobe());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPlushie.class, new RenderPlushie());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityEmitter.class, new RenderEmitter());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityLightningVolcano.class, new RenderVol2());
 
@@ -263,8 +276,14 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePumpjack.class, new RenderPumpjack());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineFrackingTower.class, new RenderFrackingTower());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineTurbofan.class, new RenderTurbofan());
-		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineEPress.class, new RenderEPress());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineTurbineGas.class, new RenderTurbineGas());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineLPW2.class, new RenderLPW2());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineHTR3.class, new RenderHTR3());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineHTRF4.class, new RenderHTRF4());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityXenonThruster.class, new RenderXenonThruster());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePress.class, new RenderPress());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineEPress.class, new RenderEPress());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineAmmoPress.class, new RenderAmmoPress());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineRadGen.class, new RenderRadGen());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineRadarNT.class, new RenderRadar());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineRadarLarge.class, new RenderRadarLarge());
@@ -272,6 +291,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReactorResearch.class, new RenderSmallReactor());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTesla.class, new RenderTesla());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBarrel.class, new RenderFluidBarrel());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineRotaryFurnace.class, new RenderRotaryFurnace());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineCrystallizer.class, new RenderCrystallizer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMicrowave.class, new RenderMicrowave());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineRTG.class, new RenderRTG());
@@ -285,14 +305,19 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySolarBoiler.class, new RenderSolarBoiler());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineSolarPanel.class, new RenderSolarPanel());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineStardar.class, new RenderStardar());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityOrbitalStation.class, new RenderOrbitalStation());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAirScrubber.class, new RenderAirScrubber());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityOrbitalStationComputer.class, new RenderOrbitalComputer());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineDriveProcessor.class, new RenderDriveProcessor());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityStorageDrum.class, new RenderStorageDrum());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChungus.class, new RenderChungus());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTowerLarge.class, new RenderLargeTower());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTowerSmall.class, new RenderSmallTower());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCondenserPowered.class, new RenderCondenser());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRadiator.class, new RenderRadiator());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDeuteriumTower.class, new RenderDeuteriumTower());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAtmoTower.class, new RenderAtmoTower());
-		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAtmoVent.class, new RenderAtmoVent());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAtmoExtractor.class, new RenderAtmoExtractor());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineCatalyticCracker.class, new RenderCatalyticCracker());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineLiquefactor.class, new RenderLiquefactor());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineSolidifier.class, new RenderSolidifier());
@@ -327,6 +352,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineMilkReformer.class, new RenderMilkReformer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineHydrotreater.class, new RenderHydrotreater());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineCoker.class, new RenderCoker());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePyroOven.class, new RenderPyroOven());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFan.class, new RenderFan());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineCryoDistill.class, new RenderCryoDistill());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineAlkylation.class, new RenderAlkylation());
@@ -338,6 +364,8 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePumpElectric.class, new RenderPump());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineArcWelder.class, new RenderArcWelder());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineSolderingStation.class, new RenderSolderingStation());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineVacuumCircuit.class, new RenderVacuumCircuit());
+
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineArcFurnaceLarge.class, new RenderArcFurnace());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineWoodBurner.class, new RenderWoodBurner());
 		//Foundry
@@ -365,7 +393,6 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySoyuzLauncher.class, new RenderSoyuzLauncher());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySoyuzCapsule.class, new RenderCapsule());
 		//network
-		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFluidDuct.class, new RenderFluidDuct());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPylon.class, new RenderPylon());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConnector.class, new RenderConnector());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPylonMedium.class, new RenderPylonMedium());
@@ -373,6 +400,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySubstation.class, new RenderSubstation());
 		//chargers
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCharger.class, new RenderCharger());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRefueler.class, new RenderRefueler());
 		//DecoContainer
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFileCabinet.class, new RenderFileCabinet());
 		//multiblocks
@@ -538,89 +566,10 @@ public class ClientProxy extends ServerProxy {
 		MinecraftForgeClient.registerItemRenderer(ModItems.chainsaw, new ItemRenderChainsaw());
 		MinecraftForgeClient.registerItemRenderer(ModItems.boltgun, new ItemRenderBoltgun());
 		//guns
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_rpg, new ItemRenderRpg());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_karl, new ItemRenderRpg());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_panzerschreck, new ItemRenderRpg());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_stinger, new ItemRenderStinger());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_skystinger, new ItemRenderStinger());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver, new ItemRenderWeaponFFColt(ResourceManager.ff_gun_bright, ResourceManager.ff_iron, ResourceManager.ff_wood));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_saturnite, new ItemRenderWeaponFFColt(ResourceManager.ff_saturnite, ResourceManager.ff_iron, ResourceManager.ff_wood));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_gold, new ItemRenderWeaponFFColt(ResourceManager.ff_gold, ResourceManager.ff_gold, ResourceManager.ff_gun_dark));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_schrabidium, new ItemRenderWeaponFFColt(ResourceManager.ff_schrabidium, ResourceManager.ff_schrabidium, ResourceManager.ff_gun_dark));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_cursed, new ItemRenderWeaponFFCursed());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_nightmare, new ItemRenderWeaponFFNightmare());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_nightmare2, new ItemRenderWeaponFFNightmareDark());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_fatman, new ItemRenderFatMan());
-		//MinecraftForgeClient.registerItemRenderer(ModItems.gun_fel, new ItemRenderWeaponMiniFEL());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_proto, new ItemRenderFatMan());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_mirv, new ItemRenderMIRVLauncher());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bf, new ItemRenderBFLauncher());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_xvl1456, new ItemRenderWeaponTau());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_zomg, new ItemRenderZOMG());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_osipr, new ItemRenderOSIPR());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_mp, new ItemRenderMP());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_inverted, new ItemRenderRevolverInverted());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_mp40, new ItemRenderMP40());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_emp, new ItemRenderEMPRay());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_immolator, new ItemRenderImmolator());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_cryolator, new ItemRenderCryolator());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uboinik, new ItemRenderUboinik());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_jack, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_spark, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_hp, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_euthanasia, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_defabricator, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_dash, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_twigun, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_lever_action, new ItemRenderWeaponFFMaresLeg(ResourceManager.ff_gun_bright, ResourceManager.ff_wood));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolt_action, new ItemRenderWeaponFFBolt(ResourceManager.rem700, ResourceManager.rem700_tex));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_lever_action_dark, new ItemRenderWeaponFFMaresLeg(ResourceManager.ff_gun_normal, ResourceManager.ff_wood_red));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolt_action_green, new ItemRenderWeaponFFBolt(ResourceManager.rem700poly, ResourceManager.rem700poly_tex));
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_lever_action_sonata, new ItemRenderGunAnim());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolt_action_saturnite, new ItemRenderGunAnim());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolt_action_saturnite, new ItemRenderWeaponFFBolt(ResourceManager.rem700sat, ResourceManager.rem700sat_tex));
 		MinecraftForgeClient.registerItemRenderer(ModItems.gun_b92, new ItemRenderGunAnim());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_b93, new ItemRenderGunAnim());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uzi, new ItemRenderUZI());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uzi_silencer, new ItemRenderUZI());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uzi_saturnite, new ItemRenderUZI());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uzi_saturnite_silencer, new ItemRenderUZI());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_calamity, new ItemRenderWeaponFFMG42());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_minigun, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_lacunae, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_folly, new ItemRenderOverkill());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_hk69, new ItemRenderWeaponObj());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bio_revolver, new ItemRenderBioRevolver());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_deagle, new ItemRenderWeaponObj());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_supershotgun, new ItemRenderWeaponShotty());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_ks23, new ItemRenderWeaponKS23());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_flamer, new ItemRenderWeaponObj());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_flechette, new ItemRenderWeaponObj());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_quadro, new ItemRenderWeaponQuadro());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_sauer, new ItemRenderWeaponSauer());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_vortex, new ItemRenderWeaponVortex());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_thompson, new ItemRenderWeaponThompson());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolter, new ItemRenderWeaponBolter());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_bolter_digamma, new ItemRenderWeaponBolter());
 		MinecraftForgeClient.registerItemRenderer(ModItems.gun_fireext, new ItemRenderFireExt());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_ar15, new ItemRenderWeaponAR15());
-		MinecraftForgeClient.registerItemRenderer(ModItems.detonator_laser, new ItemRenderDetonatorLaser());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_remington, new ItemRenderWeaponRemington());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_spas12, new ItemRenderWeaponSpas12());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_glass_cannon, new ItemRenderWeaponGlass());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_chemthrower, new ItemRenderWeaponChemthrower());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_m2, new ItemRenderM2());	
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_nopip, new ItemRenderWeaponNovac());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_pip, new ItemRenderWeaponLilMac());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_blackjack, new ItemRenderWeaponNovac());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_silver, new ItemRenderWeaponNovac());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_revolver_red, new ItemRenderWeaponNovac());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_lunatic_marksman, new ItemRenderLunaticSniper());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_benelli, new ItemRenderBenelli());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_uac_pistol, new ItemRenderUACPistol());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_coilgun, new ItemRenderWeaponCoilgun());
 		MinecraftForgeClient.registerItemRenderer(ModItems.gun_cryocannon, new ItemRenderWeaponCryoCannon());
-		MinecraftForgeClient.registerItemRenderer(ModItems.gun_congolake, new ItemRenderWeaponCongo());
+		MinecraftForgeClient.registerItemRenderer(ModItems.detonator_laser, new ItemRenderDetonatorLaser());
 		//multitool
 		MinecraftForgeClient.registerItemRenderer(ModItems.multitool_dig, new ItemRenderMultitool());
 		MinecraftForgeClient.registerItemRenderer(ModItems.multitool_silk, new ItemRenderMultitool());
@@ -633,8 +582,6 @@ public class ClientProxy extends ServerProxy {
 		MinecraftForgeClient.registerItemRenderer(ModItems.multitool_joule, new ItemRenderMultitool());
 		MinecraftForgeClient.registerItemRenderer(ModItems.multitool_decon, new ItemRenderMultitool());
 		//blocks
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModBlocks.steel_wall), new ItemRenderDecoBlock());
-		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModBlocks.steel_corner), new ItemRenderDecoBlock());
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModBlocks.steel_roof), new ItemRenderDecoBlock());
 	}
 
@@ -645,36 +592,34 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerEntityRenderingHandler(EntitySchrab.class, new RenderFlare());
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, new RenderRocket());
 		RenderingRegistry.registerEntityRenderingHandler(EntityBulletBaseNT.class, new RenderBullet());
+		RenderingRegistry.registerEntityRenderingHandler(EntityBulletBaseMK4.class, new RenderBulletMK4());
+		RenderingRegistry.registerEntityRenderingHandler(EntityBulletBaseMK4CL.class, new RenderBulletMK4());
+		RenderingRegistry.registerEntityRenderingHandler(EntityBulletBeamBase.class, new RenderBeam());
 		RenderingRegistry.registerEntityRenderingHandler(EntityRainbow.class, new RenderRainbow());
-		RenderingRegistry.registerEntityRenderingHandler(EntityNightmareBlast.class, new RenderOminousBullet());
-		RenderingRegistry.registerEntityRenderingHandler(EntityFire.class, new RenderFireball(ModItems.energy_ball));
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlasmaBeam.class, new RenderBeam());
 		RenderingRegistry.registerEntityRenderingHandler(EntityLaserBeam.class, new RenderBeam2());
 		RenderingRegistry.registerEntityRenderingHandler(EntityMinerBeam.class, new RenderBeam3());
 		RenderingRegistry.registerEntityRenderingHandler(EntitySparkBeam.class, new RenderBeam4());
 		RenderingRegistry.registerEntityRenderingHandler(EntityExplosiveBeam.class, new RenderBeam5());
 		RenderingRegistry.registerEntityRenderingHandler(EntityModBeam.class, new RenderBeam6());
 		RenderingRegistry.registerEntityRenderingHandler(EntitySiegeLaser.class, new RenderSiegeLaser());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLN2.class, new RenderLN2(ModItems.energy_ball));
-		RenderingRegistry.registerEntityRenderingHandler(EntityLaser.class, new RenderLaser());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBombletZeta.class, new RenderBombletTheta());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMeteor.class, new RenderMeteor());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBoxcar.class, new RenderBoxcar());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityDuchessGambit.class, new RenderBoxcar());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBuilding.class, new RenderBoxcar());
+	    RenderingRegistry.registerEntityRenderingHandler(EntityTorpedo.class, new RenderBoxcar());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBomber.class, new RenderBomber());
+	    RenderingRegistry.registerEntityRenderingHandler(EntityC130.class, new RenderC130());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBurningFOEQ.class, new RenderFOEQ());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityFallingNuke.class, new RenderFallingNuke());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMinerRocket.class, new RenderMinerRocket());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBobmazon.class, new RenderMinerRocket());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityTom.class, new RenderTom());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityAAShell.class, new RenderMirv());
-	    RenderingRegistry.registerEntityRenderingHandler(EntityRocketHoming.class, new RenderSRocket());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityChopperMine.class, new RenderChopperMine());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityRubble.class, new RenderRubble());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityShrapnel.class, new RenderShrapnel());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityFireworks.class, new RenderShrapnel());
-	    RenderingRegistry.registerEntityRenderingHandler(EntityOilSpill.class, new RenderEmpty());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityWaterSplash.class, new RenderEmpty());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityEMP.class, new RenderEmpty());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityBeamVortex.class, new RenderVortexBeam());
@@ -686,6 +631,7 @@ public class ClientProxy extends ServerProxy {
 	    RenderingRegistry.registerEntityRenderingHandler(EntitySawblade.class, new RenderSawblade());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityChemical.class, new RenderChemical());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMist.class, new RenderMist());
+	    RenderingRegistry.registerEntityRenderingHandler(EntityFireLingering.class, new RenderMist());
 		RenderingRegistry.registerEntityRenderingHandler(EntityWaypoint.class, new RenderMist());
 		RenderingRegistry.registerEntityRenderingHandler(EntityAcidBomb.class, new RenderSnowball(Items.slime_ball));
 		//grenades
@@ -763,6 +709,7 @@ public class ClientProxy extends ServerProxy {
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMissileDoomsdayRusted.class, new RenderMissileNuclear());
 	    RenderingRegistry.registerEntityRenderingHandler(EntitySoyuz.class, new RenderSoyuz());
 	    RenderingRegistry.registerEntityRenderingHandler(EntitySoyuzCapsule.class, new RenderSoyuzCapsule());
+	    RenderingRegistry.registerEntityRenderingHandler(EntityParachuteCrate.class, new RenderParachuteCrate());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMissileTaint.class, new RenderMissileTaint());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMissileMicro.class, new RenderMissileTaint());
 	    RenderingRegistry.registerEntityRenderingHandler(EntityMissileBHole.class, new RenderMissileTaint());
@@ -840,23 +787,18 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerEntityRenderingHandler(EntityFBIDrone.class, new RenderDrone());
 		RenderingRegistry.registerEntityRenderingHandler(EntityPlasticBag.class, new RenderPlasticBag());
 		RenderingRegistry.registerEntityRenderingHandler(EntityPigeon.class, new RenderPigeon(new ModelPigeon(), 0.3F));
+
+		RenderingRegistry.registerEntityRenderingHandler(EntityMoonCow.class, new RenderMoonCow(new ModelMoonCow(), 0.7F));
 		RenderingRegistry.registerEntityRenderingHandler(EntityScutterfish.class, new RenderScutter(new ModelScutter(), 0.3F));
 
+		RenderingRegistry.registerEntityRenderingHandler(EntityDummy.class, new RenderDummy());
 	    //"particles"
-	    RenderingRegistry.registerEntityRenderingHandler(EntitySmokeFX.class, new MultiCloudRenderer(new Item[] { ModItems.smoke1, ModItems.smoke2, ModItems.smoke3, ModItems.smoke4, ModItems.smoke5, ModItems.smoke6, ModItems.smoke7, ModItems.smoke8 }));
-	    RenderingRegistry.registerEntityRenderingHandler(EntityBSmokeFX.class, new MultiCloudRenderer(new Item[] { ModItems.b_smoke1, ModItems.b_smoke2, ModItems.b_smoke3, ModItems.b_smoke4, ModItems.b_smoke5, ModItems.b_smoke6, ModItems.b_smoke7, ModItems.b_smoke8 }));
-	    RenderingRegistry.registerEntityRenderingHandler(EntityDSmokeFX.class, new MultiCloudRenderer(new Item[] { ModItems.d_smoke1, ModItems.d_smoke2, ModItems.d_smoke3, ModItems.d_smoke4, ModItems.d_smoke5, ModItems.d_smoke6, ModItems.d_smoke7, ModItems.d_smoke8 }));
 	    RenderingRegistry.registerEntityRenderingHandler(EntityChlorineFX.class, new MultiCloudRenderer(new Item[] { ModItems.chlorine1, ModItems.chlorine2, ModItems.chlorine3, ModItems.chlorine4, ModItems.chlorine5, ModItems.chlorine6, ModItems.chlorine7, ModItems.chlorine8 }));
 	    RenderingRegistry.registerEntityRenderingHandler(EntityPinkCloudFX.class, new MultiCloudRenderer(new Item[] { ModItems.pc1, ModItems.pc2, ModItems.pc3, ModItems.pc4, ModItems.pc5, ModItems.pc6, ModItems.pc7, ModItems.pc8 }));
 	    RenderingRegistry.registerEntityRenderingHandler(com.hbm.entity.particle.EntityCloudFX.class, new MultiCloudRenderer(new Item[] { ModItems.cloud1, ModItems.cloud2, ModItems.cloud3, ModItems.cloud4, ModItems.cloud5, ModItems.cloud6, ModItems.cloud7, ModItems.cloud8 }));
 	    RenderingRegistry.registerEntityRenderingHandler(EntityOrangeFX.class, new MultiCloudRenderer(new Item[] { ModItems.orange1, ModItems.orange2, ModItems.orange3, ModItems.orange4, ModItems.orange5, ModItems.orange6, ModItems.orange7, ModItems.orange8 }));
 	    RenderingRegistry.registerEntityRenderingHandler(EntityFogFX.class, new FogRenderer());
-	    RenderingRegistry.registerEntityRenderingHandler(EntitySSmokeFX.class, new SSmokeRenderer(ModItems.nuclear_waste));
-	    RenderingRegistry.registerEntityRenderingHandler(EntityOilSpillFX.class, new SpillRenderer(ModItems.nuclear_waste));
-	    RenderingRegistry.registerEntityRenderingHandler(EntityGasFX.class, new GasRenderer(ModItems.nuclear_waste));
-	    RenderingRegistry.registerEntityRenderingHandler(EntityCombineBall.class, new RenderSnowball(ModItems.energy_ball));
 	    RenderingRegistry.registerEntityRenderingHandler(EntityEMPBlast.class, new RenderEMPBlast());
-	    RenderingRegistry.registerEntityRenderingHandler(EntityTSmokeFX.class, new TSmokeRenderer(ModItems.nuclear_waste));
 	}
 	
 	@Override
@@ -866,6 +808,8 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerBlockHandler(new RenderScaffoldBlock());
 		RenderingRegistry.registerBlockHandler(new RenderTapeBlock());
 		RenderingRegistry.registerBlockHandler(new RenderSteelBeam());
+		RenderingRegistry.registerBlockHandler(new RenderSteelWall());
+		RenderingRegistry.registerBlockHandler(new RenderSteelCorner());
 		RenderingRegistry.registerBlockHandler(new RenderBarrel());
 		RenderingRegistry.registerBlockHandler(new RenderFence());
 		RenderingRegistry.registerBlockHandler(new RenderBarbedWire());
@@ -882,7 +826,6 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerBlockHandler(new RenderPipe());
 		RenderingRegistry.registerBlockHandler(new RenderBattery());
 		RenderingRegistry.registerBlockHandler(new RenderAnvil());
-		RenderingRegistry.registerBlockHandler(new RenderCrystal());
 		RenderingRegistry.registerBlockHandler(new RenderCable());
 		RenderingRegistry.registerBlockHandler(new RenderCableClassic());
 		RenderingRegistry.registerBlockHandler(new RenderTestPipe());
@@ -903,6 +846,7 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerBlockHandler(new RenderCRT());
 		RenderingRegistry.registerBlockHandler(new RenderToaster());
 		RenderingRegistry.registerBlockHandler(new RenderPartitioner());
+		RenderingRegistry.registerBlockHandler(new RenderAlgaeFilm());
 
 		RenderingRegistry.registerBlockHandler(new RenderFoundryBasin());
 		RenderingRegistry.registerBlockHandler(new RenderFoundryMold());
@@ -1015,12 +959,6 @@ public class ClientProxy extends ServerProxy {
 		}
 	}
 	
-	public static HashMap<String, IParticleCreator> particleCreators = new HashMap();
-	
-	static {
-		particleCreators.put("explosionLarge", new ExplosionCreator());
-	}
-	
 	//mk3, only use this one
 	@Override
 	public void effectNT(NBTTagCompound data) {
@@ -1039,8 +977,8 @@ public class ClientProxy extends ServerProxy {
 		double y = data.getDouble("posY");
 		double z = data.getDouble("posZ");
 		
-		if(particleCreators.containsKey(type)) {
-			particleCreators.get(type).makeParticle(world, player, man, rand, x, y, z, data);
+		if(ParticleCreators.particleCreators.containsKey(type)) {
+			ParticleCreators.particleCreators.get(type).makeParticle(world, player, man, rand, x, y, z, data);
 			return;
 		}
 		
@@ -1060,6 +998,121 @@ public class ClientProxy extends ServerProxy {
 			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
 			
 			ParticleRocketFlame fx = new ParticleRocketFlame(man, world, x, y, z).setScale(scale);
+			fx.motionX = mX;
+			fx.motionY = mY;
+			fx.motionZ = mZ;
+			if(data.hasKey("maxAge")) fx.setMaxAge(data.getInteger("maxAge"));
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
+
+		if("missileContrailf".equals(type)) {
+			
+			if(Vec3.createVectorHelper(player.posX - x, player.posY - y, player.posZ - z).lengthVector() > 350) return;
+			
+			float scale = data.hasKey("scale") ? data.getFloat("scale") : 1F;
+			double mX = data.getDouble("moX");
+			double mY = data.getDouble("moY");
+			double mZ = data.getDouble("moZ");
+			
+			/*ParticleContrail contrail = new ParticleContrail(man, world, x, y, z, 0, 0, 0, scale);
+			contrail.motionX = mX;
+			contrail.motionY = mY;
+			contrail.motionZ = mZ;
+			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
+			
+			ParticleRocketFusion fx = new ParticleRocketFusion(man, world, x, y, z).setScale(scale);
+			fx.motionX = mX;
+			fx.motionY = mY;
+			fx.motionZ = mZ;
+			if(data.hasKey("maxAge")) fx.setMaxAge(data.getInteger("maxAge"));
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
+
+		if("missileContrailbf".equals(type)) {
+			
+			if(Vec3.createVectorHelper(player.posX - x, player.posY - y, player.posZ - z).lengthVector() > 350) return;
+			
+			float scale = data.hasKey("scale") ? data.getFloat("scale") : 1F;
+			double mX = data.getDouble("moX");
+			double mY = data.getDouble("moY");
+			double mZ = data.getDouble("moZ");
+			
+			/*ParticleContrail contrail = new ParticleContrail(man, world, x, y, z, 0, 0, 0, scale);
+			contrail.motionX = mX;
+			contrail.motionY = mY;
+			contrail.motionZ = mZ;
+			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
+			
+			ParticleRocketBF fx = new ParticleRocketBF(man, world, x, y, z).setScale(scale);
+			fx.motionX = mX;
+			fx.motionY = mY;
+			fx.motionZ = mZ;
+			if(data.hasKey("maxAge")) fx.setMaxAge(data.getInteger("maxAge"));
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
+
+		if("missileContrailMUD".equals(type)) {
+			
+			if(Vec3.createVectorHelper(player.posX - x, player.posY - y, player.posZ - z).lengthVector() > 350) return;
+			
+			float scale = data.hasKey("scale") ? data.getFloat("scale") : 1F;
+			double mX = data.getDouble("moX");
+			double mY = data.getDouble("moY");
+			double mZ = data.getDouble("moZ");
+			
+			/*ParticleContrail contrail = new ParticleContrail(man, world, x, y, z, 0, 0, 0, scale);
+			contrail.motionX = mX;
+			contrail.motionY = mY;
+			contrail.motionZ = mZ;
+			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
+			
+			ParticleRocketMUD fx = new ParticleRocketMUD(man, world, x, y, z).setScale(scale);
+			fx.motionX = mX;
+			fx.motionY = mY;
+			fx.motionZ = mZ;
+			if(data.hasKey("maxAge")) fx.setMaxAge(data.getInteger("maxAge"));
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
+
+		if("missileContrailSCH".equals(type)) {
+			
+			if(Vec3.createVectorHelper(player.posX - x, player.posY - y, player.posZ - z).lengthVector() > 350) return;
+			
+			float scale = data.hasKey("scale") ? data.getFloat("scale") : 1F;
+			double mX = data.getDouble("moX");
+			double mY = data.getDouble("moY");
+			double mZ = data.getDouble("moZ");
+			
+			/*ParticleContrail contrail = new ParticleContrail(man, world, x, y, z, 0, 0, 0, scale);
+			contrail.motionX = mX;
+			contrail.motionY = mY;
+			contrail.motionZ = mZ;
+			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
+			
+			ParticleRocketSCH fx = new ParticleRocketSCH(man, world, x, y, z).setScale(scale);
+			fx.motionX = mX;
+			fx.motionY = mY;
+			fx.motionZ = mZ;
+			if(data.hasKey("maxAge")) fx.setMaxAge(data.getInteger("maxAge"));
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
+
+		if("missileContrailUP".equals(type)) {
+			
+			if(Vec3.createVectorHelper(player.posX - x, player.posY - y, player.posZ - z).lengthVector() > 350) return;
+			
+			float scale = data.hasKey("scale") ? data.getFloat("scale") : 1F;
+			double mX = data.getDouble("moX");
+			double mY = data.getDouble("moY");
+			double mZ = data.getDouble("moZ");
+			
+			/*ParticleContrail contrail = new ParticleContrail(man, world, x, y, z, 0, 0, 0, scale);
+			contrail.motionX = mX;
+			contrail.motionY = mY;
+			contrail.motionZ = mZ;
+			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);*/
+			
+			ParticleRocketUP fx = new ParticleRocketUP(man, world, x, y, z).setScale(scale);
 			fx.motionX = mX;
 			fx.motionY = mY;
 			fx.motionZ = mZ;
@@ -1673,6 +1726,11 @@ public class ClientProxy extends ServerProxy {
 			Minecraft.getMinecraft().effectRenderer.addEffect(cloud);
 		}
 		
+		if("bf".equals(type)) {
+			ParticleMukeCloud cloud = new ParticleMukeCloudBF(man, world, x, y, z, 0, 0, 0);
+			Minecraft.getMinecraft().effectRenderer.addEffect(cloud);
+		}
+		
 		if("haze".equals(type)) {
 
 			ParticleHaze fog = new ParticleHaze(man, world, x, y, z);
@@ -1834,6 +1892,22 @@ public class ClientProxy extends ServerProxy {
 				Minecraft.getMinecraft().effectRenderer.addEffect(fx);
 			}
 		}
+
+		if("fluidfill".equals(type)) {
+			double mX = data.getDouble("mX");
+			double mY = data.getDouble("mY");
+			double mZ = data.getDouble("mZ");
+
+			EntityFX fx = new net.minecraft.client.particle.EntityCritFX(world, x, y, z, mX, mY, mZ);
+			fx.nextTextureIndexX();
+				
+			if(data.hasKey("color")) {
+				Color color = new Color(data.getInteger("color"));
+				fx.setRBGColorF(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
+			}
+				
+			Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+		}
 		
 		if("deadleaf".equals(type)) {
 			if(particleSetting == 0 || (particleSetting == 1 && rand.nextBoolean()))
@@ -1864,11 +1938,11 @@ public class ClientProxy extends ServerProxy {
 				
 				BusAnimation animation = new BusAnimation()
 						.addBus("GUARD_ROT", new BusAnimationSequence()
-								.addKeyframePosition(90, 0, 1, 0)
-								.addKeyframePosition(90, 0, 1, 800)
-								.addKeyframePosition(0, 0, 1, 50));
+								.addPos(90, 0, 1, 0)
+								.addPos(90, 0, 1, 800)
+								.addPos(0, 0, 1, 50));
 				
-				HbmAnimations.hotbar[player.inventory.currentItem] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
+				HbmAnimations.hotbar[player.inventory.currentItem][0] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
 			}
 			
 			/* crucible swing */
@@ -1880,17 +1954,17 @@ public class ClientProxy extends ServerProxy {
 					
 					BusAnimation animation = new BusAnimation()
 							.addBus("SWING_ROT", new BusAnimationSequence()
-									.addKeyframePosition(90 - offset, 90 - offset, 35, 75)
-									.addKeyframePosition(90 + offset, 90 - offset, -45, 150)
-									.addKeyframePosition(0, 0, 0, 500))
+									.addPos(90 - offset, 90 - offset, 35, 75)
+									.addPos(90 + offset, 90 - offset, -45, 150)
+									.addPos(0, 0, 0, 500))
 							.addBus("SWING_TRANS", new BusAnimationSequence()
-									.addKeyframePosition(-3, 0, 0, 75)
-									.addKeyframePosition(8, 0, 0, 150)
-									.addKeyframePosition(0, 0, 0, 500));
+									.addPos(-3, 0, 0, 75)
+									.addPos(8, 0, 0, 150)
+									.addPos(0, 0, 0, 500));
 
 					Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("hbm:weapon.cSwing"), 0.8F + player.getRNG().nextFloat() * 0.2F));
 					
-					HbmAnimations.hotbar[player.inventory.currentItem] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
+					HbmAnimations.hotbar[player.inventory.currentItem][0] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
 				}
 			}
 			
@@ -1905,16 +1979,16 @@ public class ClientProxy extends ServerProxy {
 					
 					BusAnimation animation = new BusAnimation()
 							.addBus("SWING_ROT", new BusAnimationSequence()
-									.addKeyframePosition(0, 0, 90, forward)
-									.addKeyframePosition(45, 0, 90, sideways)
-									.addKeyframePosition(0, 0, 0, retire))
+									.addPos(0, 0, 90, forward)
+									.addPos(45, 0, 90, sideways)
+									.addPos(0, 0, 0, retire))
 							.addBus("SWING_TRANS", new BusAnimationSequence()
-									.addKeyframePosition(0, 0, 3, forward)
-									.addKeyframePosition(2, 0, 2, sideways)
-									.addKeyframePosition(0, 0, 0, retire));
+									.addPos(0, 0, 3, forward)
+									.addPos(2, 0, 2, sideways)
+									.addPos(0, 0, 0, retire));
 
 					
-					HbmAnimations.hotbar[player.inventory.currentItem] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
+					HbmAnimations.hotbar[player.inventory.currentItem][0] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
 					
 				} else {
 
@@ -1925,17 +1999,17 @@ public class ClientProxy extends ServerProxy {
 					
 					BusAnimation animation = new BusAnimation()
 							.addBus("SWING_ROT", new BusAnimationSequence()
-									.addKeyframePosition(rot[0], rot[1], rot[2], 0)
-									.addKeyframePosition(0, 0, 90, forward)
-									.addKeyframePosition(45, 0, 90, sideways)
-									.addKeyframePosition(0, 0, 0, retire))
+									.addPos(rot[0], rot[1], rot[2], 0)
+									.addPos(0, 0, 90, forward)
+									.addPos(45, 0, 90, sideways)
+									.addPos(0, 0, 0, retire))
 							.addBus("SWING_TRANS", new BusAnimationSequence()
-									.addKeyframePosition(trans[0], trans[1], trans[2], 0)
-									.addKeyframePosition(0, 0, 3, forward)
-									.addKeyframePosition(2, 0, 2, sideways)
-									.addKeyframePosition(0, 0, 0, retire));
+									.addPos(trans[0], trans[1], trans[2], 0)
+									.addPos(0, 0, 3, forward)
+									.addPos(2, 0, 2, sideways)
+									.addPos(0, 0, 0, retire));
 					
-					HbmAnimations.hotbar[player.inventory.currentItem] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
+					HbmAnimations.hotbar[player.inventory.currentItem][0] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), animation);
 				}
 			}
 			
@@ -1947,7 +2021,7 @@ public class ClientProxy extends ServerProxy {
 					BusAnimation anim = item.getAnimation(data, stack);
 					
 					if(anim != null) {
-						HbmAnimations.hotbar[player.inventory.currentItem] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), anim);
+						HbmAnimations.hotbar[player.inventory.currentItem][0] = new Animation(player.getHeldItem().getItem().getUnlocalizedName(), System.currentTimeMillis(), anim);
 					}
 				}
 			}
@@ -2107,21 +2181,14 @@ public class ClientProxy extends ServerProxy {
 	}
 	
 	
-	private HashMap<Integer, Long> vanished = new HashMap();
-	
-	public void vanish(int ent) {
-		vanished.put(ent, System.currentTimeMillis() + 2000);
-	}
+	private static HashMap<Integer, Long> vanished = new HashMap();
+	public static void vanish(int ent) { vanished.put(ent, System.currentTimeMillis() + 2000); }
+	public static void vanish(int ent, int duration) { vanished.put(ent, System.currentTimeMillis() + duration); }
 	
 	@Override
 	public boolean isVanished(Entity e) {
-		
-		if(e == null)
-			return false;
-		
-		if(!this.vanished.containsKey(e.getEntityId()))
-			return false;
-		
+		if(e == null) return false;
+		if(!this.vanished.containsKey(e.getEntityId())) return false;
 		return this.vanished.get(e.getEntityId()) > System.currentTimeMillis();
 	}
 	
@@ -2169,6 +2236,11 @@ public class ClientProxy extends ServerProxy {
 		case CRANE_LEFT:		return HbmKeybinds.craneLeftKey.getIsKeyPressed();
 		case CRANE_RIGHT:		return HbmKeybinds.craneRightKey.getIsKeyPressed();
 		case CRANE_LOAD:		return HbmKeybinds.craneLoadKey.getIsKeyPressed();
+		case TOOL_ALT: 	    	return HbmKeybinds.copyToolAlt.getIsKeyPressed();
+		case TOOL_CTRL:	    	return HbmKeybinds.copyToolCtrl.getIsKeyPressed();
+		case GUN_PRIMARY:		return HbmKeybinds.gunPrimaryKey.getIsKeyPressed();
+		case GUN_SECONDARY:		return HbmKeybinds.gunSecondaryKey.getIsKeyPressed();
+		case GUN_TERTIARY:		return HbmKeybinds.gunTertiaryKey.getIsKeyPressed();
 		}
 		
 		return false;
@@ -2210,10 +2282,6 @@ public class ClientProxy extends ServerProxy {
 	@Override
 	public boolean getImpact(World world) {
 		return ImpactWorldHandler.getImpactForClient(world);
-	}
-	@Override
-	public int getCTime(World world) {
-		return ImpactWorldHandler.getCTimeForClient(world);
 	}
 	
 	@Override

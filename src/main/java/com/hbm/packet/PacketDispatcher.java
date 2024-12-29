@@ -1,6 +1,8 @@
 package com.hbm.packet;
 
 import com.hbm.lib.RefStrings;
+import com.hbm.packet.toclient.*;
+import com.hbm.packet.toserver.*;
 
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -11,13 +13,9 @@ public class PacketDispatcher {
 	//Mark 1 Packet Sending Device
 	public static final SimpleNetworkWrapper wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(RefStrings.MODID);
 
-	public static final void registerPackets()
-	{
+	public static final void registerPackets() {
 		int i = 0;
 		
-		//Fluid packet for GUI
-		wrapper.registerMessage(TEFluidPacket.Handler.class, TEFluidPacket.class, i++, Side.CLIENT);
-
 		//Sound packet that keeps client and server separated
 		wrapper.registerMessage(LoopedSoundPacket.Handler.class, LoopedSoundPacket.class, i++, Side.CLIENT);
 		//Signals server to consume items and create template
@@ -44,8 +42,6 @@ public class PacketDispatcher {
 		wrapper.registerMessage(ParticleBurstPacket.Handler.class, ParticleBurstPacket.class, i++, Side.CLIENT);
 		//Packet to send chunk radiation info to individual players
 		wrapper.registerMessage(ExtPropPacket.Handler.class, ExtPropPacket.class, i++, Side.CLIENT);
-		//Entity sound packet that keeps client and server separated
-		wrapper.registerMessage(LoopedEntitySoundPacket.Handler.class, LoopedEntitySoundPacket.class, i++, Side.CLIENT);
 		//Packet for force fields
 		wrapper.registerMessage(TEFFPacket.Handler.class, TEFFPacket.class, i++, Side.CLIENT);
 		//Sends button information for ItemGunBase
@@ -78,8 +74,6 @@ public class PacketDispatcher {
 		wrapper.registerMessage(ExplosionVanillaNewTechnologyCompressedAffectedBlockPositionDataForClientEffectsAndParticleHandlingPacket.Handler.class, ExplosionVanillaNewTechnologyCompressedAffectedBlockPositionDataForClientEffectsAndParticleHandlingPacket.class, i++, Side.CLIENT);
 		//Packet to send NBT data from clients to the serverside held item
 		wrapper.registerMessage(NBTItemControlPacket.Handler.class, NBTItemControlPacket.class, i++, Side.SERVER);
-		//sends a button press to the held item, assuming it is an ISyncButtons
-		wrapper.registerMessage(SyncButtonsPacket.Handler.class, SyncButtonsPacket.class, i++, Side.SERVER);
 		//General syncing for global values
 		wrapper.registerMessage(PermaSyncPacket.Handler.class, PermaSyncPacket.class, i++, Side.CLIENT);
 		//Syncs biome information for single positions or entire chunks
@@ -92,6 +86,9 @@ public class PacketDispatcher {
 
 		// Sends info about currently linked transporters to player
 		wrapper.registerMessage(TransporterLinkerPacket.Handler.class, TransporterLinkerPacket.class, i++, Side.CLIENT);
+
+		// Sync current GUI layer to server
+		wrapper.registerMessage(GuiLayerPacket.Handler.class, GuiLayerPacket.class, i++, Side.SERVER);
 	}
 	
 }

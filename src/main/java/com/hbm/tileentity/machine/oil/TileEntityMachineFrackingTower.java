@@ -7,9 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.SolarSystem;
-import com.hbm.interfaces.IFluidAcceptor;
 import com.hbm.inventory.container.ContainerMachineOilWell;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIMachineOilWell;
@@ -25,13 +23,12 @@ import com.hbm.world.feature.OilSpot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
-public class TileEntityMachineFrackingTower extends TileEntityOilDrillBase implements IFluidAcceptor {
+public class TileEntityMachineFrackingTower extends TileEntityOilDrillBase {
 
 	protected static int maxPower = 5_000_000;
 	protected static int consumption = 5000;
@@ -51,9 +48,9 @@ public class TileEntityMachineFrackingTower extends TileEntityOilDrillBase imple
 	public TileEntityMachineFrackingTower() {
 		super();
 		tanks = new FluidTank[3];
-		tanks[0] = new FluidTank(Fluids.OIL, 64_000, 0);
-		tanks[1] = new FluidTank(Fluids.GAS, 64_000, 1);
-		tanks[2] = new FluidTank(Fluids.FRACKSOL, 64_000, 2);
+		tanks[0] = new FluidTank(Fluids.OIL, 64_000);
+		tanks[1] = new FluidTank(Fluids.GAS, 64_000);
+		tanks[2] = new FluidTank(Fluids.FRACKSOL, 64_000);
 	}
 
 	@Override
@@ -162,19 +159,6 @@ public class TileEntityMachineFrackingTower extends TileEntityOilDrillBase imple
 	}
 
 	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 1, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 1, getTact(), type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		return type == tanks[2].getTankType() ? tanks[2].getMaxFill() : 0;
-	}
-
-	@Override
 	public FluidTank[] getSendingTanks() {
 		return new FluidTank[] { tanks[0], tanks[1] };
 	}
@@ -251,7 +235,7 @@ public class TileEntityMachineFrackingTower extends TileEntityOilDrillBase imple
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineOilWell(player.inventory, this);
 	}
 

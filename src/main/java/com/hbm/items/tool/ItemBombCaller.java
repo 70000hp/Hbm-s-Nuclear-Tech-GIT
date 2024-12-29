@@ -41,7 +41,6 @@ public class ItemBombCaller extends Item {
 			default: list.add("Type: INVALID, Report it to mod creator");
 
 		}
-
 	}
 
 	@Override

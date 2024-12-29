@@ -9,15 +9,12 @@ import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNT;
 import com.hbm.explosion.ExplosionNT.ExAttrib;
 import com.hbm.handler.CompatHandler;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.container.ContainerITER;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
-import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
 import com.hbm.inventory.gui.GUIITER;
 import com.hbm.inventory.recipes.BreederRecipes;
 import com.hbm.inventory.recipes.BreederRecipes.BreederRecipe;
@@ -26,9 +23,10 @@ import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemFusionShield;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.sound.AudioWrapper;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.CompatEnergyControl;
@@ -45,28 +43,22 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityITER extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidAcceptor, IFluidSource, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent {
+public class TileEntityITER extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent, IFluidCopiable {
 	
 	public long power;
 	public static final long maxPower = 10000000;
 	public static final int powerReq = 100000;
-	public int age = 0;
-	public List<IFluidAcceptor> list = new ArrayList();
 	public FluidTank[] tanks;
 	public FluidTank plasma;
 	public static final int CoolReq = 1;
@@ -89,11 +81,11 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 	public TileEntityITER() {
 		super(6);
 		tanks = new FluidTank[4];
-		tanks[0] = new FluidTank(Fluids.WATER, 1280000, 0);
-		tanks[1] = new FluidTank(Fluids.ULTRAHOTSTEAM, 128000, 1);
-		tanks[2] = new FluidTank(Fluids.COOLANT, 16_000, 0);
-		tanks[3] = new FluidTank(Fluids.COOLANT_HOT, 16_000, 1);
-		plasma = new FluidTank(Fluids.PLASMA_DT, 16000, 2);
+		tanks[0] = new FluidTank(Fluids.WATER, 1280000);
+		tanks[1] = new FluidTank(Fluids.ULTRAHOTSTEAM, 128000);
+		tanks[2] = new FluidTank(Fluids.COOLANT, 16_000);
+		tanks[3] = new FluidTank(Fluids.COOLANT_HOT, 16_000);
+		plasma = new FluidTank(Fluids.PLASMA_DT, 16000);
 		
 	}
 
@@ -107,16 +99,6 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 		
 		if(!worldObj.isRemote) {
 			
-			age++;
-			if (age >= 20) {
-				age = 0;
-			}
-			tanks[2].setType(5, slots);
-			tanks[2].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
-			tanks[3].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
-			if (age == 9 || age == 19)
-				this.tanks[1].getTankType();
-				this.tanks[2].getTankType();
 			this.updateConnections();
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			if(tanks[2].getTankType().hasTrait(FT_Heatable.class)) {
@@ -162,10 +144,7 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 				
 				int prod = FusionRecipes.getSteamProduction(plasma.getTankType());
 				int lod = FusionRecipes.getCoolant(plasma.getTankType());
-				double coolantTemperatureRate = FusionRecipes.coolprod.get(plasma.getTankType());
-				FT_Heatable trait = tanks[2].getTankType().getTrait(FT_Heatable.class);
-				//int temp = tanks[2].getTankType().temperature;
-				//coolantTemperatureRate = trait.getEfficiency(HeatingType.HEATEXCHANGER);
+				
 				for(int i = 0; i < 20; i++) {
 					
 					if(plasma.getFill() > 0) {
@@ -202,9 +181,6 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 			/// END Processing part ///
 
 			/// START Notif packets ///
-			for(int i = 0; i < tanks.length; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
-			plasma.updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
 			
 			for(DirPos pos : getConPos()) {
 				if(tanks[1].getFill() > 0) {
@@ -219,8 +195,6 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 			data.setBoolean("isOn", isOn);
 			data.setLong("power", power);
 			data.setInteger("progress", progress);
-			data.setShort("type", (short)tanks[2].getTankType().getID());
-			data.setShort("hottype", (short)tanks[3].getTankType().getID());
 			tanks[0].writeToNBT(data, "water");
 			tanks[1].writeToNBT(data, "steam");
 			tanks[2].writeToNBT(data, "coolant");
@@ -469,109 +443,6 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 	@Override public long getPower() { return power; }
 	@Override public long getMaxPower() { return maxPower; }
 
-	public void setFillForSync(int fill, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-		
-		if(index == 2)
-			plasma.setFill(fill);
-		tanks[0].setFill(fill);
-		tanks[1].setFill(fill);
-		tanks[2].setFill(fill);
-		tanks[3].setFill(fill);
-	}
-	/*
-	public void setFluidFill(int i, FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if (type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-		else if (type.name().equals(tanks[3].getTankType().name()))
-			tanks[3].setFill(i);
-		else if (type.name().equals(plasma.getTankType().name()))
-			plasma.setFill(i);
-			
-	}
-	*/
-	
-
-	public void setTypeForSync(FluidType type, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-		
-		if(index == 2)
-			plasma.setTankType(type);
-		tanks[0].setTankType(type);
-		tanks[1].setTankType(type);
-		tanks[2].setTankType(type);
-		tanks[3].setTankType(type);
-	}
-	/*
-	@Override
-	public int getFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if (type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else if (type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getFill();
-		else if (type.name().equals(plasma.getTankType().name()))
-			return plasma.getFill();
-		else
-			return 0;
-	}
-	*/
-/*
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(xCoord, yCoord - 3, zCoord, getTact(), type);
-		fillFluid(xCoord, yCoord + 3, zCoord, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return list;
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		list.clear();
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else if (type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getMaxFill();
-		else if (type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getMaxFill();
-		else if (type.name().equals(plasma.getTankType().name()))
-			return plasma.getMaxFill();
-		else
-			return 0;
-	}
-	*/
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
@@ -721,7 +592,7 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIITER(player.inventory, this);
 	}
 
@@ -828,51 +699,7 @@ public class TileEntityITER extends TileEntityMachineBase implements IEnergyRece
 	}
 
 	@Override
-	public void setFluidFill(int fill, FluidType type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean getTact() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		// TODO Auto-generated method stub
+	public FluidTank getTankToPaste() {
 		return null;
 	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
 }

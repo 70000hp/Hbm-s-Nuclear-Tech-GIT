@@ -10,12 +10,14 @@ import com.hbm.inventory.container.ContainerTransporterRocket;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.trait.FT_Rocket;
 import com.hbm.inventory.gui.GUITransporterRocket;
+import com.hbm.items.ItemVOTVdrive.Target;
 import com.hbm.lib.Library;
 import com.hbm.util.ParticleUtil;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -43,6 +45,13 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 	public void updateEntity() {
 		super.updateEntity();
 
+		// If our transporter state sync is incorrect, fix whichever one gets updated first
+		if(!worldObj.isRemote && linkedTransporter != null && linkedTransporter instanceof TileEntityTransporterRocket) {
+			if(hasRocket == ((TileEntityTransporterRocket) linkedTransporter).hasRocket) {
+				hasRocket = !hasRocket;
+			}
+		}
+
 		launchTicks = MathHelper.clamp_int(launchTicks + (hasRocket ? -1 : 1), hasRocket ? -20 : 0, 100);
 
 		if(worldObj.isRemote && launchTicks > 0 && launchTicks < 100) {
@@ -52,11 +61,14 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 				ExplosionLarge.spawnShock(worldObj, xCoord + 0.5, yCoord, zCoord + 0.5, 1 + worldObj.rand.nextInt(3), 1 + worldObj.rand.nextGaussian());
 			}
 		}
+
 	}
 
 	public int getThreshold() {
 		return threshold == 0 ? 0 : (int)Math.pow(2, threshold - 1);
 	}
+
+	private final int MASS_MULT = 100;
 
 	// Check that we have enough fuel to send to our destination
 	@Override
@@ -73,10 +85,10 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 
 		if(fuelStats == null) return false;
 
-		CelestialBody from = CelestialBody.getBody(worldObj);
-		CelestialBody to = CelestialBody.getBody(linkedTransporter.getWorldObj());
+		Target from = CelestialBody.getTarget(worldObj, xCoord, zCoord);
+		Target to = CelestialBody.getTarget(linkedTransporter.getWorldObj(), linkedTransporter.xCoord, linkedTransporter.zCoord);
 
-		int sendCost = Math.min(64_000, SolarSystem.getCostBetween(from, to, mass, (int)fuelStats.getThrust(), (int)fuelStats.getISP()));
+		int sendCost = Math.min(64_000, SolarSystem.getCostBetween(from.body, to.body, mass * MASS_MULT, (int)fuelStats.getThrust(), fuelStats.getISP(), from.inOrbit, to.inOrbit));
 
 		return tanks[8].getFill() >= sendCost && tanks[9].getFill() >= sendCost;
 	}
@@ -87,10 +99,10 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 		FT_Rocket fuelStats = tanks[8].getTankType().getTrait(FT_Rocket.class);
 		if(fuelStats == null) fuelStats = tanks[9].getTankType().getTrait(FT_Rocket.class);
 
-		CelestialBody from = CelestialBody.getBody(worldObj);
-		CelestialBody to = CelestialBody.getBody(linkedTransporter.getWorldObj());
+		Target from = CelestialBody.getTarget(worldObj, xCoord, zCoord);
+		Target to = CelestialBody.getTarget(linkedTransporter.getWorldObj(), linkedTransporter.xCoord, linkedTransporter.zCoord);
 
-		int sendCost = Math.min(64_000, SolarSystem.getCostBetween(from, to, quantitySent, (int)fuelStats.getThrust(), (int)fuelStats.getISP()));
+		int sendCost = Math.min(64_000, SolarSystem.getCostBetween(from.body, to.body, quantitySent * MASS_MULT, (int)fuelStats.getThrust(), fuelStats.getISP(), from.inOrbit, to.inOrbit));
 
 		tanks[8].setFill(tanks[8].getFill() - sendCost);
 		tanks[9].setFill(tanks[9].getFill() - sendCost);
@@ -112,7 +124,7 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUITransporterRocket(player.inventory, this);
 	}
 	
@@ -124,17 +136,17 @@ public class TileEntityTransporterRocket extends TileEntityTransporterBase {
 	}
 
 	@Override
-	public void networkPack(NBTTagCompound nbt, int range) {
-		nbt.setBoolean("rocket", hasRocket);
-		nbt.setInteger("threshold", threshold);
-		super.networkPack(nbt, range);
+	public void serialize(ByteBuf buf) {
+		buf.writeBoolean(hasRocket);
+		buf.writeInt(threshold);
+		super.serialize(buf);
 	}
-	
+
 	@Override
-	public void networkUnpack(NBTTagCompound nbt) {
-		super.networkUnpack(nbt);
-		hasRocket = nbt.getBoolean("rocket");
-		threshold = nbt.getInteger("threshold");
+	public void deserialize(ByteBuf buf) {
+		hasRocket = buf.readBoolean();
+		threshold = buf.readInt();
+		super.deserialize(buf);
 	}
 
 	@Override

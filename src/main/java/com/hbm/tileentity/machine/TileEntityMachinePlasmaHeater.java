@@ -6,13 +6,14 @@ import java.util.List;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineITER;
-import com.hbm.interfaces.IFluidAcceptor;
+import com.hbm.blocks.machine.MachineHTRF4;
 import com.hbm.inventory.container.ContainerPlasmaHeater;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIPlasmaHeater;
 import com.hbm.lib.Library;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 
@@ -20,7 +21,6 @@ import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.fluid.IFluidStandardReceiver;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,7 +29,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase implements IFluidAcceptor, IEnergyReceiverMK2, IFluidStandardReceiver, IGUIProvider {
+public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IGUIProvider, IFluidCopiable {
 	
 	public long power;
 	public static final long maxPower = 100000000;
@@ -40,9 +40,9 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 	public TileEntityMachinePlasmaHeater() {
 		super(5);
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(Fluids.DEUTERIUM, 16000, 0);
-		tanks[1] = new FluidTank(Fluids.TRITIUM, 16000, 1);
-		plasma = new FluidTank(Fluids.PLASMA_DT, 64000, 2);
+		tanks[0] = new FluidTank(Fluids.DEUTERIUM, 16_000);
+		tanks[1] = new FluidTank(Fluids.TRITIUM, 16_000);
+		plasma = new FluidTank(Fluids.PLASMA_DT, 64_000);
 	}
 
 	@Override
@@ -91,6 +91,33 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 			ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - BlockDummyable.offset).getOpposite();
 			int dist = 11;
 			
+			if(worldObj.getBlock(xCoord + dir.offsetX * dist, yCoord + 1, zCoord + dir.offsetZ * dist) == ModBlocks.machine_htrf4) {
+				int[] pos = ((MachineHTRF4)ModBlocks.machine_htrf4).findCore(worldObj, xCoord + dir.offsetX * dist, yCoord + 1, zCoord + dir.offsetZ * dist);
+				
+				if(pos != null) {
+					TileEntity te = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
+					
+					if(te instanceof TileEntityMachineHTRF4) {
+						TileEntityMachineHTRF4 htrf = (TileEntityMachineHTRF4)te;
+							
+						if(htrf.tanks[0].getFill() == 0 && this.plasma.getTankType() != Fluids.NONE) {
+							htrf.tanks[0].setTankType(this.plasma.getTankType());
+						}
+							{
+							if(htrf.tanks[0].getTankType() == this.plasma.getTankType()) {
+								
+								int toLoad = Math.min(htrf.tanks[0].getMaxFill() - htrf.tanks[0].getFill(), this.plasma.getFill());
+								toLoad = Math.min(toLoad, 40);
+								this.plasma.setFill(this.plasma.getFill() - toLoad);
+								htrf.tanks[0].setFill(htrf.tanks[0].getFill() + toLoad);
+								this.markDirty();
+								htrf.markDirty();
+							}
+						}
+					}
+				}
+			}
+			
 			if(worldObj.getBlock(xCoord + dir.offsetX * dist, yCoord + 2, zCoord + dir.offsetZ * dist) == ModBlocks.iter) {
 				int[] pos = ((MachineITER)ModBlocks.iter).findCore(worldObj, xCoord + dir.offsetX * dist, yCoord + 2, zCoord + dir.offsetZ * dist);
 				
@@ -123,12 +150,12 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 			/// END Loading plasma into the ITER ///
 
 			/// START Notif packets ///
-			for(int i = 0; i < tanks.length; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
-			plasma.updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
 			
 			NBTTagCompound data = new NBTTagCompound();
 			data.setLong("power", power);
+			tanks[0].writeToNBT(data, "t0");
+			tanks[1].writeToNBT(data, "t1");
+			plasma.writeToNBT(data, "t2");
 			this.networkPack(data, 50);
 			/// END Notif packets ///
 		}
@@ -154,6 +181,9 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 		super.networkUnpack(nbt);
 		
 		this.power = nbt.getLong("power");
+		tanks[0].readFromNBT(nbt, "t0");
+		tanks[1].readFromNBT(nbt, "t1");
+		plasma.readFromNBT(nbt, "t2");
 	}
 	
 	private void updateType() {
@@ -213,58 +243,6 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 	}
 
 	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else if (type.name().equals(plasma.getTankType().name()))
-			return plasma.getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if (type.name().equals(plasma.getTankType().name()))
-			plasma.setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if (type.name().equals(plasma.getTankType().name()))
-			return plasma.getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-		
-		if(index == 2)
-			plasma.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-		
-		if(index == 2)
-			plasma.setTankType(type);
-	}
-
-	@Override
 	public void setPower(long i) {
 		this.power = i;
 	}
@@ -307,7 +285,7 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIPlasmaHeater(player.inventory, this);
 	}
 }

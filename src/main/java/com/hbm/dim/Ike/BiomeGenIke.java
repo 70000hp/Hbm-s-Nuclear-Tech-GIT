@@ -21,7 +21,10 @@ public class BiomeGenIke extends BiomeGenBaseCelestial {
 		this.setBiomeName("Ike");
 		this.setDisableRain();
 
-		this.theBiomeDecorator = new BiomeDecoratorCelestial(ModBlocks.ike_stone);
+		BiomeDecoratorCelestial decorator = new BiomeDecoratorCelestial(ModBlocks.ike_stone);
+		decorator.lakeChancePerChunk = 8;
+		decorator.lakeBlock = ModBlocks.bromine_block;
+		this.theBiomeDecorator = decorator;
 		this.theBiomeDecorator.generateLakes = false;
 
 		this.setHeight(height);
@@ -30,6 +33,7 @@ public class BiomeGenIke extends BiomeGenBaseCelestial {
 		this.fillerBlock = ModBlocks.ike_regolith; // thiccer regolith due to uhhhhhh...................
 	}
 
+	@Override
 	public void genTerrainBlocks(World world, Random rand, Block[] blocks, byte[] meta, int x, int z, double noise) {
 		Block block = this.topBlock;
 		byte b0 = (byte) (this.field_150604_aj & 255);

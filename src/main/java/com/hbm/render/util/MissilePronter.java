@@ -1,14 +1,21 @@
 package com.hbm.render.util;
 
+import java.nio.DoubleBuffer;
+
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.entity.missile.EntityRideableRocket;
 import com.hbm.handler.RocketStruct;
 import com.hbm.handler.RocketStruct.RocketStage;
 import com.hbm.items.weapon.ItemCustomMissilePart.PartType;
+import com.hbm.main.ResourceManager;
 
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.TextureManager;
 
 public class MissilePronter {
+
+	private static DoubleBuffer buffer;
 
 	public static void prontMissile(MissileMultipart missile, TextureManager tex) {
 		
@@ -44,12 +51,23 @@ public class MissilePronter {
 	}
 
 	public static void prontRocket(RocketStruct rocket, TextureManager tex) {
-		prontRocket(rocket, tex, true);
+		prontRocket(rocket, null, tex, true, 0);
+	}
+
+	public static void prontRocket(RocketStruct rocket, TextureManager tex, boolean isDeployed) {
+		prontRocket(rocket, null, tex, isDeployed, 0);
 	}
 
 	// Attaches a set of stages together
-	public static void prontRocket(RocketStruct rocket, TextureManager tex, boolean isDeployed) {
+	public static void prontRocket(RocketStruct rocket, EntityRideableRocket entity, TextureManager tex, boolean isDeployed, float interp) {
 		GL11.glPushMatrix();
+		
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+
+		boolean hasShroud = false;
+
+		if(buffer == null)
+			buffer = GLAllocation.createDirectByteBuffer(8 * 4).asDoubleBuffer(); // four doubles
 
 		for(RocketStage stage : rocket.stages) {
 			int stack = stage.getStack();
@@ -75,8 +93,18 @@ public class MissilePronter {
 					}
 
 					if(stage.thruster != null) {
-						tex.bindTexture(stage.thruster.texture);
-						stage.thruster.getModel(isDeployed).renderAll();
+						if(hasShroud && stage.fuselage != null) {
+							tex.bindTexture(ResourceManager.universal);
+							buffer.put(new double[] {0, -1, 0, stage.thruster.height});
+							buffer.rewind();
+							GL11.glEnable(GL11.GL_CLIP_PLANE0);
+							GL11.glClipPlane(GL11.GL_CLIP_PLANE0, buffer);
+							stage.fuselage.getShroud().renderAll();
+							GL11.glDisable(GL11.GL_CLIP_PLANE0);
+						} else {
+							tex.bindTexture(stage.thruster.texture);
+							stage.thruster.getModel(isDeployed).renderAll();
+						}
 						GL11.glTranslated(0, stage.thruster.height, 0);
 					}
 		
@@ -103,12 +131,19 @@ public class MissilePronter {
 
 			// Only the bottom-most stage can be deployed
 			isDeployed = false;
+			hasShroud = true;
 		}
 
 		if(rocket.capsule != null) {
-			tex.bindTexture(rocket.capsule.texture);
-			rocket.capsule.model.renderAll();
+			if(entity != null && rocket.capsule.renderer != null) {
+				rocket.capsule.renderer.render(tex, entity, interp);
+			} else {
+				tex.bindTexture(rocket.capsule.texture);
+				rocket.capsule.model.renderAll();
+			}
 		}
+
+		GL11.glShadeModel(GL11.GL_FLAT);
 
 		GL11.glPopMatrix();
 	}

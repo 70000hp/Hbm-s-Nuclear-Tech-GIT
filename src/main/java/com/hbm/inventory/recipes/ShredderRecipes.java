@@ -138,7 +138,7 @@ public class ShredderRecipes extends SerializableRecipe {
 		ShredderRecipes.setRecipe(ModItems.dust_tiny, new ItemStack(ModItems.dust_tiny));
 		ShredderRecipes.setRecipe(Blocks.glowstone, new ItemStack(Items.glowstone_dust, 4));
 		ShredderRecipes.setRecipe(ModBlocks.reinforced_light, new ItemStack(Items.glowstone_dust, 4));
-		ShredderRecipes.setRecipe(ModBlocks.ore_glowstone, new ItemStack(Items.glowstone_dust, 4));
+		ShredderRecipes.setRecipe(new ItemStack(ModBlocks.ore_glowstone, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.glowstone_dust, 4));
 		ShredderRecipes.setRecipe(new ItemStack(Blocks.quartz_block, 1, 0), new ItemStack(ModItems.powder_quartz, 4));
 		ShredderRecipes.setRecipe(new ItemStack(Blocks.quartz_block, 1, 1), new ItemStack(ModItems.powder_quartz, 4));
 		ShredderRecipes.setRecipe(new ItemStack(Blocks.quartz_block, 1, 2), new ItemStack(ModItems.powder_quartz, 4));
@@ -147,7 +147,7 @@ public class ShredderRecipes extends SerializableRecipe {
 		ShredderRecipes.setRecipe(Items.quartz, new ItemStack(ModItems.powder_quartz));
 		ShredderRecipes.setRecipe(Blocks.quartz_ore, new ItemStack(ModItems.powder_quartz, 2));
 		ShredderRecipes.setRecipe(ModBlocks.ore_quartz, new ItemStack(ModItems.powder_quartz, 2));
-		ShredderRecipes.setRecipe(ModBlocks.ore_nether_fire, new ItemStack(ModItems.powder_fire, 6));
+		ShredderRecipes.setRecipe(new ItemStack(ModBlocks.ore_fire, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ModItems.powder_fire, 6));
 		ShredderRecipes.setRecipe(ModBlocks.ore_fire, new ItemStack(ModItems.powder_fire, 6));
 		ShredderRecipes.setRecipe(Blocks.packed_ice, new ItemStack(ModItems.powder_ice, 1));
 		ShredderRecipes.setRecipe(ModBlocks.brick_light, new ItemStack(Items.clay_ball, 4));
@@ -192,13 +192,13 @@ public class ShredderRecipes extends SerializableRecipe {
 		ShredderRecipes.setRecipe(ModBlocks.meteor_brick_cracked, new ItemStack(ModItems.powder_meteorite, 1));
 		ShredderRecipes.setRecipe(ModBlocks.meteor_brick_chiseled, new ItemStack(ModItems.powder_meteorite, 1));
 		ShredderRecipes.setRecipe(ModBlocks.meteor_pillar, new ItemStack(ModItems.powder_meteorite, 1));
-		ShredderRecipes.setRecipe(ModBlocks.ore_rare, new ItemStack(ModItems.powder_desh_mix, 1));
+		ShredderRecipes.setRecipe(new ItemStack(ModBlocks.ore_rare, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ModItems.powder_desh_mix, 1));
 		ShredderRecipes.setRecipe(Blocks.diamond_ore, new ItemStack(ModBlocks.gravel_diamond, 2));
 		ShredderRecipes.setRecipe(ModBlocks.ore_sellafield_diamond, new ItemStack(ModBlocks.gravel_diamond, 2));
 		ShredderRecipes.setRecipe(ModBlocks.boxcar, new ItemStack(ModItems.powder_steel, 32));
 		ShredderRecipes.setRecipe(ModItems.ingot_schrabidate, new ItemStack(ModItems.powder_schrabidate, 1));
 		ShredderRecipes.setRecipe(ModBlocks.block_schrabidate, new ItemStack(ModItems.powder_schrabidate, 9));
-		ShredderRecipes.setRecipe(ModItems.coal_infernal, new ItemStack(ModItems.powder_coal, 3));
+		ShredderRecipes.setRecipe(ModItems.coal_infernal, new ItemStack(ModItems.powder_coal, 2));
 		ShredderRecipes.setRecipe(Items.fermented_spider_eye, new ItemStack(ModItems.powder_poison, 3));
 		ShredderRecipes.setRecipe(Items.poisonous_potato, new ItemStack(ModItems.powder_poison, 1));
 		ShredderRecipes.setRecipe(ModBlocks.ore_tektite_osmiridium, new ItemStack(ModItems.powder_tektite, 1));
@@ -208,8 +208,7 @@ public class ShredderRecipes extends SerializableRecipe {
 		ShredderRecipes.setRecipe(Items.carrot, new ItemStack(Items.sugar, 1));
 		ShredderRecipes.setRecipe(ModItems.crystal_cleaned, new ItemStack(ModItems.mineral_dust, 4));
 		
-		ShredderRecipes.setRecipe(ModBlocks.ore_lithium, new ItemStack(ModItems.powder_lithium, 4));
-		ShredderRecipes.setRecipe(ModBlocks.ore_mineral, new ItemStack(ModItems.mineral_dust, 1)); // it was deserved
+		ShredderRecipes.setRecipe(new ItemStack(ModBlocks.ore_mineral, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(ModItems.mineral_dust, 1)); // it was deserved
 
 		
 		ShredderRecipes.setRecipe(ModItems.bean_roast,  new ItemStack(ModItems.powder_coffee, 1));
@@ -291,6 +290,8 @@ public class ShredderRecipes extends SerializableRecipe {
 		ShredderRecipes.setRecipe(ModItems.crystal_lithium, new ItemStack(ModItems.powder_lithium, 3));
 		ShredderRecipes.setRecipe(ModItems.crystal_starmetal, new ItemStack(ModItems.powder_dura_steel, 6));
 		ShredderRecipes.setRecipe(ModItems.crystal_cobalt, new ItemStack(ModItems.powder_cobalt, 3));
+		ShredderRecipes.setRecipe(ModItems.crystal_nickel, new ItemStack(ModItems.powder_nickel, 3));
+		ShredderRecipes.setRecipe(ModItems.crystal_niobium, new ItemStack(ModItems.powder_niobium, 3));
 
 		/* Misc recycling */
 		ShredderRecipes.setRecipe(ModBlocks.steel_poles, new ItemStack(ModItems.powder_steel_tiny, 3));

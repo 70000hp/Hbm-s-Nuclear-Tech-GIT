@@ -2,11 +2,13 @@
 
 Hi, i am memeing things into existence, dont mind me! im just the bent fork at the end of the table -JamesH_2
 
-[NTM on Modrinth](https://modrinth.com/mod/ntm)
+[NTM Space on Modrinth](https://modrinth.com/mod/ntmspace)
 
 [NTM on CurseForge](https://minecraft.curseforge.com/projects/hbms-nuclear-tech-mod?gameCategorySlug=mc-mods&projectID=235439)
 
 [Official NTM Wiki](https://nucleartech.wiki/wiki/Main_Page)
+
+[Bobcat's Blog (the blag)](https://hbmmods.github.io/), you can find lengthy yapping, upcoming features and some secrets here.
 
 **This is for 1.7.10!** For 1.12, check out these projects:
 
@@ -95,6 +97,9 @@ If you want to make some changes to the mod, follow this guide:
       * Click **Add Standard VM**; in the JRE home, navigate to the directory where the JDK is installed, then click finish and select it.
 10. Code!
 
+## Contributing animations
+Weapon animations in NTM are stored in JSON files, which are used alongside OBJ models to produce high quality animations with reasonable filesizes. Import/Export Blender addons are available for versions 2.79, 3.2, and 4.0 in `tools`, and they should function reasonably well in newer versions as well. See the comments in the header of the export scripts for usage instructions.
+
 ## Compatibility notice
 NTM has certain behaviors intended to fix vanilla code or to increase compatibility in certain cases where it otherwise would not be possible. These behaviors have the potential of not playing well with other mods, and while no such cases are currently known, here's a list of them.
 
@@ -106,6 +111,7 @@ One of the most common "performance" mods on 1.7.10, Optifine, achieves an incre
 * Get rid of Optifine and use one of the many [other, less intrusive performance mods](https://gist.github.com/makamys/7cb74cd71d93a4332d2891db2624e17c).
 * Blocks with connected textures may become invisible. This can be fixed by toggling triangulation (I do not know what or where this setting is, I just have been told that it exists and that it can fix the problem) or multicore chunk rendering (same here).
 * Entity "optimization" has a tendency to break chunkloading, this is especially noticeable with missiles which rely heavily on chunkloading to work, causing them to freeze mid-air. It's unclear what setting might fix this, and analysis of Optifine's source code (or rather, lack thereof) has not proven useful either.
+   * This issue will also cause orbital stations to never reach orbit, I can't emphasize enough how much pain and misery this "performance" mod will cause you, use Angelica instead.
 
 ### Angelica
 In older versions, Angelica caused issues regarding model rendering, often times making 3D models transparent. Ever since the switch to VBOs, models work fine. Another issue was blocks with connected textures not rendering at all, but this too was fixed, meaning as of time of writing there are no major incompatibilities known with Angelica. However there a few minor issues that persist, but those can be fixed:

@@ -10,6 +10,8 @@ import com.hbm.handler.RocketStruct.RocketStage;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.ContainerMachineRocketAssembly;
 import com.hbm.inventory.gui.GUIMachineRocketAssembly;
+import com.hbm.items.ISatChip;
+import com.hbm.items.ItemVOTVdrive;
 import com.hbm.items.weapon.ItemCustomRocket;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
@@ -19,9 +21,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -50,7 +52,17 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	@Override
 	public void updateEntity() {
 		if(!worldObj.isRemote) {
+			ItemStack fromStack = slots[slots.length - 2];
+			ItemStack toStack = slots[slots.length - 1];
+
+			// updates the orbital station information and syncs it to the client, if necessary
+			ItemVOTVdrive.getTarget(fromStack, worldObj);
+			ItemVOTVdrive.getTarget(toStack, worldObj);
+
 			rocket = new RocketStruct(slots[0]);
+			if(slots[0] != null && slots[0].getItem() instanceof ISatChip) {
+				rocket.satFreq = ISatChip.getFreqS(slots[0]);
+			}
 			for(int i = 1; i < RocketStruct.MAX_STAGES * 3; i += 3) {
 				if(slots[i] == null && slots[i+1] == null && slots[i+2] == null) {
 					// Check for later stages and shift them up into empty stages
@@ -222,6 +234,36 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 			slots[i] = null;
 		}
 	}
+
+	public boolean canDeconstruct() {
+		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - 3]);
+		if(rocket == null) return false;
+		for(int i = 0; i < slots.length - 3; i++) {
+			if(slots[i] != null) return false;
+		}
+
+		return true;
+	}
+
+	public void deconstruct() {
+		if(!canDeconstruct()) return;
+		int satFreq = ISatChip.getFreqS(slots[slots.length - 3]);
+		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - 3]);
+
+		slots[0] = new ItemStack(rocket.capsule.part);
+		if(slots[0].getItem() instanceof ISatChip) {
+			ISatChip.setFreqS(slots[0], satFreq);
+		}
+		for(int i = 0; i < rocket.stages.size(); i++) {
+			int o = i * 3;
+			RocketStage stage = rocket.stages.get(rocket.stages.size() - 1 - i);
+			slots[o + 1] = new ItemStack(stage.fuselage.part, stage.fuselageCount);
+			if(stage.fins != null) slots[o + 2] = new ItemStack(stage.fins.part);
+			slots[o + 3] = new ItemStack(stage.thruster.part, stage.thrusterCount);
+		}
+
+		slots[slots.length - 3] = null;
+	}
 	
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
@@ -241,7 +283,7 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineRocketAssembly(player.inventory, this);
 	}
 
@@ -259,6 +301,9 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	public void receiveControl(NBTTagCompound data) {
 		if(data.getBoolean("construct")) {
 			construct();
+		}
+		if(data.getBoolean("deconstruct")) {
+			deconstruct();
 		}
 	}
 

@@ -13,7 +13,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemCapacitor;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.toclient.AuxElectricityPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.render.tileentity.RenderTurretMaxwell;
 import com.hbm.sound.AudioWrapper;
@@ -184,7 +184,7 @@ public class TileEntityMachineDischarger extends TileEntityMachineBase implement
 			if (slots[0].stackSize <= 0 && slots[0].getItem() == ModItems.ingot_schrabidium) {
 				power += Gen * 2;
 				slots[0] = null;
-				slots[0] = new ItemStack(ModItems.ingot_lanthanium);
+				slots[0] = new ItemStack(ModItems.ingot_hafnium); //this machine sucks and should be shot
 				//if (slots[0].getItem() == ModItems.ingot_lanthanium && slots[0].stackSize < slots[0].getMaxStackSize()) {
 				//	  slots[0].stackSize++;
 				//}
@@ -330,7 +330,7 @@ public class TileEntityMachineDischarger extends TileEntityMachineBase implement
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineDischarger(player.inventory, this);
 	}
 

@@ -8,20 +8,18 @@ import com.hbm.entity.logic.EntityBalefire;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.handler.CompatHandler;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.container.ContainerBarrel;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Corrosive;
-import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FluidTrait.FluidReleaseType;
 import com.hbm.inventory.gui.GUIBarrel;
 import com.hbm.lib.Library;
 import com.hbm.saveddata.TomSaveData;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IOverpressurable;
 import com.hbm.tileentity.IPersistentNBT;
@@ -36,7 +34,6 @@ import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -53,14 +50,13 @@ import java.util.List;
 import java.util.Set;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")})
-public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcceptor, IFluidSource, SimpleComponent, IFluidStandardTransceiver, IPersistentNBT, IGUIProvider, IOverpressurable, CompatHandler.OCComponent {
+public class TileEntityBarrel extends TileEntityMachineBase implements SimpleComponent, IFluidStandardTransceiver, IPersistentNBT, IGUIProvider, CompatHandler.OCComponent, IFluidCopiable, IOverpressurable {
 	
 	public boolean hasExploded = false;
 	public FluidTank tank;
 	public short mode = 0;
 	public static final short modes = 4;
 	public int age = 0;
-	public List<IFluidAcceptor> list = new ArrayList();
 	protected boolean sendingBrake = false;
 	
 	public Explosion lastExplosion = null;
@@ -68,12 +64,12 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 
 	public TileEntityBarrel() {
 		super(6);
-		tank = new FluidTank(Fluids.NONE, 0, 0);
+		tank = new FluidTank(Fluids.NONE, 0);
 	}
 
 	public TileEntityBarrel(int capacity) {
 		super(6);
-		tank = new FluidTank(Fluids.NONE, capacity, 0);
+		tank = new FluidTank(Fluids.NONE, capacity);
 	}
 
 	@Override
@@ -126,9 +122,6 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 			this.sendingBrake = true;
 			tank.setFill(transmitFluidFairly(worldObj, tank, this, tank.getFill(), this.mode == 0 || this.mode == 1, this.mode == 1 || this.mode == 2, getConPos()));
 			this.sendingBrake = false;
-			
-			if((mode == 1 || mode == 2) && (age == 9 || age == 19))
-				fillFluidInit(tank.getTankType());
 			
 			if(tank.getFill() > 0) {
 				checkFluidInteraction();
@@ -292,69 +285,6 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 			}
 		}
 	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		
-		if(mode == 2 || mode == 3)
-			return 0;
-		
-		return type == this.tank.getTankType() ? tank.getMaxFill() : 0;
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord + 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord - 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 1, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type == this.tank.getTankType() ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type == tank.getTankType()) tank.setFill(i);
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return this.list;
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		this.list.clear();
-	}
 	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
@@ -388,6 +318,16 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 	}
 
 	@Override
+	public int[] getFluidIDToCopy() {
+		return new int[] {tank.getTankType().getID()};
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return tank;
+	}
+
+	@Override
 	public void writeNBT(NBTTagCompound nbt) {
 		if(tank.getFill() == 0) return;
 		NBTTagCompound data = new NBTTagCompound();
@@ -410,7 +350,7 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIBarrel(player.inventory, this);
 	}
 
@@ -446,42 +386,39 @@ public class TileEntityBarrel extends TileEntityMachineBase implements IFluidAcc
 
 	@Override
 	public void explode(World world, int x, int y, int z) {
-		//if(this.hasExploded) return;
-	    	float amat = Math.min(this.getFluidFill(Fluids.AMAT)/100,90);
-	    	float aschrab = Math.min(this.getFluidFill(Fluids.ASCHRAB)/100,90);
-	    	if(this.hasExploded && !worldObj.isRemote) {
-	    		if(amat>0)
-	    		{
-	    			if(amat >= 25)
-	    			{
-	    				EntityBalefire bf = new EntityBalefire(worldObj);
-	    				bf.antimatter();
-	    	    		bf.setPosition(xCoord, yCoord, zCoord);
-	    				bf.destructionRange = (int) amat;
-	    				worldObj.spawnEntityInWorld(bf);
-	    				EntityNukeTorex.startFacAnti(worldObj, xCoord, yCoord, zCoord, amat * 1.5F);
-	    				return;
-	    			}
-	    			else
-	    			{
-	    				new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, amat).makeAmat().explode();
-	    			}
-	    		}
-	    		if(aschrab>0)
-	    		{
-	    			EntityNukeExplosionMK3 ex = EntityNukeExplosionMK3.statFacFleija(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, (int) aschrab);
-	    			if(!ex.isDead) {
-	    				worldObj.spawnEntityInWorld(ex);
-	    	
-	    				EntityCloudFleija cloud = new EntityCloudFleija(worldObj, (int) aschrab);
-	    				cloud.setPosition(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
-	    				worldObj.spawnEntityInWorld(cloud);
-	    			}
-	    			return;			
-	    		}	
-	    	}
-	    	this.markChanged();
-	    }
+		if(tank.getTankType() == Fluids.AMAT || tank.getTankType() == Fluids.ASCHRAB) {
+			float amat = Math.min(tank.getFill() / 100, 90);
+			float aschrab = Math.min(tank.getFill() / 100, 90);
+			if(this.hasExploded && !worldObj.isRemote) {
+				if(amat > 0) {
+					if(amat >= 25) {
+						EntityBalefire bf = new EntityBalefire(worldObj);
+						bf.antimatter();
+						bf.setPosition(xCoord, yCoord, zCoord);
+						bf.destructionRange = (int) amat;
+						worldObj.spawnEntityInWorld(bf);
+						EntityNukeTorex.startFacAnti(worldObj, xCoord, yCoord, zCoord, amat * 1.5F);
+						return;
+					} else {
+						new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, amat).makeAmat().explode();
+					}
+				}
+				if(aschrab > 0) {
+					EntityNukeExplosionMK3 ex = EntityNukeExplosionMK3.statFacFleija(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, (int) aschrab);
+					if(!ex.isDead) {
+						worldObj.spawnEntityInWorld(ex);
+			
+						EntityCloudFleija cloud = new EntityCloudFleija(worldObj, (int) aschrab);
+						cloud.setPosition(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+						worldObj.spawnEntityInWorld(cloud);
+					}
+					return;			
+				}	
+			}
+		}
+		
+		this.markChanged();
+	}
 
 	@Override
 	@Optional.Method(modid = "OpenComputers")

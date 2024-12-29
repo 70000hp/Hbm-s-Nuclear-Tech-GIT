@@ -1,23 +1,20 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.config.VersatileConfig;
 import com.hbm.hazard.HazardRegistry;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.hazard.type.HazardTypeNeutron;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.container.ContainerStorageDrum;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIStorageDrum;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemWasteLong;
 import com.hbm.items.special.ItemWasteShort;
-import com.hbm.lib.Library;
+import com.hbm.tileentity.IFluidCopiable;
+import com.hbm.tileentity.IBufPacketReceiver;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.ContaminationUtil;
@@ -27,7 +24,7 @@ import com.hbm.util.ContaminationUtil.HazardType;
 import api.hbm.fluid.IFluidStandardSender;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -38,19 +35,18 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-public class TileEntityStorageDrum extends TileEntityMachineBase implements IFluidSource, IFluidStandardSender, IGUIProvider {
+public class TileEntityStorageDrum extends TileEntityMachineBase implements IFluidStandardSender, IBufPacketReceiver, IGUIProvider, IFluidCopiable {
+
 
 	public FluidTank[] tanks;
 	private static final int[] slots_arr = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
-	public List<IFluidAcceptor> list = new ArrayList();
-	public List<IFluidAcceptor> list2 = new ArrayList();
 	public int age = 0;
 
 	public TileEntityStorageDrum() {
 		super(24);
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(Fluids.WASTEFLUID, 16000, 0);
-		tanks[1] = new FluidTank(Fluids.WASTEGAS, 16000, 1);
+		tanks[0] = new FluidTank(Fluids.WASTEFLUID, 16000);
+		tanks[1] = new FluidTank(Fluids.WASTEGAS, 16000);
 	}
 
 	@Override
@@ -64,7 +60,7 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 		if(!worldObj.isRemote) {
 			
 			float rad = 0;
-			float digamma = 0;
+
 			int liquid = 0;
 			int gas = 0;
 			
@@ -76,11 +72,6 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 					
 					if(worldObj.getTotalWorldTime() % 20 == 0) {
 						rad += HazardSystem.getHazardLevelFromStack(slots[i], HazardRegistry.RADIATION);
-						digamma += HazardSystem.getHazardLevelFromStack(slots[i], HazardRegistry.DIGAMMA);
-						if(item == ModItems.particle_digamma)
-						{
-							digamma+=0.333f;
-						}
 					}
 					
 					int meta = slots[i].getItemDamage();
@@ -126,15 +117,16 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 					if(item == ModItems.nugget_pb209 && worldObj.rand.nextInt(VersatileConfig.getShortDecayChance() / 50) == 0) {
 						slots[i] = new ItemStack(ModItems.nugget_bismuth, 1, meta);
 					}
+					if(item == ModItems.powder_sr90 && worldObj.rand.nextInt(VersatileConfig.getShortDecayChance() / 10) == 0) {
+						slots[i] = new ItemStack(ModItems.powder_zirconium, 1, meta);
+					}
+					if(item == ModItems.nugget_sr90 && worldObj.rand.nextInt(VersatileConfig.getShortDecayChance() / 50) == 0) {
+						slots[i] = new ItemStack(ModItems.nugget_zirconium, 1, meta);
+					}
+
+					
 					if(slots[i] != null) {
 						HazardTypeNeutron.decay(slots[i], 0.9899916F);
-
-						if(item == ModItems.powder_sr90 && worldObj.rand.nextInt(VersatileConfig.getShortDecayChance() / 10) == 0) {
-							slots[i] = new ItemStack(ModItems.powder_zirconium, 1, meta);
-						}
-						if(item == ModItems.nugget_sr90 && worldObj.rand.nextInt(VersatileConfig.getShortDecayChance() / 50) == 0) {
-							slots[i] = new ItemStack(ModItems.nugget_zirconium, 1, meta);
-						}
 					}
 				}
 			}
@@ -157,27 +149,28 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 			if(age >= 20)
 				age -= 20;
 			
-			if(age == 9 || age == 19) {
-				fillFluidInit(tanks[0].getTankType());
-			}
-			if(age == 8 || age == 18) {
-				fillFluidInit(tanks[1].getTankType());
-			}
-
 			this.sendFluidToAll(tanks[0], this);
 			this.sendFluidToAll(tanks[1], this);
-
-			tanks[0].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
-			tanks[1].updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
 			
-			if(rad > 0 || digamma > 0) {
-				radiate(worldObj, xCoord, yCoord, zCoord, rad, digamma);
+			this.sendStandard(25);
+			
+			if(rad > 0) {
+				radiate(worldObj, xCoord, yCoord, zCoord, rad);
 			}
 		}
-		
+	}
+
+	@Override public void serialize(ByteBuf buf) {
+		tanks[0].serialize(buf);
+		tanks[1].serialize(buf);
 	}
 	
-	private void radiate(World world, int x, int y, int z, float rads, float digamma) {
+	@Override public void deserialize(ByteBuf buf) {
+		tanks[0].deserialize(buf);
+		tanks[1].deserialize(buf);
+	}
+	
+	private void radiate(World world, int x, int y, int z, float rads) {
 		
 		double range = 32D;
 		
@@ -255,74 +248,6 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 	public int[] getAccessibleSlotsFromSide(int side) {
 		return slots_arr;
 	}
-
-	@Override
-	public boolean getTact() {
-		return age < 10;
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord - 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord + 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 1, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 1, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type == tanks[0].getTankType())
-			return tanks[0].getFill();
-		else if(type == tanks[1].getTankType())
-			return tanks[1].getFill();
-
-		return 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type == tanks[0].getTankType())
-			tanks[0].setFill(i);
-		else if(type == tanks[1].getTankType())
-			tanks[1].setFill(i);
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		if(type == tanks[0].getTankType())
-			return list;
-		if(type == tanks[1].getTankType())
-			return list2;
-		
-		return new ArrayList();
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		if(type == tanks[0].getTankType())
-			this.list.clear();
-		if(type == tanks[1].getTankType())
-			this.list2.clear();
-	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
 	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
@@ -355,7 +280,12 @@ public class TileEntityStorageDrum extends TileEntityMachineBase implements IFlu
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIStorageDrum(player.inventory, this);
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return null;
 	}
 }

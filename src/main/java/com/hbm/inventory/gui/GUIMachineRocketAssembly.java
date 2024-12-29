@@ -4,15 +4,16 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.dim.CelestialBody;
 import com.hbm.handler.RocketStruct;
 import com.hbm.inventory.container.ContainerMachineRocketAssembly;
 import com.hbm.items.ItemVOTVdrive;
+import com.hbm.items.ItemVOTVdrive.Target;
 import com.hbm.lib.RefStrings;
-import com.hbm.packet.NBTControlPacket;
+import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.render.util.MissilePronter;
 import com.hbm.tileentity.machine.TileEntityMachineRocketAssembly;
+import com.hbm.util.I18nUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -41,9 +42,9 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 
 	@Override
 	public void initGui() {
-        super.initGui();
+		super.initGui();
 		lastTime = System.nanoTime();
-    }
+	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -95,19 +96,17 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 			ItemStack fromStack = machine.slots[machine.slots.length - 2];
 			ItemStack toStack = machine.slots[machine.slots.length - 1];
 
-			CelestialBody fromBody = fromStack != null ? ((ItemVOTVdrive)fromStack.getItem()).getDestination(fromStack).body.getBody() : null;
-			CelestialBody toBody = toStack != null ? ((ItemVOTVdrive)toStack.getItem()).getDestination(toStack).body.getBody() : null;
+			Target from = ItemVOTVdrive.getTarget(fromStack, machine.getWorldObj());
+			Target to = ItemVOTVdrive.getTarget(toStack, machine.getWorldObj());
 
-			List<String> issues = machine.rocket.findIssues(stage, fromBody, toBody);
+			List<String> issues = machine.rocket.findIssues(stage, from.body, to.body, from.inOrbit, to.inOrbit);
 			for(int i = 0; i < issues.size(); i++) {
 				String issue = issues.get(i);
 				fontRendererObj.drawStringWithShadow(issue, (guiLeft + 65) * 2, (guiTop + 5) * 2 + i * 8, 0xFFFFFF);
 			}
 
-			if(fromBody != null)
-				fontRendererObj.drawString(fromBody.name, (guiLeft + 162) * 2, (guiTop + 75) * 2, 0x00FF00);
-			if(toBody != null)
-				fontRendererObj.drawString(toBody.name, (guiLeft + 162) * 2, (guiTop + 108) * 2, 0x00FF00);
+			if(from.body != null) fontRendererObj.drawString(I18nUtil.resolveKey("body." + from.body.name), (guiLeft + 162) * 2, (guiTop + 75) * 2, 0x00FF00);
+			if(to.body != null) fontRendererObj.drawString(I18nUtil.resolveKey("body." + to.body.name), (guiLeft + 162) * 2, (guiTop + 108) * 2, 0x00FF00);
 
 		}
 		GL11.glPopMatrix();
@@ -129,20 +128,24 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 		if(machine.rocket.validate()) {
 			drawTexturedModalRect(41, 62, xSize + 18, 8, 18, 18);
 		}
+
+		if(machine.canDeconstruct()) {
+			drawTexturedModalRect(39, 52, xSize + 36, 8, 20, 38);
+		}
 	}
 
 	@Override
 	protected void mouseClicked(int x, int y, int i) {
-    	super.mouseClicked(x, y, i);
+		super.mouseClicked(x, y, i);
 		
 		// Stage up
-    	if(checkClick(x, y, 17, 34, 18, 8)) {
+		if(checkClick(x, y, 17, 34, 18, 8)) {
 			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
 
 			if(getLayer() > 0) {
 				setLayer(getLayer() - 1);
 			}
-    	}
+		}
 
 		// Stage down
 		if(checkClick(x, y, 17, 98, 18, 8)) {
@@ -151,15 +154,22 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 			if(getLayer() < Math.min(machine.rocket.stages.size(), RocketStruct.MAX_STAGES - 1)) {
 				setLayer(getLayer() + 1);
 			}
-    	}
+		}
 
 		// Construct rocket
-		if(machine.rocket != null && machine.rocket.validate() && checkClick(x, y, 41, 62, 18, 18)) {
-			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
-			NBTTagCompound data = new NBTTagCompound();
-			data.setBoolean("construct", true);
-			PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, machine.xCoord, machine.yCoord, machine.zCoord));
+		if(checkClick(x, y, 41, 62, 18, 18)) {
+			if(machine.rocket.validate()) {
+				mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
+				NBTTagCompound data = new NBTTagCompound();
+				data.setBoolean("construct", true);
+				PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, machine.xCoord, machine.yCoord, machine.zCoord));
+			} else if(machine.canDeconstruct()) {
+				mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
+				NBTTagCompound data = new NBTTagCompound();
+				data.setBoolean("deconstruct", true);
+				PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, machine.xCoord, machine.yCoord, machine.zCoord));
+			}
 		}
-    }
+	}
 		
 }

@@ -2,9 +2,12 @@ package com.hbm.items.weapon;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.items.ModItems;
+import com.hbm.entity.missile.EntityMissileCustom;
 import com.hbm.items.special.ItemLootCrate;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
@@ -60,7 +63,7 @@ public class ItemCustomMissilePart extends Item {
 	
 	public enum PartType {
 		CHIP,
-		WARHEAD,
+		WARHEAD, // aka payload
 		FUSELAGE,
 		FINS,
 		THRUSTER,
@@ -104,6 +107,17 @@ public class ItemCustomMissilePart extends Item {
 		CLOUD,
 		TURBINE,
 		APOLLO,
+		SATELLITE,
+		
+		//shit solution but it works. this allows traits to be attached to these empty dummy types, allowing for custom warheads
+		CUSTOM0, CUSTOM1, CUSTOM2, CUSTOM3, CUSTOM4, CUSTOM5, CUSTOM6, CUSTOM7, CUSTOM8, CUSTOM9;
+
+		/** Overrides that type's impact effect. Only runs serverside */
+		public Consumer<EntityMissileCustom> impactCustom = null;
+		/** Runs at the beginning of the missile's update cycle, both client and serverside. */
+		public Consumer<EntityMissileCustom> updateCustom = null;
+		/** Override for the warhead's name in the missile description */
+		public String labelCustom = null;
 	}
 	
 	public enum FuelType {
@@ -203,8 +217,9 @@ public class ItemCustomMissilePart extends Item {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool)
-	{
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
+
+		if(this == ModItems.rp_pod_20) return;
 
 		if(title != null)
 			list.add(EnumChatFormatting.DARK_PURPLE + "\"" + title + "\"");
@@ -217,7 +232,8 @@ public class ItemCustomMissilePart extends Item {
 			case WARHEAD:
 				list.add(EnumChatFormatting.BOLD + "Size: " + EnumChatFormatting.GRAY + getSize(bottom));
 				list.add(EnumChatFormatting.BOLD + "Type: " + EnumChatFormatting.GRAY + getWarhead());
-				list.add(EnumChatFormatting.BOLD + "Strength: " + EnumChatFormatting.GRAY + (Float)attributes[1]);
+				if(attributes[0] != WarheadType.APOLLO && attributes[0] != WarheadType.SATELLITE)
+					list.add(EnumChatFormatting.BOLD + "Strength: " + EnumChatFormatting.GRAY + (Float)attributes[1]);
 				list.add(EnumChatFormatting.BOLD + "Mass: " + EnumChatFormatting.GRAY + mass + "kg");
 				break;
 			case FUSELAGE:
@@ -234,10 +250,10 @@ public class ItemCustomMissilePart extends Item {
 			case THRUSTER:
 				list.add(EnumChatFormatting.BOLD + "Size: " + EnumChatFormatting.GRAY + getSize(top));
 				list.add(EnumChatFormatting.BOLD + "Fuel type: " + EnumChatFormatting.GRAY + getFuelName());
-				list.add(EnumChatFormatting.BOLD + "Fuel consumption: " + EnumChatFormatting.GRAY + (Float)attributes[1] + "mB/tick");
-				list.add(EnumChatFormatting.BOLD + "Max. payload: " + EnumChatFormatting.GRAY + (Float)attributes[2] + "t");
-				list.add(EnumChatFormatting.BOLD + "Thrust " + EnumChatFormatting.GRAY + (Integer)attributes[3] + "N");
-				list.add(EnumChatFormatting.BOLD + "ISP " + EnumChatFormatting.GRAY + (Integer)attributes[4] + "s");
+				// list.add(EnumChatFormatting.BOLD + "Fuel consumption: " + EnumChatFormatting.GRAY + (Float)attributes[1] + "mB/tick");
+				// list.add(EnumChatFormatting.BOLD + "Max. payload: " + EnumChatFormatting.GRAY + (Float)attributes[2] + "t");
+				list.add(EnumChatFormatting.BOLD + "Thrust: " + EnumChatFormatting.GRAY + (Integer)attributes[3] + "N");
+				list.add(EnumChatFormatting.BOLD + "ISP: " + EnumChatFormatting.GRAY + (Integer)attributes[4] + "s");
 				list.add(EnumChatFormatting.BOLD + "Mass: " + EnumChatFormatting.GRAY + mass + "kg");
 				break;
 			}
@@ -278,8 +294,12 @@ public class ItemCustomMissilePart extends Item {
 	
 	public String getWarhead() {
 		if(!(attributes[0] instanceof WarheadType)) return EnumChatFormatting.BOLD + "N/A";
+
+		WarheadType type = (WarheadType) attributes[0];
 		
-		switch((WarheadType)attributes[0]) {
+		if(type.labelCustom != null) return type.labelCustom;
+		
+		switch(type) {
 		case HE:
 			return EnumChatFormatting.YELLOW + "HE";
 		case INC:
@@ -306,6 +326,8 @@ public class ItemCustomMissilePart extends Item {
 			return (System.currentTimeMillis() % 1000 < 500 ? EnumChatFormatting.RED : EnumChatFormatting.LIGHT_PURPLE) + "Turbine";
 		case APOLLO:
 			return (System.currentTimeMillis() % 1000 < 500 ? EnumChatFormatting.GOLD : EnumChatFormatting.RED) + "Capsule";
+		case SATELLITE:
+			return (System.currentTimeMillis() % 1000 < 500 ? EnumChatFormatting.GOLD : EnumChatFormatting.RED) + "Satellite";
 		default:
 			return EnumChatFormatting.BOLD + "N/A";
 		}

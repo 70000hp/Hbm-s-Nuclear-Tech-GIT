@@ -54,7 +54,7 @@ public abstract class TileEntityMachineChemplantBase extends TileEntityMachineBa
 		
 		tanks = new FluidTank[4 * count];
 		for(int i = 0; i < 4 * count; i++) {
-			tanks[i] = new FluidTank(Fluids.NONE, getTankCapacity(), i);
+			tanks[i] = new FluidTank(Fluids.NONE, getTankCapacity());
 		}
 	}
 
@@ -104,6 +104,10 @@ public abstract class TileEntityMachineChemplantBase extends TileEntityMachineBa
 		if(!hasSpaceForFluids(recipe, index)) return false;
 		if(!hasRequiredItems(recipe, index)) return false;
 		if(!hasSpaceForItems(recipe, index)) return false;
+
+		if(recipe.oxygenConsumption > 0) {
+			return breatheAir(recipe.oxygenConsumption);
+		}
 		
 		return true;
 	}
@@ -372,7 +376,7 @@ public abstract class TileEntityMachineChemplantBase extends TileEntityMachineBa
 		
 		for(int i = 0; i < tanks.length; i++) {
 			FluidTank tank = tanks[i];
-			if(tank.index % 4 < 2) {
+			if(i % 4 < 2) {
 				inTanks.add(tank);
 			}
 		}
@@ -493,7 +497,7 @@ public abstract class TileEntityMachineChemplantBase extends TileEntityMachineBa
 		
 		for(int i = 0; i < tanks.length; i++) {
 			FluidTank tank = tanks[i];
-			if(tank.index % 4 > 1) {
+			if(i % 4 > 1) {
 				outTanks.add(tank);
 			}
 		}

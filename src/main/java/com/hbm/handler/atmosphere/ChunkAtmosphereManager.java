@@ -1,7 +1,9 @@
 package com.hbm.handler.atmosphere;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class ChunkAtmosphereManager {
@@ -26,6 +28,16 @@ public class ChunkAtmosphereManager {
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
         proxy.receiveBlockBroken(event);
+    }
+
+    @SubscribeEvent
+    public void onDetonate(ExplosionEvent.Detonate event) {
+        proxy.receiveDetonate(event);
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        proxy.receiveServerTick(event);
     }
 
 }

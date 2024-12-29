@@ -9,16 +9,18 @@ import java.util.List;
 import static com.hbm.items.ModItems.*;
 import static com.hbm.blocks.ModBlocks.*;
 import static com.hbm.inventory.OreDictManager.DictFrame.*;
-import static com.hbm.inventory.OreNames.*;
+import static com.hbm.inventory.material.MaterialShapes.*;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockOreBasalt.EnumBasaltOreType;
 import com.hbm.blocks.BlockEnums.EnumStoneType;
 import com.hbm.config.GeneralConfig;
+import com.hbm.crafting.MineralRecipes;
 import com.hbm.hazard.HazardData;
 import com.hbm.hazard.HazardEntry;
 import com.hbm.hazard.HazardRegistry;
 import com.hbm.hazard.HazardSystem;
+import com.hbm.interfaces.NotableComments;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
@@ -27,6 +29,7 @@ import com.hbm.inventory.material.NTMMaterial.SmeltingBehavior;
 import com.hbm.items.ModItems;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ItemEnums.EnumBriquetteType;
+import com.hbm.items.ItemEnums.EnumChunkType;
 import com.hbm.items.ItemEnums.EnumCokeType;
 import com.hbm.items.ItemEnums.EnumTarType;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
@@ -43,6 +46,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
 //the more i optimize this, the more it starts looking like gregtech
+@NotableComments
 public class OreDictManager {
 	
 	/** Alternate, additional names for ore dict registration. Used mostly for DictGroups */
@@ -107,6 +111,8 @@ public class OreDictManager {
 	/*
 	 * VANILLA
 	 */
+	public static final DictFrame WOOD = new DictFrame("Wood");
+	public static final DictFrame BONE = new DictFrame("Bone");
 	public static final DictFrame COAL = new DictFrame("Coal");
 	public static final DictFrame IRON = new DictFrame("Iron");
 	public static final DictFrame GOLD = new DictFrame("Gold");
@@ -222,6 +228,8 @@ public class OreDictManager {
 	public static final DictFrame CMB = new DictFrame("CMBSteel");
 	public static final DictFrame DESH = new DictFrame("Desh");
 	public static final DictFrame STAR = new DictFrame("Starmetal");
+	public static final DictFrame GUNMETAL = new DictFrame("GunMetal");
+	public static final DictFrame WEAPONSTEEL = new DictFrame("WeaponSteel");
 	public static final DictFrame BIGMT = new DictFrame("Saturnite");
 	public static final DictFrame FERRO = new DictFrame("Ferrouranium");
 	public static final DictFrame EUPH = new DictFrame("Euphemium");
@@ -284,6 +292,7 @@ public class OreDictManager {
 	/*
 	 * RARE EARTHS
 	 */
+	public static final DictFrame RAREEARTH = new DictFrame("RareEarth");
 	/** LANTHANUM */ 
 	public static final DictFrame LA = new DictFrame("Lanthanum");
 	/** ZIRCONIUM */ 
@@ -328,7 +337,7 @@ public class OreDictManager {
 	public static final DictGroup ANY_HARDPLASTIC = new DictGroup("AnyHardPlastic", PC, PVC);
 	/** Any post nuclear steel like TCA or CDA */
 	public static final DictGroup ANY_RESISTANTALLOY = new DictGroup("AnyResistantAlloy", TCALLOY, CDALLOY);
-	/** Any post nuclear steel like TCA or CDA */
+	/** Any post RBMK bronze like BB or AB */
 	public static final DictGroup ANY_BISMOIDBRONZE = new DictGroup("AnyBismoidBronze", BBRONZE, ABRONZE);
 	/** Any "powder" propellant like gunpowder, ballistite and cordite */
 	public static final DictFrame ANY_GUNPOWDER = new DictFrame("AnyPropellant");
@@ -414,7 +423,7 @@ public class OreDictManager {
 		NI																	.ingot(ingot_nickel)												.dust(powder_nickel)            .plate(plate_nickel) 			.block(block_nickel)		.oreAll(ore_nickel) 												.nugget(nugget_nickel);
 		TI																	.ingot(ingot_titanium)												.dust(powder_titanium)			.plate(plate_titanium)			.block(block_titanium)		.oreAll(ore_titanium);
 		CU																	.ingot(ingot_copper)												.dust(powder_copper)			.plate(plate_copper)			.block(block_copper)		.ore(ore_gneiss_copper) .oreAll(ore_copper);
-		MINGRADE															.ingot(ingot_red_copper)											.dust(powder_red_copper)										.block(block_red_copper);
+		MINGRADE															.ingot(ingot_red_copper)											.dust(powder_red_copper)		.billet(billet_red_copper)		.block(block_red_copper);
 		ALLOY																.ingot(ingot_advanced_alloy)										.dust(powder_advanced_alloy)	.plate(plate_advanced_alloy)	.block(block_advanced_alloy);
 		W																	.ingot(ingot_tungsten)												.dust(powder_tungsten)											.block(block_tungsten)		.ore(ore_nether_tungsten)	.oreNether(ore_nether_tungsten) .oreAll(ore_tungsten);
 		AL																	.ingot(ingot_aluminium)												.dust(powder_aluminium)			.plate(plate_aluminium)			.block(block_aluminium)		.oreAll(ore_aluminium);
@@ -432,7 +441,7 @@ public class OreDictManager {
 		CD																	.ingot(ingot_cadmium)												.dust(powder_cadmium)											.block(block_cadmium);
 		TA			.nugget(nugget_tantalium)	.gem(gem_tantalium)			.ingot(ingot_tantalium)												.dust(powder_tantalium)											.block(block_tantalium);
 		COLTAN																.ingot(fragment_coltan)												.dust(powder_coltan_ore)										.block(block_coltan)		.oreAll(ore_coltan);
-		NB			.nugget(nugget_niobium, fragment_niobium)				.ingot(ingot_niobium)			.dustSmall(powder_niobium_tiny)		.dust(powder_niobium)											.block(block_niobium);
+		NB			.nugget(nugget_niobium, fragment_niobium)				.ingot(ingot_niobium)			.dustSmall(powder_niobium_tiny)		.dust(powder_niobium)											.block(block_niobium)		.oreAll(ore_niobium);
 		BE			.nugget(nugget_beryllium)	.billet(billet_beryllium)	.ingot(ingot_beryllium)												.dust(powder_beryllium)											.block(block_beryllium)		.oreAll(ore_beryllium);
 		CO			.nugget(fragment_cobalt)	.nugget(nugget_cobalt)		.billet(billet_cobalt)			.ingot(ingot_cobalt)				.dust(powder_cobalt)			.dustSmall(powder_cobalt_tiny)	.block(block_cobalt)		.ore(ore_nether_cobalt)	.oreAll(ore_cobalt);
 		B			.nugget(fragment_boron)									.ingot(ingot_boron)				.dustSmall(powder_boron_tiny)		.dust(powder_boron)												.block(block_boron);
@@ -451,6 +460,8 @@ public class OreDictManager {
 		CMB																	.ingot(ingot_combine_steel)											.dust(powder_combine_steel)		.plate(plate_combine_steel)		.block(block_combine_steel);
 		DESH		.nugget(nugget_desh)									.ingot(ingot_desh)													.dust(powder_desh)												.block(block_desh);
 		STAR																.ingot(ingot_starmetal)																												.block(block_starmetal);
+		GUNMETAL															.ingot(ingot_gunmetal)																				.plate(plate_gunmetal);
+		WEAPONSTEEL															.ingot(ingot_weaponsteel)																			.plate(plate_weaponsteel);
 		BIGMT																.ingot(ingot_saturnite)																				.plate(plate_saturnite);
 		FERRO																.ingot(ingot_ferrouranium);
 		EUPH		.nugget(nugget_euphemium)								.ingot(ingot_euphemium)												.dust(powder_euphemium)											.block(block_euphemium);
@@ -498,21 +509,22 @@ public class OreDictManager {
 		 * PHOSPHORUS
 		 */
 		P_WHITE	.hot(5)	.ingot(ingot_phosphorus)	.block(block_white_phosphorus);
-		P_RED			.dust(powder_fire)			.block(block_red_phosphorus);
+		P_RED			.dust(powder_fire)			.block(block_red_phosphorus) .oreAll(ore_fire);
 		
 		/*
 		 * RARE METALS
 		 */
 		AUSTRALIUM	.nugget(nugget_australium)	.billet(billet_australium)	.ingot(ingot_australium)	.dust(powder_australium)	.block(block_australium)	.oreAll(ore_australium);
-		REIIUM		.nugget(nugget_reiium)									.ingot(ingot_reiium)		.dust(powder_reiium)		.block(block_reiium);
-		WEIDANIUM	.nugget(nugget_weidanium)								.ingot(ingot_weidanium)		.dust(powder_weidanium)		.block(block_weidanium);
-		UNOBTAINIUM	.nugget(nugget_unobtainium)								.ingot(ingot_unobtainium)	.dust(powder_unobtainium)	.block(block_unobtainium);
-		VERTICIUM	.nugget(nugget_verticium)								.ingot(ingot_verticium)		.dust(powder_verticium)		.block(block_verticium);
-		DAFFERGON	.nugget(nugget_daffergon)								.ingot(ingot_daffergon)		.dust(powder_daffergon)		.block(block_daffergon);
+		REIIUM		.block(block_reiium);
+		WEIDANIUM	.block(block_weidanium);
+		UNOBTAINIUM	.block(block_unobtainium);
+		VERTICIUM	.block(block_verticium);
+		DAFFERGON	.block(block_daffergon);
 
 		/*
 		 * RARE EARTHS
 		 */
+		RAREEARTH.ingot(DictFrame.fromOne(ModItems.chunk_ore, EnumChunkType.RARE)).ore(ore_gneiss_rare).oreAll(ore_rare);
 		LA	.nugget(nugget_lanthanium, fragment_lanthanium)	.ingot(ingot_lanthanium)						.dustSmall(powder_lanthanium_tiny)	.dust(powder_lanthanium)	.block(block_lanthanium)	.oreAll(ore_lanthanium);
 		ZR	.nugget(nugget_zirconium)		.ingot(ingot_zirconium)		.billet(billet_zirconium)												.dust(powder_zirconium)		.block(block_zirconium)		.ore(ore_depth_zirconium);
 		ND	.nugget(fragment_neodymium)																		.dustSmall(powder_neodymium_tiny)	.dust(powder_neodymium)									.ore(ore_depth_nether_neodymium)	.oreNether(ore_depth_nether_neodymium);
@@ -521,7 +533,7 @@ public class OreDictManager {
 		/*
 		 * NITAN
 		 */
-		I	.dust(powder_iodine);
+		I	.dust(powder_iodine)	.oreAll(ore_iodine);
 		AT	.dust(powder_astatine);
 		CS	.dust(powder_caesium);
 		ST	.dust(powder_strontium);
@@ -587,15 +599,25 @@ public class OreDictManager {
 
 		for(NTMMaterial mat : Mats.orderedList) {
 			if(mat.smeltable == SmeltingBehavior.SMELTABLE) {
-				if(mat.shapes.contains(MaterialShapes.BOLT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.BOLT.name() + name, new ItemStack(ModItems.bolt, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.CASTPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.CASTPLATE.name() + name, new ItemStack(ModItems.plate_cast, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.WELDEDPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.WELDEDPLATE.name() + name, new ItemStack(ModItems.plate_welded, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.HEAVY_COMPONENT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.HEAVY_COMPONENT.name() + name, new ItemStack(ModItems.heavy_component, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.DENSEWIRE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.DENSEWIRE.name() + name, new ItemStack(ModItems.wire_dense, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.SHELL)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.SHELL.name() + name, new ItemStack(ModItems.shell, 1, mat.id));
-				if(mat.shapes.contains(MaterialShapes.PIPE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.PIPE.name() + name, new ItemStack(ModItems.pipe, 1, mat.id));
+				if(mat.autogen.contains(MaterialShapes.CASTPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.CASTPLATE.name() + name, new ItemStack(ModItems.plate_cast, 1, mat.id));
+				if(mat.autogen.contains(MaterialShapes.WELDEDPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.WELDEDPLATE.name() + name, new ItemStack(ModItems.plate_welded, 1, mat.id));
+				if(mat.autogen.contains(MaterialShapes.HEAVY_COMPONENT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.HEAVY_COMPONENT.name() + name, new ItemStack(ModItems.heavy_component, 1, mat.id));
+				if(mat.autogen.contains(MaterialShapes.DENSEWIRE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.DENSEWIRE.name() + name, new ItemStack(ModItems.wire_dense, 1, mat.id));
 			}
-			if(mat.shapes.contains(MaterialShapes.WIRE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.WIRE.name() + name, new ItemStack(ModItems.wire_fine, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.BOLT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.BOLT.name() + name, new ItemStack(ModItems.bolt, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.INGOT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.INGOT.name() + name, new ItemStack(ModItems.ingot_raw, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.SHELL)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.SHELL.name() + name, new ItemStack(ModItems.shell, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.PIPE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.PIPE.name() + name, new ItemStack(ModItems.pipe, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.FRAGMENT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.FRAGMENT.name() + name, new ItemStack(ModItems.bedrock_ore_fragment, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.WIRE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.WIRE.name() + name, new ItemStack(ModItems.wire_fine, 1, mat.id));
+
+			if(mat.autogen.contains(MaterialShapes.LIGHTBARREL)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.LIGHTBARREL.name() + name, new ItemStack(ModItems.part_barrel_light, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.HEAVYBARREL)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.HEAVYBARREL.name() + name, new ItemStack(ModItems.part_barrel_heavy, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.LIGHTRECEIVER)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.LIGHTRECEIVER.name() + name, new ItemStack(ModItems.part_receiver_light, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.HEAVYRECEIVER)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.HEAVYRECEIVER.name() + name, new ItemStack(ModItems.part_receiver_heavy, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.MECHANISM)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.MECHANISM.name() + name, new ItemStack(ModItems.part_mechanism, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.STOCK)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.STOCK.name() + name, new ItemStack(ModItems.part_stock, 1, mat.id));
+			if(mat.autogen.contains(MaterialShapes.GRIP)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.GRIP.name() + name, new ItemStack(ModItems.part_grip, 1, mat.id));
 		}
 		
 		for(EnumBedrockOre ore : EnumBedrockOre.values()) {
@@ -617,8 +639,6 @@ public class OreDictManager {
 		OreDictionary.registerOre("briquetteWood", fromOne(briquette, EnumBriquetteType.WOOD));
 		
 		OreDictionary.registerOre(getReflector(), neutron_reflector);
-		OreDictionary.registerOre("oreRareEarth", ore_rare);
-		OreDictionary.registerOre("oreRareEarth", ore_gneiss_rare);
 
 		OreDictionary.registerOre("logWood", pink_log);
 		OreDictionary.registerOre("logWoodPink", pink_log);
@@ -698,16 +718,21 @@ public class OreDictManager {
 		OreDictionary.registerOre(KEY_COBBLESTONE, moho_regolith);
 		OreDictionary.registerOre(KEY_STONE, moho_stone);
 		OreDictionary.registerOre(KEY_COBBLESTONE, moon_rock);
+		OreDictionary.registerOre(KEY_COBBLESTONE, minmus_regolith);
+		OreDictionary.registerOre(KEY_STONE, minmus_smooth);
+		OreDictionary.registerOre(KEY_STONE, minmus_stone);
 		
-		//Legacy wires
-		OreDictionary.registerOre(AL.wireFine(), wire_aluminium);
-		OreDictionary.registerOre(CU.wireFine(), wire_copper);
-		OreDictionary.registerOre(MINGRADE.wireFine(), wire_red_copper);
-		OreDictionary.registerOre(GOLD.wireFine(), wire_gold);
-		OreDictionary.registerOre(W.wireFine(), wire_tungsten);
-		OreDictionary.registerOre(ALLOY.wireFine(), wire_advanced_alloy);
-		OreDictionary.registerOre(MAGTUNG.wireFine(), wire_magnetized_tungsten);
-		OreDictionary.registerOre(SA326.wireFine(), wire_schrabidium);
+		for(NTMMaterial mat : Mats.orderedList) {
+			if(mat.autogen.contains(MaterialShapes.FRAGMENT)) {
+				String name = mat.names[0];
+				if(!OreDictionary.getOres(MaterialShapes.DUST.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.DUST.name() + name).get(0));
+				else if(!OreDictionary.getOres(MaterialShapes.GEM.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.GEM.name() + name).get(0));
+				else if(!OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).get(0));
+				else if(!OreDictionary.getOres(MaterialShapes.INGOT.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.INGOT.name() + name).get(0));
+				else if(!OreDictionary.getOres(MaterialShapes.BILLET.name() + name).isEmpty()) MineralRecipes.addBilletFragment(OreDictionary.getOres(MaterialShapes.BILLET.name() + name).get(0), mat.make(ModItems.bedrock_ore_fragment));
+				else MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), new ItemStack(ModItems.nothing));
+			}
+		}
 		
 		MaterialShapes.registerCompatShapes();
 		compensateMojangSpaghettiBullshit();
@@ -719,10 +744,11 @@ public class OreDictManager {
 	
 	public static void registerGroups() {
 		ANY_RUBBER.addPrefix(INGOT, true);
-		ANY_PLASTIC.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(BLOCK, true);
-		ANY_HARDPLASTIC.addPrefix(INGOT, true);
-		ANY_RESISTANTALLOY.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(PLATECAST, true).addPrefix(PLATEWELDED, true).addPrefix(HEAVY_COMPONENT, true).addPrefix(BLOCK, true);
-		ANY_BISMOIDBRONZE.addPrefix(INGOT, true).addPrefix(PLATECAST, true);
+		ANY_PLASTIC.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(BLOCK, true).addPrefix(GRIP, true).addPrefix(STOCK, true);
+		ANY_HARDPLASTIC.addPrefix(INGOT, true).addPrefix(STOCK, true).addPrefix(GRIP, true);
+		ANY_RESISTANTALLOY.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(CASTPLATE, true).addPrefix(WELDEDPLATE, true).addPrefix(HEAVY_COMPONENT, true).addPrefix(BLOCK, true)
+		.addPrefix(LIGHTBARREL, true).addPrefix(HEAVYBARREL, true).addPrefix(LIGHTRECEIVER, true).addPrefix(HEAVYRECEIVER, true);
+		ANY_BISMOIDBRONZE.addPrefix(INGOT, true).addPrefix(CASTPLATE, true).addPrefix(LIGHTBARREL, true).addPrefix(HEAVYBARREL, true).addPrefix(LIGHTRECEIVER, true).addPrefix(HEAVYRECEIVER, true);
 		ANY_TAR.addPrefix(ANY, false);
 		ANY_COAL_COKE.addPrefix(DUST, true);
 	}
@@ -731,9 +757,7 @@ public class OreDictManager {
 	
 	@SubscribeEvent
 	public void onRegisterOre(OreRegisterEvent event) {
-		
-		if(recursionBrake)
-			return;
+		if(recursionBrake) return;
 		
 		recursionBrake = true;
 		
@@ -790,42 +814,35 @@ public class OreDictManager {
 		/*
 		 * Quick access methods to grab ore names for recipes.
 		 */
-		public String any() {			return ANY				+ mats[0]; }
-		public String nugget() {		return NUGGET			+ mats[0]; }
-		public String tiny() {			return TINY				+ mats[0]; }
-		public String bolt() {			return BOLT				+ mats[0]; }
-		public String ingot() {			return INGOT			+ mats[0]; }
-		public String dustTiny() {		return DUSTTINY			+ mats[0]; }
-		public String dust() {			return DUST				+ mats[0]; }
-		public String gem() {			return GEM				+ mats[0]; }
-		public String crystal() {		return CRYSTAL			+ mats[0]; }
-		public String plate() {			return PLATE			+ mats[0]; }
-		public String plateCast() {		return PLATECAST		+ mats[0]; }
-		public String plateWelded() {	return PLATEWELDED		+ mats[0]; }
-		public String heavyComp() {		return HEAVY_COMPONENT	+ mats[0]; }
-		public String wireFine() {		return WIRE				+ mats[0]; }
-		public String wireDense() {		return WIREDENSE		+ mats[0]; }
-		public String shell() {			return SHELL			+ mats[0]; }
-		public String pipe() {			return PIPE				+ mats[0]; }
-		public String billet() {		return BILLET			+ mats[0]; }
-		public String block() {			return BLOCK			+ mats[0]; }
-		public String ore() {			return ORE				+ mats[0]; }
-		public String[] anys() {		return appendToAll(ANY); }
-		public String[] nuggets() {		return appendToAll(NUGGET); }
-		public String[] tinys() {		return appendToAll(TINY); }
-		public String[] allNuggets() {	return appendToAll(NUGGET, TINY); }
-		public String[] ingots() {		return appendToAll(INGOT); }
-		public String[] dustTinys() {	return appendToAll(DUSTTINY); }
-		public String[] dusts() {		return appendToAll(DUST); }
-		public String[] gems() {		return appendToAll(GEM); }
-		public String[] crystals() {	return appendToAll(CRYSTAL); }
-		public String[] plates() {		return appendToAll(PLATE); }
-		public String[] plateCasts() {	return appendToAll(PLATECAST); }
-		public String[] shells() {		return appendToAll(SHELL); }
-		public String[] pipes() {		return appendToAll(PIPE); }
-		public String[] billets() {		return appendToAll(BILLET); }
-		public String[] blocks() {		return appendToAll(BLOCK); }
-		public String[] ores() {		return appendToAll(ORE); }
+		public String any() {			return ANY.name()				+ mats[0]; }
+		public String nugget() {		return NUGGET.name()			+ mats[0]; }
+		public String tiny() {			return TINY.name()				+ mats[0]; }
+		public String bolt() {			return BOLT.name()				+ mats[0]; }
+		public String ingot() {			return INGOT.name()				+ mats[0]; }
+		public String dustTiny() {		return DUSTTINY.name()			+ mats[0]; }
+		public String dust() {			return DUST.name()				+ mats[0]; }
+		public String gem() {			return GEM.name()				+ mats[0]; }
+		public String crystal() {		return CRYSTAL.name()			+ mats[0]; }
+		public String plate() {			return PLATE.name()				+ mats[0]; }
+		public String plateCast() {		return CASTPLATE.name()			+ mats[0]; }
+		public String plateWelded() {	return WELDEDPLATE.name()		+ mats[0]; }
+		public String heavyComp() {		return HEAVY_COMPONENT.name()	+ mats[0]; }
+		public String wireFine() {		return WIRE.name()				+ mats[0]; }
+		public String wireDense() {		return DENSEWIRE.name()			+ mats[0]; }
+		public String shell() {			return SHELL.name()				+ mats[0]; }
+		public String pipe() {			return PIPE.name()				+ mats[0]; }
+		public String billet() {		return BILLET.name()			+ mats[0]; }
+		public String block() {			return BLOCK.name()				+ mats[0]; }
+		public String ore() {			return ORE.name()				+ mats[0]; }
+		public String fragment() {		return FRAGMENT.name()			+ mats[0]; }
+		public String lightBarrel() {	return LIGHTBARREL.name()		+ mats[0]; }
+		public String heavyBarrel() {	return HEAVYBARREL.name()		+ mats[0]; }
+		public String lightReceiver() {	return LIGHTRECEIVER.name()		+ mats[0]; }
+		public String heavyReceiver() {	return HEAVYRECEIVER.name()		+ mats[0]; }
+		public String mechanism() {		return MECHANISM.name()			+ mats[0]; }
+		public String stock() {			return STOCK.name()				+ mats[0]; }
+		public String grip() {			return GRIP.name()				+ mats[0]; }
+		public String[] all(MaterialShapes shape) {				return appendToAll(shape.prefixes); }
 		
 		/** Returns cast (triple) plates if 528 mode is enabled or normal plates if not */
 		public String plate528() { return GeneralConfig.enable528 ? plateCast() : plate(); }
@@ -923,7 +940,7 @@ public class OreDictManager {
 		}
 		public DictFrame plateCast(Object... plate) {
 			hazMult = HazardRegistry.plateCast;
-			return makeObject(PLATECAST, plate);
+			return makeObject(CASTPLATE, plate);
 		}
 		public DictFrame billet(Object... billet) {
 			hazMult = HazardRegistry.billet;
@@ -948,12 +965,13 @@ public class OreDictManager {
 			return makeObject(ORENETHER, oreNether);
 		}
 
-		public DictFrame makeObject(String tag, Object... objects) {
-			return makeObject(tag, 0, objects);
+		public DictFrame makeObject(MaterialShapes shape, Object... objects) {
+			return makeObject(shape, 0, objects);
 		}
 
-		public DictFrame makeObject(String tag, int meta, Object... objects) {
+		public DictFrame makeObject(MaterialShapes shape, int meta, Object... objects) {
 			
+			String tag = shape.name();
 			for(Object o : objects) {
 				if(o instanceof Item)		registerStack(tag, new ItemStack((Item) o, 1, meta));
 				if(o instanceof Block)		registerStack(tag, new ItemStack((Block) o, 1, meta));
@@ -1038,8 +1056,9 @@ public class OreDictManager {
 		 * @param prefix The prefix of both the input and result of the reregistration
 		 * @return
 		 */
-		public DictGroup addPrefix(String prefix, boolean inputPrefix) {
+		public DictGroup addPrefix(MaterialShapes shape, boolean inputPrefix) {
 			
+			String prefix = shape.name();
 			String group = prefix + groupName;
 			
 			for(String name : names) {
@@ -1062,24 +1081,31 @@ public class OreDictManager {
 			return this;
 		}
 		
-		public String any() {			return ANY				+ groupName; }
-		public String nugget() {		return NUGGET			+ groupName; }
-		public String tiny() {			return TINY				+ groupName; }
-		public String bolt() {			return BOLT				+ groupName; }
-		public String ingot() {			return INGOT			+ groupName; }
-		public String dustTiny() {		return DUSTTINY			+ groupName; }
-		public String dust() {			return DUST				+ groupName; }
-		public String gem() {			return GEM				+ groupName; }
-		public String crystal() {		return CRYSTAL			+ groupName; }
-		public String plate() {			return PLATE			+ groupName; }
-		public String plateCast() {		return PLATECAST		+ groupName; }
-		public String plateWelded() {	return PLATEWELDED		+ groupName; }
-		public String heavyComp() {		return HEAVY_COMPONENT	+ groupName; }
-		public String wireFine() {		return WIRE				+ groupName; }
-		public String wireDense() {		return WIREDENSE		+ groupName; }
-		public String billet() {		return BILLET			+ groupName; }
-		public String block() {			return BLOCK			+ groupName; }
-		public String ore() {			return ORE				+ groupName; }
+		public String any() {			return ANY.name()				+ groupName; }
+		public String nugget() {		return NUGGET.name()			+ groupName; }
+		public String tiny() {			return TINY.name()				+ groupName; }
+		public String bolt() {			return BOLT.name()				+ groupName; }
+		public String ingot() {			return INGOT.name()				+ groupName; }
+		public String dustTiny() {		return DUSTTINY	.name()			+ groupName; }
+		public String dust() {			return DUST.name()				+ groupName; }
+		public String gem() {			return GEM.name()				+ groupName; }
+		public String crystal() {		return CRYSTAL.name()			+ groupName; }
+		public String plate() {			return PLATE.name()				+ groupName; }
+		public String plateCast() {		return CASTPLATE.name()			+ groupName; }
+		public String plateWelded() {	return WELDEDPLATE.name()		+ groupName; }
+		public String heavyComp() {		return HEAVY_COMPONENT.name()	+ groupName; }
+		public String wireFine() {		return WIRE.name()				+ groupName; }
+		public String wireDense() {		return DENSEWIRE.name()			+ groupName; }
+		public String billet() {		return BILLET.name()			+ groupName; }
+		public String block() {			return BLOCK.name()				+ groupName; }
+		public String ore() {			return ORE.name()				+ groupName; }
+		public String lightBarrel() {	return LIGHTBARREL.name()		+ groupName; }
+		public String heavyBarrel() {	return HEAVYBARREL.name()		+ groupName; }
+		public String lightReceiver() {	return LIGHTRECEIVER.name()		+ groupName; }
+		public String heavyReceiver() {	return HEAVYRECEIVER.name()		+ groupName; }
+		public String mechanism() {		return MECHANISM.name()			+ groupName; }
+		public String stock() {			return STOCK.name()				+ groupName; }
+		public String grip() {			return GRIP.name()				+ groupName; }
 	}
 	
 	private static void addReRegistration(String original, String additional) {

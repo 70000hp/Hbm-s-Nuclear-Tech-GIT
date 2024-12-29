@@ -1,21 +1,18 @@
 package com.hbm.tileentity.machine.oil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.UpgradeManager;
 import com.hbm.inventory.container.ContainerLiquefactor;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUILiquefactor;
 import com.hbm.inventory.recipes.LiquefactionRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
@@ -28,7 +25,6 @@ import api.hbm.fluid.IFluidStandardSender;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -37,21 +33,22 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
-public class TileEntityMachineLiquefactor extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidSource, IFluidStandardSender, IGUIProvider, IUpgradeInfoProvider, IInfoProviderEC {
+public class TileEntityMachineLiquefactor extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardSender, IGUIProvider, IUpgradeInfoProvider, IInfoProviderEC, IFluidCopiable {
+
 
 	public long power;
 	public static final long maxPower = 100000;
 	public static final int usageBase = 500;
 	public int usage;
 	public int progress;
-	public static final int processTimeBase = 200;
+	public static final int processTimeBase = 100;
 	public int processTime;
 	
 	public FluidTank tank;
 	
 	public TileEntityMachineLiquefactor() {
 		super(4);
-		tank = new FluidTank(Fluids.NONE, 24000, 0);
+		tank = new FluidTank(Fluids.NONE, 24_000);
 	}
 
 	@Override
@@ -64,7 +61,6 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 		
 		if(!worldObj.isRemote) {
 			this.power = Library.chargeTEFromItems(slots, 1, power, maxPower);
-			tank.updateTank(this);
 			
 			this.updateConnections();
 
@@ -80,10 +76,6 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 			else
 				this.progress = 0;
 			
-			if(worldObj.getTotalWorldTime() % 10 == 0) {
-				this.fillFluidInit(tank.getTankType());
-			}
-			
 			this.sendFluid();
 			
 			NBTTagCompound data = new NBTTagCompound();
@@ -91,6 +83,7 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 			data.setInteger("progress", this.progress);
 			data.setInteger("usage", this.usage);
 			data.setInteger("processTime", this.processTime);
+			tank.writeToNBT(data, "t");
 			this.networkPack(data, 50);
 		}
 	}
@@ -130,22 +123,14 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 	
 	public boolean canProcess() {
 		
-		if(this.power < usage)
-			return false;
-		
-		if(slots[0] == null)
-			return false;
+		if(this.power < usage) return false;
+		if(slots[0] == null) return false;
 		
 		FluidStack out = LiquefactionRecipes.getOutput(slots[0]);
 		
-		if(out == null)
-			return false;
-		
-		if(out.type != tank.getTankType() && tank.getFill() > 0)
-			return false;
-		
-		if(out.fill + tank.getFill() > tank.getMaxFill())
-			return false;
+		if(out == null) return false;
+		if(out.type != tank.getTankType() && tank.getFill() > 0) return false;
+		if(out.fill + tank.getFill() > tank.getMaxFill()) return false;
 		
 		return true;
 	}
@@ -177,6 +162,7 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 		this.progress = nbt.getInteger("progress");
 		this.usage = nbt.getInteger("usage");
 		this.processTime = nbt.getInteger("processTime");
+		tank.readFromNBT(nbt, "t");
 	}
 	
 	@Override
@@ -206,59 +192,6 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 		return maxPower;
 	}
 
-	@Override
-	public void setFillForSync(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setFluidFill(int fill, FluidType type) {
-		if(type == tank.getTankType())
-			tank.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type == tank.getTankType() ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(xCoord, yCoord - 1, zCoord, getTact(), type);
-		fillFluid(xCoord, yCoord + 4, zCoord, getTact(), type);
-		fillFluid(xCoord + 2, yCoord + 1, zCoord, getTact(), type);
-		fillFluid(xCoord - 2, yCoord + 1, zCoord, getTact(), type);
-		fillFluid(xCoord, yCoord + 1, zCoord + 2, getTact(), type);
-		fillFluid(xCoord, yCoord + 1, zCoord - 2, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public boolean getTact() {
-		return worldObj.getTotalWorldTime() % 20 < 10;
-	}
-
-	private List<IFluidAcceptor> consumers = new ArrayList();
-	
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return consumers;
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		consumers.clear();
-	}
-	
 	AxisAlignedBB bb = null;
 	
 	@Override
@@ -301,7 +234,7 @@ public class TileEntityMachineLiquefactor extends TileEntityMachineBase implemen
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUILiquefactor(player.inventory, this);
 	}
 

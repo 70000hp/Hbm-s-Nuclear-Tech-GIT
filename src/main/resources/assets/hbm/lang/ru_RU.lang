@@ -1,4 +1,4 @@
-﻿itemGroup.tabTest=Тестовая вкладка NTM
+itemGroup.tabTest=Тестовая вкладка NTM
 itemGroup.tabParts=Ресурсы и детали NTM
 itemGroup.tabControl=Топливо и элементы механизмов NTM
 itemGroup.tabTemplate=Шаблоны NTM
@@ -365,6 +365,7 @@ armorMod.type.insert=Пластина
 armorMod.type.leggings=Поножи
 armorMod.type.servo=Сервоприводы
 armorMod.type.special=Особое
+armorMod.type.battery=Аккумулятор
 armorMod.insertHere=Вставьте броню, чтобы её модифицировать...
 
 hazard.prot=Защищает от:
@@ -519,6 +520,8 @@ hbm.key.dash=Рывок
 hbm.key.toggleBack=Включить ранец
 hbm.key.toggleHUD=Включить HUD
 hbm.key.reload=Перезарядить
+hbm.key.copyToolAlt=Устройство настройки: Переключить вставку
+hbm.key.copyToolCtrl=Устройство настройки: Применить к трубам
 
 bomb.detonated=Успешно взорвано!
 bomb.incompatible=Устройство не может быть взорвано!
@@ -545,11 +548,12 @@ contents.program.doom=DOOM
 contents.program.unknown=???
 contents.program.windows=Установка Windows 12
 
-commands.satellite.no_satellite=Спутник с такой частотой не найден!
+commands.satellite.no_satellite=Спутник не найден!
 commands.satellite.not_a_satellite=Предмет в руке не спутник!
 commands.satellite.satellite_descended=Спутник успешно удалён.
 commands.satellite.satellite_orbited=Спутник запущен.
 commands.satellite.should_be_run_as_player=Команда должна быть выполнена игроком!
+commands.satellite.no_active_satellites=Нет активных спутников!
 
 desc.block.barrel.acid=едкие жидкости
 desc.block.barrel.acidAlt=едкие жидкости правильно
@@ -1397,6 +1401,15 @@ hbmmat.neodymium=Неодима
 hbmmat.calcium=Кальция
 hbmmat.silicon=Кремния
 hbmmat.sodium=Натрия
+hbmmat.bscco=BSCCO
+hbmmat.strontium=Стронций
+hbmmat.chlorocalcite=Хлоркальцит
+hbmmat.diamond=Алмаз
+hbmmat.lanthanum=Лантан
+hbmmat.molysite=Молизит
+hbmmat.rareearth=Редкоземельные металлы
+hbmmat.sodalite=Содалит
+hbmmat.emerald=Изумруд
 
 icffuel.beryllium=Бериллий
 icffuel.boron=Бор
@@ -1428,6 +1441,7 @@ crucible.steelWrought=Переплавка кованого железа в ст
 crucible.tcalloy=Производство технециевой стали
 crucible.cdalloy=Производство кадмиевой стали
 crucible.cmb=Производство стали Альянса
+crucible.bscco=Производство BSCCO
 
 matshape.block=Блок %s
 matshape.blocks=Блоки %s
@@ -1725,6 +1739,7 @@ death.attack.rubble=%1$s превратился в лепёшку
 death.attack.shrapnel=%1$s был разорван шрапнелью
 death.attack.teleporter=%1$s телепортировался в никуда
 death.attack.blackhole=%1$s превратился в спагетти
+death.attack.blacklung=%1$s умер от болезни черных легких
 death.attack.blender=%1$s стал фаршем
 death.attack.meteorite=%1$s был раздавлен огромным космическим камнем
 death.attack.boxcar=%1$s был раздавлен падающим грузовым вагоном. Ну что ж...
@@ -1741,7 +1756,7 @@ death.attack.taint=%1$s умер от невероятного количест�
 death.attack.electricity=%1$s был убит электрическим током
 death.attack.exhaust=%1$s был превращен в шашлык стартовой ракетой
 death.attack.lunar=%1$s забыли зарядить свои жизненно важные органы.
-death.attack.monoxide=%1$s забыл сменить батарейки в своем детекторе угарного газа.
+death.attack.monoxide=%1$s забыл сменить батарейки в своем детекторе угарного газа
 death.attack.digamma=%1$s шагнул в пустоту.
 death.attack.asbestos=%1$s теперь имеет право на финансовую компенсацию.
 death.attack.mku=%1$s умер по неизвестным причинам.
@@ -2245,6 +2260,8 @@ container.machineArcFurnaceLarge=Дуговая печь
 tile.machine_arc_furnace.name=Электрическая дуговая печь
 container.machineSolderingStation=Паяльный стол
 tile.machine_soldering_station.name=Паяльный стол
+container.machinePyroOven=Пиролизная печь
+tile.machine_pyrooven.name=Пиролизная печь
 
 tile.conveyor.name=Конвейер
 tile.conveyor.desc=Перемещает предметы, упавшие на него$Может вращаться по часовой стрелке с помощью отвертки$Нажмите на отвертку для сгибания
@@ -2845,6 +2862,7 @@ item.ingot_schrabidium.name=Шрабидиевый слиток
 item.nugget_schrabidium.name=Шрабидиевый самородок
 item.plate_copper.name=Медная пластина
 item.board_copper.name=Медная панель
+item.ingot_bscco.name=Слиток BSCCO
 item.ingot_advanced_alloy.name=Слиток продвинутого сплава
 item.plate_advanced_alloy.name=Пластина продвинутого сплава
 item.wire_advanced_alloy.name=Сверхпроводник
@@ -2887,6 +2905,9 @@ item.plate_armor_ajr.name=Кованая железная обшивка бро�
 item.plate_armor_fau.name=Обшивка брони Фау
 item.plate_armor_dnt.name=Обшивка ДНТ-брони
 item.armor_polish.name=Полироль для брони ШайнингАрмор™
+item.armor_battery.name=Аккумуляторный блок для силовой брони
+item.armor_battery_mk2.name=Аккумуляторный блок для силовой брони Mk2
+item.armor_battery_mk3.name=Аккумуляторный блок для силовой брони Mk3
 item.insert_esapi.name=ESAPI пластины
 item.insert_kevlar.name=Кевларовые пластины
 item.insert_sapi.name=SAPI пластины
@@ -3167,6 +3188,10 @@ item.circuit.chip_bismoid.name=Передовой интегральный ми�
 item.circuit.pcb.name=Печатная плата
 item.circuit.silicon.name=Печатная кремниевая пластина
 item.circuit.vacuum_tube.name=Вакуумная трубка
+item.circuit.atomic_clock.name=Атомные часы
+item.circuit.chip_quantum.name=Твердотельный квантовый процессор
+item.circuit.controller_quantum.name=Квантовый компьютер
+item.circuit.quantum.name=Устройство квантовой обработки
 item.mechanism_revolver_1.name=Револьверный механизм
 item.mechanism_revolver_2.name=Усовершенствованный револьверный механизм
 item.mechanism_rifle_1.name=Винтовочный механизм
@@ -3448,6 +3473,7 @@ item.bedrock_ore.grade.rad_byproduct.name=%s бедроковая руда, Оч
 item.bedrock_ore.grade.rad_roasted.name=%s бедроковая руда, Обожженная очищенная побочка
 item.bedrock_ore.grade.rad_arc.name=%s бедроковая руда, Переплавленная очищенная побочка
 item.bedrock_ore.grade.rad_washed.name=%s бедроковая руда, Промытая очищенная побочка
+item.bedrock_ore_fragment.name=Фрагмент от %s руда
 item.bedrock_ore.type.actinide.name=Актинидная
 item.bedrock_ore.type.crystal.name=Кристаллическая
 item.bedrock_ore.type.heavy.name=Тяжелая металлическая
@@ -3490,6 +3516,7 @@ item.ammonium_nitrate.name=Нитрат аммония
 
 tile.bobblehead.name=Болванчик
 tile.snowglobe.name=Снежный шар
+tile.plushie.name=Плюшевая игрушка %s
 tile.deco_titanium.name=Титановый декоративный блок
 tile.deco_red_copper.name=Красномедный декоративный блок
 tile.deco_tungsten.name=Вольфрамовый декоративный блок
@@ -3569,6 +3596,7 @@ tile.lamp_tritium_green_on.name=Зелёная тритиевая лампа
 tile.spotlight_incandescent.name=Лампа в клетке
 tile.spotlight_fluoro.name=Флюоресцентная лампа
 tile.spotlight_halogen.name=Галогенный прожектор
+tile.floodlight.name=Электрический прожектор
 tile.lamp_demon.name=Лампа из заряда-демона
 tile.reinforced_stone.name=Уплотненный камень
 tile.concrete_smooth.name=Бетон
@@ -5550,6 +5578,7 @@ item.trenchmaster_plate.name=Нагрудник траншейщика
 tile.mush.name=Светящийся гриб
 tile.waste_mycelium.name=Светящийся мицелий
 
+tile.sellafield_bedrock.name=Бедроковый селлафит
 tile.sellafield_slaked.name=Погашенный селлафит
 tile.sellafield.0.name=Селлафит
 tile.sellafield.1.name=Горячий селлафит
@@ -6026,6 +6055,7 @@ item.part_generic.piston_electric.name=Электрический поршень
 item.part_generic.piston_hydraulic.name=Гидравлический поршень
 item.part_generic.piston_pneumatic.name=Пневматический поршень
 item.part_generic.lde.name=Элемент малой плотности
+item.part_generic.hde.name=Элемент повышенной прочности
 item.particle_aelectron.name=Капсула с Позитроном
 item.particle_amat.name=Капсула с Антиматерией
 item.particle_aproton.name=Капсула с Антипротоном
@@ -6100,7 +6130,16 @@ item.digamma_diagnostic.name=Диагностика дигаммы
 tile.geiger.name=Счетчик Гейгера
 tile.glass_polonium.name=Полониевое стекло
 item.survey_scanner.name=Сканер
+
 item.ore_density_scanner.name=Сканер плотности бедроковой руды
+item.ore_density_scanner.excellent=Избыток
+item.ore_density_scanner.high=Высокий
+item.ore_density_scanner.low=Низкий
+item.ore_density_scanner.moderate=Средний
+item.ore_density_scanner.poor=Бедный
+item.ore_density_scanner.veryhigh=Очень высокий
+item.ore_density_scanner.verypoor=Очень бедный
+
 item.coltan_tool.name=Колтасс
 item.mirror_tool.name=Инструмент для регулировки зеркал
 item.mirror_tool.linked=Позиция выравнивания установлена!
@@ -6115,6 +6154,18 @@ item.power_net_tool.name=Анализатор энергосети
 item.anchor_remote.name=Устройство вызова
 item.acetylene_torch.name=Ацетиленовая сварочная горелка
 item.blowtorch.name=Паяльная лампа
+
+item.settings_tool.name=Устройство настройки
+copytool.filter=Фильтр
+copytool.invertRedstone=Инвертированный редстоун
+copytool.invertFilter=Инвертированный фильтр
+copytool.orientation=Ориентация
+copytool.pattern0=Красная сторона
+copytool.pattern1=Оранжевая сторона
+copytool.pattern2=Желтая сторона
+copytool.pattern3=Зелёная сторона
+copytool.pattern4=Синяя сторона
+copytool.pattern5=Фиолетовая сторона
 
 item.multitool_dig.name=Силовая перчатка (Добывающий коготь)
 item.multitool_silk.name=Силовая перчатка (Коготь шёлкового касания)
@@ -6723,3 +6774,434 @@ warheadType.DENIAL=Area Denial
 warheadType.STRATEGIC=Strategic
 warheadType.TACTICAL=Tactical
 warheadType.WMD=WMD
+
+
+// NTM Space //
+tile.machine_drive_processor.name=Станция обработки сигналов
+tile.machine_solar.name=Солнечная панель
+tile.machine_stardar.name=Радиотелескоп "StarDar"
+tile.propulsion_creative.name=Творческий орбитальный двигатель
+tile.air_scrubber.name=Скруббер
+tile.algae_film.name=Картридж с водорослями
+tile.orbital_station.name=Ядро орбитальной станции
+tile.orbital_station_port.name=Стыковочный порт орбитальной станции
+tile.orbital_station_computer.name=Компьютер орбитальной станции
+tile.machine_atmo_tower.name=Башня сжижения воздуха
+tile.machine_atmo_vent.name=Атмосферный компрессор
+tile.atmosphere_editor.name=Редактор атмосферы
+tile.machine_cryo_distill.name=Криогенный дистиллятор
+tile.machine_alkylation.name=Аппарат алкилирования
+tile.machine_rocket_assembly.name=Станция сборки многоступенчатых ракет
+tile.launch_pad_rocket.name=Стартовая ракетная площадка
+tile.det_salt.name=Соленный ядерный заряд
+tile.air_vent.name=Воздушный клапан
+
+tile.machine_stardar.desc=Межпланетный радиотелескоп, который обнаруживает$сигналы с планет и устанавливает безопасные зоны посадки.$Для записи сигналов требуется пустой жёсткий диск.
+tile.air_scrubber.desc=Собирает углекислый газ, образующийся в герметичном помещении с кислородом.
+tile.algae_film.desc=Преобразует углекислый газ обратно в жидкий кислород.$Работает только в невесомости.
+tile.machine_rocket_assembly.desc=Позволяет создавать многоступенчатые ракеты.$Каждая ступень обеспечивает одноразовый полет к другой$планете при условии, что в ней достаточно топлива.$Пример: Двухступенчатая ракета может долететь$до Луны и обратно.
+tile.launch_pad_rocket.desc=Заправляет и подготавливает к запуску ракету,$сконструированную на станции сборки многоступенчатых ракет.
+
+
+
+container.cryoDistillator=Криогенный дистиллятор
+
+tile.ore_iron.name=Железная руда
+tile.ore_gold.name=Золотая руда
+tile.ore_redstone.name=Редстоуновая руда
+tile.ore_lapis.name=Лазуритовая руда
+tile.ore_emerald.name=Изумрудная руда
+tile.ore_quartz.name=Кварцевая руда
+tile.ore_diamond.name=Алмазная руда
+tile.ore_morkite.name=Моркитовая руда
+tile.ore_lithium.name=Литиевая руда
+tile.ore_niobium.name=Ниобиевая руда
+tile.ore_cadmium.name=Кадмиевая руда
+tile.ore_palladium.name=Палладиевая руда
+tile.ore_plutonium.name=Плутониевая руда
+tile.ore_glowstone.name=Светокаменная руда
+tile.ore_nickel.name=Никелевая руда
+tile.ore_mineral.name=Богатая минералами руда
+tile.ore_zinc.name=Цинковая руда
+tile.ore_gas.name=Природный газовый карман
+tile.ore_gas_empty.name=Пустой природный газовый карман
+tile.ore_iodine.name=Йодиевая руда
+tile.ore_arsenic.name=Мышьяковая руда
+tile.ore_silicon.name=Кремниевая руда
+tile.ore_fire.name=Фосфорная руда
+tile.ore_shale.name=Сланцевый природный газ
+tile.ore_lanthanium.name=Лантановая руда
+
+item.circuit.capacitor_lanthanium.name=Лантановый конденсатор
+
+item.hard_drive.name=Пустой жёсткий диск
+item.hard_drive_full.name=Жёсткий диск
+
+item.circuit.processt1.name=Процессор обработки 1-го уровня
+item.circuit.processt2.name=Процессор обработки 2-го уровня
+item.circuit.processt3.name=Процессор обработки 3-го уровня
+
+item.mp_thruster_10_hydrazine.name=Гидразиновый ракетный двигатель 10-го размера
+item.mp_fuselage_10_hydrazine.name=Гидразиновый фюзеляж 10-го размера
+item.mp_thruster_20_methalox.name=Газовый ракетный двигатель 20-го размера
+item.mp_thruster_20_methalox_dual.name=Двойной газовый ракетный двигатель 20-го размера
+item.mp_thruster_20_methalox_triple.name=Тройной газовый ракетный двигатель 20-го размера
+item.mp_thruster_20_hydrazine.name=Гидразиновый ракетный двигатель 20-го размера
+item.mp_fuselage_20_hydrazine=Гидразиновый фюзеляж 20-го размера
+item.rp_f_20_12.name=12-метровый топливный бак
+item.rp_f_20_6.name=6-метровый топливный бак
+item.rp_f_20_3.name=3-метровый топливный бак
+item.rp_f_20_1.name=1-метровый топливный бак
+item.rp_c_20.name=Посадочная капсула
+item.rp_l_20.name=Посадочные опоры
+item.rp_sc_20.name=Модуль создания орбитальной станции
+item.rp_pod_20.name=Десантная капсула
+
+entity.entity_mob_flesh_creeper.name=Мясной крипер
+tile.tumor.name=Мясистая масса
+item.flesh.name=Плоть
+item.flesh_wafer.name=Заготовка котлеты из плоти
+item.grilled_flesh.name=Жареная котлета из плоти
+item.flesh_burger.name=Флэшбургер
+tile.stalactite.flesh.name=Мясистые веретена
+tile.stalagmite.flesh.name=Мясистые веретена
+death.attack.eve=%1$ превратился в лужицу кипящей плоти.
+
+tile.minmus_smooth.name=Гладкий камень Минмуса
+tile.minmus_regolith.name=Реголит Минмуса
+tile.minmus_stone.name=Камень Минмуса
+tile.duna_sands.name=Песок Дюны
+tile.duna_rock.name=Камень Дюны
+
+
+
+hbmfluid.dunaair=Воздух Дюны
+hbmfluid.eveair=Воздух Евы
+hbmfluid.joolgas=Воздух Джула
+hbmfluid.ngas=Воздух Нейдона
+hbmfluid.sarnusgas=Воздух Сарнуса
+hbmfluid.tektoair=Воздух Текто
+hbmfluid.ugas=Воздух Урлума
+hbmfluid.air=Сжатый воздух
+tile.gas_dock.name=Станция газового комбайна
+tile.transporter_rocket.name=Станция ракетного транспортера
+item.transporter_linker.name=Соединитель ракетного транспортера
+tile.refueler.name=Станция заправки
+
+hbmmat.bismuth=Висмутовая
+hbmmat.cadmium=Кадмиевая
+hbmmat.galliumarsenide=Арсенид-галлиевая
+
+item.ore.bismuth=Висмутовая
+item.ore.cadmium=Кадмиевая
+
+tile.moho_regolith.name=Реголит Мохо
+tile.moho_stone.name=Камень Мохо
+
+tile.ike_regolith.name=Реголит Айка
+tile.ike_stone.name=Камень Айка
+
+tile.plant_tall_laythe.laythe.name=Высокая морская трава Лейта
+tile.laythe_kelp.name=Ламинария Лейта
+tile.laythe_seagrass.name=Морская трава Лейта
+tile.laythe_silt.name=Ил Лейта
+
+tile.dres_rock.name=Камень Дреса
+
+tile.stone_resource.calcium.name=Кальцит
+
+atmosphere.name=Статус атмосферы
+atmosphere.noSeal=КОМНАТА НЕГЕРМЕТИЧНА
+atmosphere.noTank=ПУСТОЙ БАК
+atmosphere.vacuum=Отсутствует
+atmosphere.noAir=ТРЕБУЕТСЯ ВАКУУМ
+atmosphere.noVacuum=ТРЕБУЕТСЯ АТМОСФЕРА
+atmosphere.noGravity=ТРЕБУЕТСЯ НЕВЕСОМОСТЬ
+atmosphere.noOrbit=РАБОТАЕТ ТОЛЬКО НА ОРБИТЕ
+atmosphere.engineFacing=НЕВЕРНОЕ НАПРАВЛЕНИЕ
+
+hbmfluid.nitrogen=Жидкий азот
+hbmfluid.krypton=Криптон
+hbmfluid.argon=Аргон
+hbmfluid.neon=Неон
+hbmfluid.ammonia=Аммиак
+hbmfluid.hydrazine=Гидразин
+
+chem.ANIMAN=Синтез литературного ужаса
+chem.HYDRAZINE=Производство гидразина
+chem.NITROACID=Производство азотной кислоты
+chem.BLOODFUEL=Производство кровавого топлива
+
+chem.AMMONIUM=Отверждение нитрата аммония
+chem.AMONGUS=Производство аммиака
+
+body.kerbin=Земля
+body.mun=Луна
+body.minmus=Минмус
+body.duna=Дюна
+body.moho=Мохо
+body.eve=Ева
+body.laythe=Лейт
+body.ike=Айк
+body.dres=Дрес
+body.tekto=Текто
+body.thatmo=Тайло
+
+hbmfluid.nmass=N-Масс(III) Варп топливо
+hbmfluid.nmasstetranol=N-Масс(III) Тетрагексаэтанол
+chem.NMASSII=Изменение полярности материи
+chem.NMASSIII=Изотропизация N-Масс доли углерода
+hbmfluid.elbowgrease=Логтевая смазка
+chem.ELBOWS=Смазывание локтей
+
+hbmfluid.minsol=Минеральный шлам
+item.crystal_mineral.name=Кристаллизованные минералы
+item.crystal_cleaned.name=Очищенные кристаллизованные минералы
+item.clump_peroxide.name=Очищенные минералы
+item.clump_sulfuric.name=Промытые минералы
+item.clump_schrabidic.name=Сверхглубоко очищенные минералы
+item.clump_nitric.name=Азотированные минералы
+item.clump_solvent.name=Глубоко очищенные минералы
+item.clump_hydrochloric.name=Хлорированные очищенные минералы
+item.mineral_dust.name=Минеральная смесь
+
+chem.HCL=Подкисление соляной кислотой
+hbmfluid.hcl=Соляная кислота
+
+entity.entity_scutterfish.name=Рыба-Рассеиватель
+item.scuttertail.name=Хвост рыбы рассеивателя
+hbmfluid.scutterblood=Кровь рыбы рассеивателя
+
+item.ingot_cm242.name=Слиток кюрия-242
+item.ingot_cm243.name=Слиток кюрия-243
+item.ingot_cm244.name=Слиток кюрия-244
+item.ingot_cm245.name=Слиток кюрия-245
+item.ingot_cm246.name=Слиток кюрия-246
+item.ingot_cm247.name=Слиток кюрия-247
+
+item.billet_cm242.name=Заготовка кюрия-242
+item.billet_cm243.name=Заготовка кюрия-243
+item.billet_cm244.name=Заготовка кюрия-244
+item.billet_cm245.name=Заготовка кюрия-245
+item.billet_cm246.name=Заготовка кюрия-246
+item.billet_cm247.name=Заготовка кюрия-247
+item.nugget_cm242.name=Самородок кюрия-242
+item.nugget_cm243.name=Самородок кюрия-243
+item.nugget_cm244.name=Самородок кюрия-244
+item.nugget_cm245.name=Самородок кюрия-245
+item.nugget_cm246.name=Самородок кюрия-246
+item.nugget_cm247.name=Самородок кюрия-247
+
+item.ingot_cm_mix.name=Слиток кюрия реакторного качества
+item.billet_cm_mix.name=Заготовка кюрия реакторного качества
+item.nugget_cm_mix.name=Самородок кюрия реакторного качества
+item.ingot_cm_fuel.name=Слиток кюриевого топлива
+item.billet_cm_fuel.name=Заготовка кюриевого топлива
+item.nugget_cm_fuel.name=Самородок кюриевого топлива
+
+item.ingot_bk247.name=Слиток берклия-247
+item.billet_bk247.name=Заготовка берклия-247
+item.nugget_bk247.name=Самородок берклия-247
+item.ingot_cf251.name=Слиток калифорния-251
+item.ingot_cf252.name=Слиток калифорния-252
+
+item.billet_cf251.name=Заготовка калифорния-251 
+item.billet_cf252.name=Заготовка калифорния-252
+item.nugget_cf251.name=Самородок калифорния-251
+item.nugget_cf252.name=Самородок калифорния-252
+
+item.ingot_es253.name=Слиток эйнштейния-253
+item.billet_es253.name=Заготовка эйнштейния-253
+item.nugget_es253.name=Самородок эйнштейния-253
+item.ingot_es255.name=Слиток эйнштейния-255
+item.ingot_iridium.name=Иридиевый слиток
+item.ingot_gallium.name=Галлиевый слиток
+item.ingot_hafnium.name=Гафниевый слиток
+item.ingot_gwenium.name=Гвениумовый слиток
+item.ingot_gaas.name=Слиток арсенида галлия
+item.powder_coke.coal.name=Порошок угольного кокса
+item.powder_coke.lignite.name=Порошок бурого кокса
+item.powder_coke.petroleum.name=Порошок нефтяного кокса
+item.crystal_nickel.name=Кристаллизированный никель
+item.ingot_nickel.name=Никелевый слиток
+item.nugget_nickel.name=Никелевый самородок
+item.plate_nickel.name=Никелевая пластина
+item.powder_nickel.name=Никелевый порошок
+tile.block_nickel.name=Никелевый блок
+item.ingot_tt.name=Техктактиумовый слиток
+item.ingot_ttas.name=Слиток арсенида техтактиния
+item.ingot_zinc.name=Цинковый слиток
+item.nugget_zinc.name=Цинковый самородок
+item.powder_zinc.name=Цинковый порошок
+item.wire_zinc.name=Цинковый провод
+item.ingot_palladium.name=Палладиумовый слиток
+item.ingot_platnium.name=Платиновый слиток
+item.nugget_platnium.name=Платиновый самородок
+item.powder_platnium.name=Платиновый порошок
+item.ingot_stainless.name=Слиток нержавеющей стали
+item.blade_syngas.name=Нержавеющая лопость
+item.plate_stainless.name=Пластина нержавеющей стали
+item.turbine_syngas.name=Нержавеющие лопасти
+item.crystal_niobium.name=Кристаллизированный ниобий
+tile.block_osmiridium.name=Осмиридиевый блок
+
+item.rbmk_fuel_lecm.name=Низкообогащенный кюривый-245 топливный стержень РБМК
+item.rbmk_fuel_mecm.name=Среднеобогащенный кюривый-245 топливный стержень РБМК
+item.rbmk_fuel_hecm.name=Высокообогащенный кюривый-245 топливный стержень РБМК
+item.rbmk_pellet_lecm.name=Низкообогащенная кюриевая-245 топливная пеллета
+item.rbmk_pellet_mecm.name=Среднеобогащенная кюриквая-245 топливная пеллета
+item.rbmk_pellet_hecm.name=Высокообогащенная кюриевая-245 топливная пеллета
+item.rbmk_fuel_bk247.name=Высокообогащенный берклий-247 топливный стержень РБМК
+item.rbmk_pellet_bk247.name=Высокообогащенная берклиевая-247 топливная пеллета
+
+item.watz_pellet.pu241.name=Ватцз-пелллета из плутония-241
+item.watz_pellet.amrg.name=Ватцз-пеллета из среднообогащеного америция
+item.watz_pellet.amf.name=Ватцз-пеллета из америция
+item.watz_pellet.cmrg.name=Ватцз-пеллета из среднеобогащеного кюрия
+item.watz_pellet.cmf.name=Ватцз-пеллета из топливного кюрия
+item.watz_pellet.bk247.name=Ватцз-пеллета из берклия-247
+item.watz_pellet.cf252.name=Ватцз-пеллета из высокообогащеного калифорния
+item.watz_pellet.cf251.name=Ватцз-пеллета из среднеобогащеного калифорния
+item.watz_pellet.es253.name=Ватцз-пеллета из эйнштейний-253
+
+item.watz_pellet_depleted.pu241.name=Ватцз-пелллета из плутония-241 (Обедненная)
+item.watz_pellet_depleted.amrg.name=Ватцз-пеллета из среднообогащеного америция (Обедненная)
+item.watz_pellet_depleted.amf.name=Ватцз-пеллета из америция (Обедненная)
+item.watz_pellet_depleted.cmrg.name=Ватцз-пеллета из среднеобогащеного кюрия (Обедненная)
+item.watz_pellet_depleted.cmf.name=Ватцз-пеллета из топливного кюрия (Обедненная) 
+item.watz_pellet_depleted.bk247.name=Ватцз-пеллета из берклия-247 (Обедненная)
+item.watz_pellet_depleted.cf252.name=Ватцз-пеллета из высокообогащеного калифорния (Обедненная)
+item.watz_pellet_depleted.cf251.name=Ватцз-пеллета из среднеобогащеного калифорния (Обедненная)
+item.watz_pellet_depleted.es253.name=Ватцз-пеллета из эйнштейний-253 (Обедненная)
+
+tile.machine_discharger.name=Устройство разрядки материала
+container.machine_discharger=Устройство разрядки материала
+
+tile.plant_flower.strawberry.name=Куст дикой клубники
+tile.ferric_clay.name=Блок железистой глины
+tile.dry_ice.name=Сухой лёд
+tile.eve_silt.name=Грунт Евы
+tile.eve_rock.name=Камень Евы
+
+item.pellet_rtg_cf251.name=РИТЭГ-пеллета из калифорния-251
+item.pellet_rtg_cf251.desc=В штате Калифорния известно, что он вызывает рак.
+item.pellet_rtg_cf252.name=РИТЭГ-пеллета из калифорния-252
+item.pellet_rtg_cf252.desc=Ионизирующий
+
+tile.machine_milk_reformer.name=Молочный Реформер
+
+hbmfluid.bloodgas=Кровавое топливо
+hbmfluid.fluorine=Фтор
+hbmfluid.dicyanoacetylene=Дицианоацетилен
+hbmfluid.bromine=Бромид алкила
+hbmfluid.chloromethane=Хлорметан
+hbmfluid.methanol=Метанол
+hbmfluid.polythylene=Полиэтилен
+hbmfluid.methylene=Метилен
+hbmfluid.kmno4=Раствор перманганата калия
+hbmfluid.htco4=Пертехнетиновая кислота
+hbmfluid.oliveoil=Оливковое масло
+hbmfluid.honey=Мёд
+hbmfluid.tea=Чай
+hbmfluid.coffee=Кофе
+hbmfluid.cmilk=Сгущённое молоко
+hbmfluid.emilk=Сливки
+hbmfluid.smilk=Клубничное молоко
+hbmfluid.milk=Молоко
+hbmfluid.cream=Взбитые сливки
+
+chem.MASS_CAKE=Испечение тортов
+chem.BUTTER=Взбивание сливочного масла
+chem.STRAWICE=Производство клубничного мороженного
+
+item.butter.name=Сливочное масло
+
+station.retrieveRocket=Interact to retrieve stored rockets
+station.removeRocket=Нажмите, чтобы удалить пристыкованную капсулу
+station.enterRocket=Нажмите, чтобы войти в пристыкованную капсулу
+station.occupiedRocket=Капсула занята
+station.emptyRocket=Требуется топливо!
+station.placeRocket=Нажмите, чтобы разместить удерживаемую капсулу
+station.engage=Включение двигателей
+station.disengage=Выключение двигателей
+station.travelling=Точка назначения
+station.progress=Прогресс
+station.removeDrive=Извлеките жёсткий диск, чтобы продолжить
+station.interactDrive=Нажмите, чтобы извлечь жёсткий диск
+station.insertDrive=Вставьте жёсткий диск, чтобы начать путешествие
+
+tile.machine_lpw2.name=Ракетный двигатель LPW-2
+tile.machine_htr3.name=Ракетный двигатель HTR-3
+tile.machine_xenon_thruster.name=Ракетный двигатель XNM-1
+
+tile.machine_radiator.name=Паровой радиатор
+item.billet_red_copper.name=Заготовка красной меди
+item.circuit.molychip.name=Молизитовый микрочип
+item.circuit.gaas.name=Печатная арсенид-галлиевая пластина
+item.circuit.gaschip.name=Арсенид-галлиевый микрочип
+item.circuit.hfchip.name=Гафниевый микрочип
+
+item.circuit.capacitor_lanthanium.name=Лантановый конденсатор
+item.circuit.avionics.name=Блок авионики
+
+item.woodemium_briquette.name=Брикет жар-древесины
+
+tile.primed_log.name=Загрунтованное дерево
+tile.lattice_log.name=Решётчатое дерево
+tile.eu_log.name=Анти-масс дерево
+tile.bf_log.name=Жар-дерево
+
+item.powder_wd2004.name=Порошок решётчатого анти-масс древесиума-2004
+item.powder_wd2004_tiny.name=Кучка порошка решётчатого анти-масс древесиума-2004
+
+item.glass_empty.name=Пустой стакан
+item.glass_smilk.name=Стакан клубничного молока
+item.powder_coffee.name=Молотый кофе
+item.cmug_empty.name=Пустая кружка
+item.teaseeds.name=Семена чая
+item.tea_leaf.name=Чайный лист
+item.teacup_empty.name=Пустая чашка
+item.teacup.name=Чай
+item.bottle_honey.name=Пузырёк меда
+item.strawberry.name=Клубника
+item.s_cream.name=Клубничное мороженое
+item.saltleaf.name=Солёный лист
+item.bean_raw.name=Сырое кофейное зерно
+item.bean_roast.name=Жареное кофейное зерно
+
+tile.crop_coffee.name=Кофе
+tile.crop_strawberry.name=Клубника
+tile.crop_tea.name=Чай
+
+item.insert_cmb.name=Бронепластина из стали Альянса
+
+tile.stone_resource.conglomerate.name=Конгломерат
+hbmmat.conglomerate=Конгломерат
+
+crucible.arse=Производство арсенида галлия
+chem.ARSENIDE=Производство арсенида галлия
+item.nugget_gaas.name=Самородок арсенида галлия
+item.powder_gallium_tiny.name=Кучка галливого порошка
+item.powder_gallium.name=Галлиевый порошок
+item.nugget_gallium.name=Галлиевый самородок
+item.nugget_hafnium.name=Гафниевый самородок
+item.nugget_lanthanium.name=Полустабильный самородок лантана
+item.billet_gaas.name=Заготовка арсенида галлия
+
+item.bucket_mercury.name=Ведро ртути
+item.bucket_bromine.name=Ведро бромида алкила
+
+hbmfluid.superheated_hydrogen=Перегретый жидкий водород
+
+hbmmat.gallium=Галлий
+hbmmat.nickel=Никель
+
+item.animan.name=Проблематичное блюдо
+item.animan.desc=Ты столкнешься лицом к лицу с железной волей божества.
+
+crucible.conglomerate=Переплавка конгломерата в железо и никель
+crucible.stainless=Производство нержавеющей стали
+crucible.hsss=Альтернативное производство высокоскоростной стали
+
+potion.hbm_run=БОГ НАБЛЮДАЕТ ЗА ВАМИ
+potion.hbm_slippery=Скользкий

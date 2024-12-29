@@ -16,6 +16,8 @@ public class NEIRegistry {
 		
 		if(!handlers.isEmpty()) return handlers;
 
+		handlers.add(new AnvilRecipeHandler());
+		handlers.add(new SmithingRecipeHandler());
 		handlers.add(new AlloyFurnaceRecipeHandler());
 		handlers.add(new ShredderRecipeHandler());
 		handlers.add(new PressRecipeHandler());
@@ -29,6 +31,7 @@ public class NEIRegistry {
 		handlers.add(new CrackingHandler());
 		handlers.add(new AlkylationHandler());
 		handlers.add(new CryoHandler());
+		handlers.add(new RadiolysisRecipeHandler());
 		handlers.add(new ReformingHandler());
 		handlers.add(new HydrotreatingHandler());
 		handlers.add(new ChemplantRecipeHandler());
@@ -37,16 +40,13 @@ public class NEIRegistry {
 		handlers.add(new FusionRecipeHandler());
 		handlers.add(new HadronRecipeHandler());
 		handlers.add(new SILEXRecipeHandler());
-		handlers.add(new SmithingRecipeHandler());
-		handlers.add(new AnvilRecipeHandler());
 		handlers.add(new FuelPoolHandler());
-		handlers.add(new FluidRecipeHandler());
-		handlers.add(new RadiolysisRecipeHandler());
 		handlers.add(new CrucibleSmeltingHandler());
 		handlers.add(new CrucibleAlloyingHandler());
 		handlers.add(new CrucibleCastingHandler());
 		handlers.add(new ToolingHandler());
 		handlers.add(new ConstructionHandler());
+		handlers.add(new DairyHandler());
 
 		//universal boyes
 		handlers.add(new ZirnoxRecipeHandler());
@@ -54,6 +54,7 @@ public class NEIRegistry {
 		handlers.add(new LiquefactionHandler());
 		handlers.add(new SolidificationHandler());
 		handlers.add(new CokingHandler());
+		handlers.add(new PyroHandler());
 		handlers.add(new FractioningHandler());
 		handlers.add(new BoilingHandler());
 		handlers.add(new CombinationHandler());
@@ -65,9 +66,15 @@ public class NEIRegistry {
 		handlers.add(new AshpitHandler());
 		handlers.add(new ArcWelderHandler());
 		handlers.add(new SolderingStationHandler());
+		handlers.add(new VacuumCircuitHandler());
 		handlers.add(new ExposureChamberHandler());
 		handlers.add(new ArcFurnaceSolidHandler());
 		handlers.add(new ArcFurnaceFluidHandler());
+		handlers.add(new RotaryFurnaceHandler());
+		handlers.add(new AmmoPressHandler());
+
+		//this shit comes last
+		handlers.add(new FluidRecipeHandler());
 		
 		return handlers;
 	}

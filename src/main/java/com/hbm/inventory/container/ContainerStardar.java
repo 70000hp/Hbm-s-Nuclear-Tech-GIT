@@ -15,11 +15,7 @@ public class ContainerStardar extends Container {
 	public ContainerStardar(InventoryPlayer player, TileEntityMachineStardar imGonnaThrowUpandShitAllovertheBeduggghhhh) {
 		stardar = imGonnaThrowUpandShitAllovertheBeduggghhhh; // yummers
 		
-		//0 - load slot
-		//1 - save slot
-		
-		this.addSlotToContainer(new Slot(imGonnaThrowUpandShitAllovertheBeduggghhhh, 0, 129, 124));	
-		this.addSlotToContainer(new Slot(imGonnaThrowUpandShitAllovertheBeduggghhhh, 1, 109, 144));	
+		this.addSlotToContainer(new Slot(imGonnaThrowUpandShitAllovertheBeduggghhhh, 0, 150, 124));	
 
 		for(int i = 0; i < 3; i++) {
 			for(int j = 0; j < 9; j++) {
@@ -57,8 +53,8 @@ public class ContainerStardar extends Container {
 	}
 	
 	@Override
-	public boolean canInteractWith(EntityPlayer p_75145_1_) {
-		return stardar.isUseableByPlayer(p_75145_1_);
+	public boolean canInteractWith(EntityPlayer player) {
+		return stardar.isUseableByPlayer(player);
 	}
 
 }

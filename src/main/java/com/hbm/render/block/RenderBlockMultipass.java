@@ -1,21 +1,13 @@
 package com.hbm.render.block;
 
-import java.awt.Color;
-
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.blocks.IBlockMultiPass;
-import com.hbm.blocks.ModBlocks;
-import com.hbm.blocks.generic.BlockMotherOfAllOres;
-import com.hbm.inventory.RecipesCommon.ComparableStack;
-import com.hbm.items.ModItems;
-import com.hbm.util.ColorUtil;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 
 public class RenderBlockMultipass implements ISimpleBlockRenderingHandler {
@@ -77,7 +69,7 @@ public class RenderBlockMultipass implements ISimpleBlockRenderingHandler {
 		}
 		
 		/** terrible hack to make this shit work */
-		if(block == ModBlocks.ore_random) {
+		/*if(block == ModBlocks.ore_random) {
 
 			currentPass = 1;
 			renderer.setOverrideBlockTexture(block.getIcon(0, metadata));
@@ -133,7 +125,7 @@ public class RenderBlockMultipass implements ISimpleBlockRenderingHandler {
 			
 			renderer.clearOverrideBlockTexture();
 			GL11.glColor3f(1F, 1F, 1F);
-		}
+		}*/
 		
 		GL11.glTranslatef(0.5F, 0.5F, 0.5F);
 	}

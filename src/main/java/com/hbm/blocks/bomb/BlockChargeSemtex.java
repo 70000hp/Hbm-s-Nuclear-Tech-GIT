@@ -2,16 +2,12 @@ package com.hbm.blocks.bomb;
 
 import java.util.List;
 
-import org.apache.logging.log4j.Level;
-
 import com.hbm.config.GeneralConfig;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorStandard;
 import com.hbm.explosion.vanillant.standard.BlockProcessorStandard;
-import com.hbm.explosion.vanillant.standard.ExplosionEffectStandard;
-import com.hbm.main.MainRegistry;
+import com.hbm.particle.helper.ExplosionCreator;
 
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -32,8 +28,8 @@ public class BlockChargeSemtex extends BlockChargeBase {
 			xnt.setBlockProcessor(new BlockProcessorStandard()
 					.setAllDrop()
 					.setFortune(3));
-			xnt.setSFX(new ExplosionEffectStandard());
 			xnt.explode();
+			ExplosionCreator.composeEffectSmall(world, x + 0.5, y + 1, z + 0.5);
 			
 			return BombReturnCode.DETONATED;
 		}
@@ -54,12 +50,5 @@ public class BlockChargeSemtex extends BlockChargeBase {
 		list.add(EnumChatFormatting.BLUE + "");
 		list.add(EnumChatFormatting.LIGHT_PURPLE + "Fortune III");
 	}
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
-	if(!world.isRemote) {
-			if(GeneralConfig.enableExtendedLogging) {
-			MainRegistry.logger.log(Level.INFO, "[BOMBPL]" + this.getLocalizedName() + " placed at " + x + " / " + y + " / " + z + "! " + "by "+ player.getCommandSenderName());
-		}	
-	}
-	}
+	
 }

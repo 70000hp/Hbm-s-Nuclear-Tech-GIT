@@ -18,7 +18,6 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -229,7 +228,7 @@ public class TileEntityRadioTelex extends TileEntity implements INBTPacketReceiv
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GuiScreenRadioTelex(this);
 	}
 	
@@ -300,7 +299,7 @@ public class TileEntityRadioTelex extends TileEntity implements INBTPacketReceiv
 			// this also checks if it's even a string at all
 			if(args.checkAny(i) == null || args.checkString(i).equals(""))
 				this.txBuffer[i] = "";
-			if(args.checkString(i).equals("")) { // if it isn't an empty string
+			if(!args.checkString(i).equals("")) { // if it isn't an empty string
 				if(args.checkString(i).length() > TileEntityRadioTelex.lineWidth) { // line longer than allowed
 					this.txBuffer[i] = args.checkString(i).substring(0, TileEntityRadioTelex.lineWidth); // truncate it
 				} else

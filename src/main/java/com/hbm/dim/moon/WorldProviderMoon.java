@@ -17,7 +17,7 @@ public class WorldProviderMoon extends WorldProviderCelestial {
 
 	@Override
 	public String getDimensionName() {
-		return "Moon";
+		return "Mun";
 	}
 	
 	@Override

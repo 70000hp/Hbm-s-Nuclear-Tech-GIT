@@ -1,2 +1,16 @@
 ## Added
-* fucki- space man, it's space, that's what was added
+* HTR-F4 Fusion Plasma Thruster
+  * Utilises plasma generated within a Plasma Heater as a potent thruster fuel
+  * Set the plasma type in the heater before placing the thruster to automatically set the plasma type
+* Double barrel shotgun (from [X5193](https://github.com/HbmMods/Hbm-s-Nuclear-Tech-GIT/releases/tag/1.0.27_X5193))
+  * Special weapon, spawns as part of certain loot pools
+  * Uses the new 10 gauge caliber
+  * Will reload after each shot, however it is not belt-fed, if ammo is depleted, the next reload must be triggered manually
+
+## Changed
+* HTR-3 renamed to LPW-3N, which can now also use all new nuclear fuels which all function as PWR coolants. a Fluid ID can be used to change fuel types
+* Removed the old casing items
+* Reduced the flicker on the autoshotgun's holo sights
+
+## Fixed
+* All fixes from upstream NTM - [X5193](https://github.com/HbmMods/Hbm-s-Nuclear-Tech-GIT/releases/tag/1.0.27_X5193)

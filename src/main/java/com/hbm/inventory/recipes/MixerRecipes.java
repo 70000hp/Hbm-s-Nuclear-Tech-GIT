@@ -59,8 +59,8 @@ public class MixerRecipes extends SerializableRecipe {
 				new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.NAPHTHA_COKER, 500)).setStack2(new FluidStack(Fluids.AROMATICS, 500)));
 		register(Fluids.SULFURIC_ACID, new MixerRecipe(500, 50).setStack1(new FluidStack(Fluids.PEROXIDE, 800)).setSolid(new OreDictStack(S.dust())));
 		register(Fluids.NITRIC_ACID,
-				new MixerRecipe(500, 50).setStack1(new FluidStack(Fluids.AMMONIA, 1000)).setStack2(new FluidStack(Fluids.WATER, 500)),
-				new MixerRecipe(500, 50).setStack1(new FluidStack(Fluids.SULFURIC_ACID, 500)).setSolid(new OreDictStack(KNO.dust())));
+				new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.AMMONIA, 1000)).setStack2(new FluidStack(Fluids.WATER, 500)),
+				new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.SULFURIC_ACID, 500)).setSolid(new OreDictStack(KNO.dust())));
 		register(Fluids.RADIOSOLVENT, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.REFORMGAS, 750)).setStack2(new FluidStack(Fluids.CHLORINE, 250)));
 		register(Fluids.SCHRABIDIC, new MixerRecipe(16_000, 100).setStack1(new FluidStack(Fluids.SAS3, 8_000)).setStack2(new FluidStack(Fluids.PEROXIDE, 6_000)).setSolid(new ComparableStack(ModItems.pellet_charged)));
 		
@@ -99,7 +99,7 @@ public class MixerRecipes extends SerializableRecipe {
 
 		register(Fluids.HTCO4, new MixerRecipe(250, 50).setStack1(new FluidStack(Fluids.NITRIC_ACID, 500)).setSolid(new ComparableStack(ModItems.nugget_technetium)));
 
-		register(Fluids.MINSOL, new MixerRecipe(250, 50).setStack1(new FluidStack(Fluids.NITRIC_ACID, 500)).setSolid(new ComparableStack(ModBlocks.ore_mineral)));
+		register(Fluids.MINSOL, new MixerRecipe(250, 50).setStack1(new FluidStack(Fluids.NITRIC_ACID, 500)).setSolid(new ComparableStack(ModBlocks.ore_mineral, 1, OreDictionary.WILDCARD_VALUE)));
 		register(Fluids.REDMUD, new MixerRecipe(50, 100).setStack1(new FluidStack(Fluids.HCL, 1400)).setSolid(new ComparableStack(ModBlocks.duna_sands, 4)));
 
 		register(Fluids.DICYANOACETYLENE, new MixerRecipe(750, 50).setStack1(new FluidStack(Fluids.AMMONIA, 300)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 500))); //too powerful, needs change
@@ -107,6 +107,7 @@ public class MixerRecipes extends SerializableRecipe {
 		register(Fluids.CHLOROCALCITE_SOLUTION, new MixerRecipe(500, 50).setStack1(new FluidStack(Fluids.WATER, 250)).setStack2(new FluidStack(Fluids.NITRIC_ACID, 250)).setSolid(new OreDictStack(CHLOROCALCITE.dust())));
 		register(Fluids.CHLOROCALCITE_MIX, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.CHLOROCALCITE_SOLUTION, 500)).setStack2(new FluidStack(Fluids.SULFURIC_ACID, 500)).setSolid(new ComparableStack(ModItems.powder_flux)));
 		register(Fluids.PHEROMONE_M, new MixerRecipe(2000, 10).setStack1(new FluidStack(Fluids.PHEROMONE, 1500)).setStack2(new FluidStack(Fluids.BLOOD, 500)).setSolid(new ComparableStack(ModItems.pill_herbal)));
+		register(Fluids.SCUTTERBLOOD, new MixerRecipe(550, 50).setStack1(new FluidStack(Fluids.HCL, 300)).setSolid(new ComparableStack(ModItems.scuttertail))); 
 
 	}
 	

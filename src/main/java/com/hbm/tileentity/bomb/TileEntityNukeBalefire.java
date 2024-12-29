@@ -11,7 +11,6 @@ import com.hbm.tileentity.TileEntityMachineBase;
 import api.hbm.energymk2.IBatteryItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -103,12 +102,12 @@ public class TileEntityNukeBalefire extends TileEntityMachineBase implements IGU
 	public int getBattery() {
 		
 		if(slots[1] != null && slots[1].getItem() == ModItems.battery_spark &&
-				((IBatteryItem)ModItems.battery_spark).getCharge(slots[1]) == ((IBatteryItem)ModItems.battery_spark).getMaxCharge()) {
+				((IBatteryItem)ModItems.battery_spark).getCharge(slots[1]) == ((IBatteryItem)ModItems.battery_spark).getMaxCharge(slots[1])) {
 			return 1;
 		}
 		
 		if(slots[1] != null && slots[1].getItem() == ModItems.battery_trixite &&
-				((IBatteryItem)ModItems.battery_trixite).getCharge(slots[1]) == ((IBatteryItem)ModItems.battery_trixite).getMaxCharge()) {
+				((IBatteryItem)ModItems.battery_trixite).getCharge(slots[1]) == ((IBatteryItem)ModItems.battery_trixite).getMaxCharge(slots[1])) {
 			return 2;
 		}
 		
@@ -186,7 +185,7 @@ public class TileEntityNukeBalefire extends TileEntityMachineBase implements IGU
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUINukeFstbmb(player.inventory, this);
 	}
 }

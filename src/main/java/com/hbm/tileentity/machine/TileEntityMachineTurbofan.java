@@ -5,13 +5,8 @@ import java.util.List;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.handler.MultiblockHandlerXR;
-import com.hbm.handler.pollution.PollutionHandler;
-import com.hbm.handler.pollution.PollutionHandler.PollutionType;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.inventory.UpgradeManager;
 import com.hbm.inventory.container.ContainerMachineTurbofan;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
@@ -23,9 +18,10 @@ import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.sound.AudioWrapper;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachinePolluting;
@@ -39,7 +35,6 @@ import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,7 +47,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implements IEnergyProviderMK2, IFluidContainer, IFluidAcceptor, IFluidStandardTransceiver, IGUIProvider, IUpgradeInfoProvider, IInfoProviderEC {
+public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implements IEnergyProviderMK2, IFluidStandardTransceiver, IGUIProvider, IUpgradeInfoProvider, IInfoProviderEC, IFluidCopiable {
 
 	public long power;
 	public static final long maxPower = 1_000_000;
@@ -439,32 +434,6 @@ public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implem
 	public void setPower(long i) {
 		this.power = i;
 	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		return type == this.tank.getTankType() ? tank.getMaxFill() : 0;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type == this.tank.getTankType() ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type == tank.getTankType())
-			tank.setFill(i);
-	}
 	
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
@@ -499,7 +468,7 @@ public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implem
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineTurbofan(player.inventory, this);
 	}
 

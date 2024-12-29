@@ -8,11 +8,11 @@ import com.hbm.config.GeneralConfig;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.item.EntityTNTPrimedBase;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
-import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNT;
 import com.hbm.interfaces.IBomb;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
+import com.hbm.particle.helper.ExplosionCreator;
 
 import net.minecraft.util.MathHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -38,14 +38,11 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconRegister) {
-
 		super.registerBlockIcons(iconRegister);
-		if(this == ModBlocks.det_nuke)
-		{
+		if(this == ModBlocks.det_nuke) {
 			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_nuke_top");	
 		}
-		if(this == ModBlocks.det_salt)
-		{
+		if(this == ModBlocks.det_salt) {
 			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_cobalt_top");	
 		}
 	}
@@ -77,7 +74,7 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 			}
 			if(this == ModBlocks.det_charge) {
 				new ExplosionNT(world, null, x + 0.5, y + 0.5, z + 0.5, 15).overrideResolution(64).explode();
-				ExplosionLarge.spawnParticles(world, x, y, z, ExplosionLarge.cloudFunction(15));
+				ExplosionCreator.composeEffectStandard(world, x + 0.5, y + 1, z + 0.5);
 			}
 			if(this == ModBlocks.det_nuke) {
 				world.spawnEntityInWorld(EntityNukeExplosionMK5.statFac(world, BombConfig.missileRadius, x + 0.5, y + 0.5, z + 0.5));
@@ -92,13 +89,14 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 
 		return BombReturnCode.DETONATED;
 	}
+	
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
 		if(!world.isRemote) {
 			if(GeneralConfig.enableExtendedLogging) {
 				MainRegistry.logger.log(Level.INFO, "[BOMBPL]" + this.getLocalizedName() + " placed at " + x + " / " + y + " / " + z + "! " + "by "+ player.getCommandSenderName());
-		}	
-	}
+			}	
+		}
 	}
 
 	@Override

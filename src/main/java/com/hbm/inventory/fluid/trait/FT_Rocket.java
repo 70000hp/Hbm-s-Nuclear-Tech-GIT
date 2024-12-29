@@ -12,6 +12,9 @@ import net.minecraft.util.EnumChatFormatting;
 public class FT_Rocket extends FluidTrait {
 
 	/**
+	 * this is only for the transporter pads, and probably won't remain forever
+	 * well now it's also used for station engines, but just the ISP value
+	 * 
 	 * A rockets effectiveness and efficiency is defined within two flight regimes:
 	 * When escaping gravity and entering orbit (To Orbit)
 	 * Whilst in "free-fall", navigating to celestial bodies (Transfer)
@@ -23,27 +26,23 @@ public class FT_Rocket extends FluidTrait {
 	 * Whilst also having high enough efficiency such that dV per unit of fuel is very high
 	 */
 	
-	/** The ISP of the fuel (aka how long it can go) */
-	private long isp;
-	/**
-	 * The thrust *multiplier* of the fuel (aka how much it can carry)
-	 * Thrust itself is a function of nozzle geometry+count multiplied by this
-	 * Thrust to weight ratio (TWR) must exceed 1 for a rocket to launch
-	 * TWR between 1 - 1.5 incurs an effectiveness debuff (due to gravity losses)
-	 */
-	private long twrMultiplier;
-	
-	public FT_Rocket(long isp, long twr) {
-		this.isp = isp;
-		this.twrMultiplier = twr;
+	// The ISP of the fuel (aka how long it can go)
+	private int isp;
 
+	//The thrust of the fuel (aka how much it can carry)
+	private long thrust;
+	
+	public FT_Rocket(int isp, long twr) {
+		this.isp = isp;
+		this.thrust = twr;
 	}
 	
-	public long getISP() {
+	public int getISP() {
 		return this.isp;
 	}
+
 	public long getThrust() {
-		return this.twrMultiplier;
+		return this.thrust;
 	}
 
 	@Override
@@ -57,20 +56,20 @@ public class FT_Rocket extends FluidTrait {
 		
 		info.add(EnumChatFormatting.RED + "[Thrust power]");
 
-		if(twrMultiplier > 0)
-			info.add(EnumChatFormatting.YELLOW + "Provides " + EnumChatFormatting.RED + "" + BobMathUtil.getShortNumber(twrMultiplier) + " N " + EnumChatFormatting.YELLOW + "of thrust per bucket");
+		if(thrust > 0)
+			info.add(EnumChatFormatting.YELLOW + "Provides " + EnumChatFormatting.RED + "" + BobMathUtil.getShortNumber(thrust) + " N " + EnumChatFormatting.YELLOW + "of thrust per bucket");
 	}
 
 	@Override
 	public void serializeJSON(JsonWriter writer) throws IOException {
 		writer.name("isp").value(isp);
-		writer.name("thrust").value(twrMultiplier);
+		writer.name("thrust").value(thrust);
 	}
 	
 	@Override
 	public void deserializeJSON(JsonObject obj) {
-		this.isp = obj.get("energy").getAsLong();
-		this.twrMultiplier = obj.get("v").getAsLong();
-
+		this.isp = obj.get("isp").getAsInt();
+		this.thrust = obj.get("thrust").getAsLong();
 	}
+
 }

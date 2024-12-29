@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
+import com.hbm.handler.MultiblockHandlerXR;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.items.ModItems;
@@ -14,20 +16,17 @@ import com.hbm.util.I18nUtil;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.Pre;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class LaunchPadRocket extends BlockDummyable implements ILookOverlay {
+public class LaunchPadRocket extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
 	public LaunchPadRocket(Material mat) {
 		super(mat);
-		this.bounding.add(AxisAlignedBB.getBoundingBox(-4.5D, 0D, -4.5D, 4.5D, 1D, -0.5D));
-		this.bounding.add(AxisAlignedBB.getBoundingBox(-4.5D, 0D, 0.5D, 4.5D, 1D, 4.5D));
-		this.bounding.add(AxisAlignedBB.getBoundingBox(-4.5D, 0.875D, -0.5D, 4.5D, 1D, 0.5D));
 	}
 
 	@Override
@@ -44,29 +43,36 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay {
 
 	@Override
 	public int[] getDimensions() {
-		return new int[] {0, 0, 4, 4, 4, 4};
+		return new int[] {2, 0, 7, 6, 6, 6};
 	}
 
 	@Override
 	public int getOffset() {
-		return 4;
+		return 6;
 	}
 
 	@Override
 	public void fillSpace(World world, int x, int y, int z, ForgeDirection dir, int o) {
-		super.fillSpace(world, x, y, z, dir, o);
+		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
 
 		x += dir.offsetX * o;
 		z += dir.offsetZ * o;
 
-		this.makeExtra(world, x + 4, y, z + 2);
-		this.makeExtra(world, x + 4, y, z - 2);
-		this.makeExtra(world, x - 4, y, z + 2);
-		this.makeExtra(world, x - 4, y, z - 2);
-		this.makeExtra(world, x + 2, y, z + 4);
-		this.makeExtra(world, x - 2, y, z + 4);
-		this.makeExtra(world, x + 2, y, z - 4);
-		this.makeExtra(world, x - 2, y, z - 4);
+		// Main body
+		MultiblockHandlerXR.fillSpace(world, x, y, z, new int[] {2, 0, 6, 6, 4, 4}, this, dir);
+		
+		MultiblockHandlerXR.fillSpace(world, x - dir.offsetX * 2, y, z - dir.offsetZ * 2, new int[] {2, 0, 4, 0, 6, 6}, this, dir);
+		MultiblockHandlerXR.fillSpace(world, x + dir.offsetX * 2, y, z + dir.offsetZ * 2, new int[] {2, 0, 0, 4, 6, 6}, this, dir);
+		
+		// Inputs
+		BlockDummyable.safeRem = true;
+		for(int or = 1; or < 5; or++) {
+			for(int oy = 0; oy < 3; oy++) {
+				world.setBlock(x - rot.offsetX * or - dir.offsetX * 7, y + oy, z - rot.offsetZ * or - dir.offsetZ * 7, this, dir.getOpposite().ordinal() + extra, 3);
+			}
+		}
+		world.setBlock(x + rot.offsetX * 3 - dir.offsetX * 7, y, z + rot.offsetZ * 3 - dir.offsetZ * 7, this, dir.getOpposite().ordinal() + extra, 3);
+		BlockDummyable.safeRem = false;
 	}
 
 	@Override
@@ -86,6 +92,8 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay {
 
 		if(pad.rocket == null) return;
 
+		if(y - pos[1] > 2) return; // Don't show tooltip on support tower
+
 		List<String> text = new ArrayList<String>();
 		text.add("Required fuels:");
 
@@ -102,6 +110,12 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay {
 		if(text.size() <= 1) return;
 
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean ext) {
+		addStandardInfo(stack, player, list, ext);
 	}
 	
 }
