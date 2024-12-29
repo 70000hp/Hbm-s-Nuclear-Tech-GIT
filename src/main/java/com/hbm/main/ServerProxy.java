@@ -28,12 +28,14 @@ public class ServerProxy {
 	public static final int ID_TOOLABILITY = 9;
 	public static final int ID_GUN_MODE = 10;
 	public static final int ID_GAS_HAZARD = 11;
-	
+
+	public void registerPreRenderInfo() { }
 	public void registerRenderInfo() { }
 	public void registerTileEntitySpecialRenderer() { }
 	public void registerItemRenderer() { }
 	public void registerEntityRenderer() { }
 	public void registerBlockRenderer() { }
+	public void registerGunCfg() { }
 	public void handleNHNEICompat() { }
 	
 	public void particleControl(double x, double y, double z, int type) { }

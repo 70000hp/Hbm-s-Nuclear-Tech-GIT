@@ -14,6 +14,7 @@ import com.hbm.main.MainRegistry;
 import com.hbm.saveddata.TomSaveData;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IConfigurableMachine;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.INBTPacketReceiver;
 import com.hbm.tileentity.TileEntityLoadedBase;
 import com.hbm.util.fauxpointtwelve.DirPos;
@@ -27,7 +28,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.EnumSkyBlock;
 
-public class TileEntityHeatBoilerIndustrial extends TileEntityLoadedBase implements INBTPacketReceiver, IFluidStandardTransceiver, IConfigurableMachine {
+public class TileEntityHeatBoilerIndustrial extends TileEntityLoadedBase implements INBTPacketReceiver, IFluidStandardTransceiver, IConfigurableMachine, IFluidCopiable {
 
 	public int heat;
 	public FluidTank[] tanks;
@@ -43,8 +44,8 @@ public class TileEntityHeatBoilerIndustrial extends TileEntityLoadedBase impleme
 	public TileEntityHeatBoilerIndustrial() {
 		this.tanks = new FluidTank[2];
 
-		this.tanks[0] = new FluidTank(Fluids.WATER, 64_000, 0);
-		this.tanks[1] = new FluidTank(Fluids.STEAM, 64_000 * 100, 1);
+		this.tanks[0] = new FluidTank(Fluids.WATER, 64_000);
+		this.tanks[1] = new FluidTank(Fluids.STEAM, 64_000 * 100);
 	}
 	
 	@Override

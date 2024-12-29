@@ -9,6 +9,7 @@ import com.hbm.entity.projectile.EntityBoxcar;
 import com.hbm.explosion.ExplosionChaos;
 import com.hbm.explosion.ExplosionLarge;
 import com.hbm.items.ModItems;
+import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
 
@@ -91,7 +92,7 @@ public class ItemGlitch extends Item implements IBatteryItem {
 				}
 				break;
 			case 13:
-				player.inventory.addItemStackToInventory(new ItemStack(ModItems.gun_revolver_pip));
+				player.inventory.addItemStackToInventory(new ItemStack(ModItems.gun_heavy_revolver_lilmac));
 				player.inventory.addItemStackToInventory(new ItemStack(ModItems.bottle_sparkle));
 				player.inventory.addItemStackToInventory(new ItemStack(ModItems.geiger_counter));
 				player.addChatMessage(new ChatComponentText("Have some free stuff. You'll need it for that one cryptic achievement."));
@@ -111,8 +112,8 @@ public class ItemGlitch extends Item implements IBatteryItem {
 				player.addChatMessage(new ChatComponentText("89% of magic tricks are not magic. Technically, they are sorcery."));
 				break;
 			case 18:
-				player.inventory.addItemStackToInventory(new ItemStack(ModItems.gun_lever_action));
-				player.inventory.addItemStackToInventory(new ItemStack(ModItems.ammo_20gauge, 12));
+				player.inventory.addItemStackToInventory(new ItemStack(ModItems.gun_maresleg));
+				player.inventory.addItemStackToInventory(new ItemStack(ModItems.ammo_standard, 12, EnumAmmo.G12.ordinal()));
 				player.addChatMessage(new ChatComponentText("Here ya go."));
 				break;
 			case 19:
@@ -241,7 +242,7 @@ public class ItemGlitch extends Item implements IBatteryItem {
 	@Override public void setCharge(ItemStack stack, long i) { }
 	@Override public void dischargeBattery(ItemStack stack, long i) { }
 	@Override public long getCharge(ItemStack stack) { return 200; }
-	@Override public long getMaxCharge() { return 200; }
+	@Override public long getMaxCharge(ItemStack stack) { return 200; }
 	@Override public long getChargeRate() { return 0; }
 	@Override public long getDischargeRate() { return 200; }
 }

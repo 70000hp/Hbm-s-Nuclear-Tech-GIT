@@ -11,17 +11,21 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 public class ExplosionCreator implements IParticleCreator {
 	
+	public static final double speedOfSound = (17.15D) * 0.5;
+	
 	public static void composeEffect(World world, double x, double y, double z, int cloudCount, float cloudScale, float cloudSpeedMult, float waveScale,
-			int debrisCount, int debrisSize, int debrisRetry, float debrisVelocity, float debrisHorizontalDeviation, float debrisVerticalOffset) {
+			int debrisCount, int debrisSize, int debrisRetry, float debrisVelocity, float debrisHorizontalDeviation, float debrisVerticalOffset, float soundRange) {
 		
 		NBTTagCompound data = new NBTTagCompound();
 		data.setString("type", "explosionLarge");
@@ -35,17 +39,18 @@ public class ExplosionCreator implements IParticleCreator {
 		data.setFloat("debrisVelocity", debrisVelocity);
 		data.setFloat("debrisHorizontalDeviation", debrisHorizontalDeviation);
 		data.setFloat("debrisVerticalOffset", debrisVerticalOffset);
-		IParticleCreator.sendPacket(world, x, y, z, 200, data);
+		data.setFloat("soundRange", soundRange);
+		IParticleCreator.sendPacket(world, x, y, z, Math.max(300, (int) soundRange), data);
 	}
 	
 	/** Downscaled for small bombs */
-	public static void composeEffectSmall(World world, double x, double y, double z) { composeEffect(world, x, y, z, 10, 2F, 0.5F, 25F, 5, 8, 20, 0.75F, 1F, -2F); }
+	public static void composeEffectSmall(World world, double x, double y, double z) { composeEffect(world, x, y, z, 10, 2F, 0.5F, 25F, 5, 8, 20, 0.75F, 1F, -2F, 150); }
 
 	/** Development version */
-	public static void composeEffectStandard(World world, double x, double y, double z) { composeEffect(world, x, y, z, 15, 5F, 1F, 45F, 10, 16, 50, 1F, 3F, -2F); }
+	public static void composeEffectStandard(World world, double x, double y, double z) { composeEffect(world, x, y, z, 15, 5F, 1F, 45F, 10, 16, 50, 1F, 3F, -2F, 200); }
 	
 	/** Upscaled version, ATACMS go brrt */
-	public static void composeEffectLarge(World world, double x, double y, double z) { composeEffect(world, x, y, z, 30, 6.5F, 2F, 65F, 25, 16, 50, 1.25F, 3F, -2F); }
+	public static void composeEffectLarge(World world, double x, double y, double z) { composeEffect(world, x, y, z, 30, 6.5F, 2F, 65F, 25, 16, 50, 1.25F, 3F, -2F, 350); }
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -61,6 +66,15 @@ public class ExplosionCreator implements IParticleCreator {
 		float debrisVelocity = data.getFloat("debrisVelocity");
 		float debrisHorizontalDeviation = data.getFloat("debrisHorizontalDeviation");
 		float debrisVerticalOffset = data.getFloat("debrisVerticalOffset");
+		float soundRange = data.getFloat("soundRange");
+		
+		float dist = (float) player.getDistance(x, y, z);
+
+		if(dist <= soundRange) {
+			String sound = dist <= soundRange * 0.4 ? "hbm:weapon.explosionLargeNear" : "hbm:weapon.explosionLargeFar";
+			PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(new ResourceLocation(sound), 1000F, 0.9F + rand.nextFloat() * 0.2F, (float) x, (float) y, (float) z);
+			Minecraft.getMinecraft().getSoundHandler().playDelayedSound(positionedsoundrecord, (int) (dist / speedOfSound));
+		}
 		
 		// WAVE
 		ParticleMukeWave wave = new ParticleMukeWave(man, world, x, y + 2, z);
@@ -88,9 +102,6 @@ public class ExplosionCreator implements IParticleCreator {
 			double oX = rand.nextGaussian() * debrisHorizontalDeviation;
 			double oY = debrisVerticalOffset;
 			double oZ = rand.nextGaussian() * debrisHorizontalDeviation;
-			int ix = (int) Math.floor(x + oX);
-			int iy = (int) Math.floor(y + oY);
-			int iz = (int) Math.floor(z + oZ);
 			int cX = (int) Math.floor(x + oX + 0.5);
 			int cY = (int) Math.floor(y + oY + 0.5);
 			int cZ = (int) Math.floor(z + oZ + 0.5);

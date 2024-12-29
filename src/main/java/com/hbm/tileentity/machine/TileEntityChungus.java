@@ -1,23 +1,23 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.io.IOException;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.handler.CompatHandler;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.inventory.fluid.trait.FT_Coolable.CoolingType;
-import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.NBTPacket;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.NBTPacket;
 import com.hbm.sound.AudioWrapper;
+import com.hbm.tileentity.IFluidCopiable;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.tileentity.INBTPacketReceiver;
 import com.hbm.tileentity.TileEntityLoadedBase;
 import com.hbm.util.CompatEnergyControl;
@@ -41,31 +41,57 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityChungus extends TileEntityLoadedBase implements IFluidAcceptor, IFluidSource, IEnergyProviderMK2, INBTPacketReceiver, IFluidStandardTransceiver, SimpleComponent, IInfoProviderEC, CompatHandler.OCComponent {
-
+public class TileEntityChungus extends TileEntityLoadedBase implements IEnergyProviderMK2, INBTPacketReceiver, IFluidStandardTransceiver, SimpleComponent, IInfoProviderEC, CompatHandler.OCComponent, IConfigurableMachine, IFluidCopiable {
 	public long power;
-	public static final long maxPower = 100000000000L;
 	private int turnTimer;
 	public float rotor;
 	public float lastRotor;
 	public float fanAcceleration = 0F;
-	
-	public List<IFluidAcceptor> list2 = new ArrayList();
 	
 	public FluidTank[] tanks;
 	protected double[] info = new double[3];
 	
 	private AudioWrapper audio;
 	private float audioDesync;
+
+	//Configurable values
+	public static long maxPower = 100000000000L;
+	public static int inputTankSize = 1_000_000_000;
+	public static int outputTankSize = 1_000_000_000;
+	public static double efficiency = 0.85D;
 	
 	public TileEntityChungus() {
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(Fluids.STEAM, 1000000000, 0);
-		tanks[1] = new FluidTank(Fluids.SPENTSTEAM, 1000000000, 1);
+		tanks[0] = new FluidTank(Fluids.STEAM, inputTankSize);
+		tanks[1] = new FluidTank(Fluids.SPENTSTEAM, outputTankSize);
 
 		Random rand = new Random();
 		audioDesync = rand.nextFloat() * 0.05F;
 	}
+
+	@Override
+	public String getConfigName() {
+		return "steamturbineLeviathan";
+	}
+
+	@Override
+	public void readIfPresent(JsonObject obj) {
+		maxPower = IConfigurableMachine.grab(obj, "L:maxPower", maxPower);
+		inputTankSize = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSize);
+		outputTankSize = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSize);
+		efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
+	}
+
+	@Override
+	public void writeConfig(JsonWriter writer) throws IOException {
+		writer.name("L:maxPower").value(maxPower);
+		writer.name("INFO").value("leviathan steam turbine consumes all availible steam per tick");
+		writer.name("I:inputTankSize").value(inputTankSize);
+		writer.name("I:outputTankSize").value(outputTankSize);
+		writer.name("D:efficiency").value(efficiency);
+	}
+
+
 
 	@Override
 	public void updateEntity() {
@@ -79,7 +105,7 @@ public class TileEntityChungus extends TileEntityLoadedBase implements IFluidAcc
 			boolean valid = false;
 			if(in.hasTrait(FT_Coolable.class)) {
 				FT_Coolable trait = in.getTrait(FT_Coolable.class);
-				double eff = trait.getEfficiency(CoolingType.TURBINE) * 0.85D; //85% efficiency
+				double eff = trait.getEfficiency(CoolingType.TURBINE) * efficiency; //85% efficiency by default
 				if(eff > 0) {
 					tanks[1].setTankType(trait.coolsTo);
 					int inputOps = tanks[0].getFill() / trait.amountReq;
@@ -112,10 +138,7 @@ public class TileEntityChungus extends TileEntityLoadedBase implements IFluidAcc
 			
 			turnTimer--;
 			
-			if(operational)
-				turnTimer = 25;
-			
-			this.fillFluidInit(tanks[1].getTankType());
+			if(operational) turnTimer = 25;
 			
 			NBTTagCompound data = new NBTTagCompound();
 			data.setLong("power", power);
@@ -216,74 +239,6 @@ public class TileEntityChungus extends TileEntityLoadedBase implements IFluidAcc
 		tanks[0].writeToNBT(nbt, "water");
 		tanks[1].writeToNBT(nbt, "steam");
 		nbt.setLong("power", power);
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		
-		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - BlockDummyable.offset);
-		dir = dir.getRotation(ForgeDirection.UP);
-
-		fillFluid(xCoord + dir.offsetX * 3, yCoord, zCoord + dir.offsetZ * 3, getTact(), type);
-		fillFluid(xCoord + dir.offsetX * -3, yCoord, zCoord + dir.offsetZ * -3, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-	
-	@Override
-	public boolean getTact() {
-		return worldObj.getTotalWorldTime() % 2 == 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type == tanks[0].getTankType())
-			tanks[0].setFill(i);
-		else if(type == tanks[1].getTankType())
-			tanks[1].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type == tanks[0].getTankType())
-			return tanks[0].getFill();
-		else if(type == tanks[1].getTankType())
-			return tanks[1].getFill();
-		
-		return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type == tanks[0].getTankType())
-			return tanks[0].getMaxFill();
-		
-		return 0;
-	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-	
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return list2;
-	}
-	
-	@Override
-	public void clearFluidList(FluidType type) {
-		list2.clear();
 	}
 	
 	@Override
@@ -416,5 +371,10 @@ public class TileEntityChungus extends TileEntityLoadedBase implements IFluidAcc
 		data.setDouble(CompatEnergyControl.D_CONSUMPTION_MB, info[0]);
 		data.setDouble(CompatEnergyControl.D_OUTPUT_MB, info[1]);
 		data.setDouble(CompatEnergyControl.D_OUTPUT_HE, info[2]);
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return null;
 	}
 }

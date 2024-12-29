@@ -1,9 +1,7 @@
 package com.hbm.tileentity.machine;
 
 import com.hbm.handler.CompatHandler;
-import com.hbm.interfaces.IFluidAcceptor;
 import com.hbm.inventory.container.ContainerCoreReceiver;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUICoreReceiver;
@@ -22,7 +20,6 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
@@ -33,7 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEnergyProviderMK2, IFluidAcceptor, ILaserable, IFluidStandardReceiver, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
+public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEnergyProviderMK2, ILaserable, IFluidStandardReceiver, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
 	
 	public long power;
 	public long joules;
@@ -41,7 +38,7 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 
 	public TileEntityCoreReceiver() {
 		super(0);
-		tank = new FluidTank(Fluids.CRYOGEL, 64000, 0);
+		tank = new FluidTank(Fluids.CRYOGEL, 64000);
 	}
 
 	@Override
@@ -54,7 +51,6 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 
 		if (!worldObj.isRemote) {
 			
-			tank.updateTank(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
 			this.subscribeToAllAround(tank.getTankType(), this);
 			
 			power = joules * 5000;
@@ -74,6 +70,7 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 
 			NBTTagCompound data = new NBTTagCompound();
 			data.setLong("joules", joules);
+			tank.writeToNBT(data, "t");
 			this.networkPack(data, 50);
 			
 			joules = 0;
@@ -83,6 +80,7 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 	public void networkUnpack(NBTTagCompound data) {
 		super.networkUnpack(data);
 		joules = data.getLong("joules");
+		tank.readFromNBT(data, "t");
 	}
 
 	@Override
@@ -103,38 +101,6 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 	@Override
 	public long getMaxPower() {
 		return this.power;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			return tank.getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			return tank.getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		tank.setTankType(type);
 	}
 
 	@Override
@@ -220,7 +186,7 @@ public class TileEntityCoreReceiver extends TileEntityMachineBase implements IEn
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUICoreReceiver(player.inventory, this);
 	}
 

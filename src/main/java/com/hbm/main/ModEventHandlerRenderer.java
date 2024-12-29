@@ -1,14 +1,18 @@
 package com.hbm.main;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GLContext;
 
 import com.hbm.blocks.ICustomBlockHighlight;
+import com.hbm.config.ClientConfig;
 import com.hbm.config.RadiationConfig;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
 import com.hbm.items.armor.IArmorDisableModel;
 import com.hbm.items.armor.IArmorDisableModel.EnumPlayerPart;
+import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.packet.PermaSyncHandler;
+import com.hbm.render.item.weapon.sedna.ItemRenderWeaponBase;
 import com.hbm.render.model.ModelMan;
 import com.hbm.world.biome.BiomeGenCraterBase;
 
@@ -18,6 +22,8 @@ import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -33,11 +39,15 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogColors;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogDensity;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.ForgeModContainer;
 
@@ -51,6 +61,7 @@ public class ModEventHandlerRenderer {
 
 		EntityPlayer player = event.entityPlayer;
 		RenderPlayer renderer = event.renderer;
+		ItemStack held = player.getHeldItem();
 
 		boolean isManly = PermaSyncHandler.boykissers.contains(player.getEntityId());
 
@@ -63,6 +74,18 @@ public class ModEventHandlerRenderer {
 				box.isHidden = true;
 			} else {
 				partsHidden[j] = false;
+			}
+		}
+
+		if(held != null) {
+			IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+			if(customRenderer instanceof ItemRenderWeaponBase) {
+				ItemRenderWeaponBase renderGun = (ItemRenderWeaponBase) customRenderer;
+				if(renderGun.isAkimbo()) {
+					partsHidden[EnumPlayerPart.LEFT_ARM.ordinal()] = true;
+					ModelRenderer box = getBoxFromType(renderer, EnumPlayerPart.LEFT_ARM);
+					box.isHidden = true;
+				}
 			}
 		}
 
@@ -93,8 +116,34 @@ public class ModEventHandlerRenderer {
 
 		EntityPlayer player = event.entityPlayer;
 		RenderPlayer renderer = event.renderer;
+		
+		boolean akimbo = false;
+
+		ItemStack held = player.getHeldItem();
+		
+		if(held != null) {
+			IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+			if(customRenderer instanceof ItemRenderWeaponBase) {
+				ItemRenderWeaponBase renderGun = (ItemRenderWeaponBase) customRenderer;
+				if(renderGun.isAkimbo()) {
+					akimbo = true;
+				}
+			}
+		}
 
 		boolean isManly = PermaSyncHandler.boykissers.contains(player.getEntityId());
+		
+		if(akimbo) {
+			ModelBiped biped = renderer.modelBipedMain;
+			renderer.modelArmorChestplate.bipedLeftArm.rotateAngleY = renderer.modelArmor.bipedLeftArm.rotateAngleY = biped.bipedLeftArm.rotateAngleY =
+					0.1F + biped.bipedHead.rotateAngleY;
+			if(!isManly) {
+				AbstractClientPlayer acp = (AbstractClientPlayer) player;
+				Minecraft.getMinecraft().getTextureManager().bindTexture(acp.getLocationSkin());
+				biped.bipedLeftArm.isHidden = false;
+				biped.bipedLeftArm.render(0.0625F);
+			}
+		}
 
 		if(isManly) {
 			if(manlyModel == null)
@@ -110,6 +159,7 @@ public class ModEventHandlerRenderer {
 			if(f6 > 1.0F) {
 				f6 = 1.0F;
 			}
+			
 			manlyModel.render(event.entityPlayer, f7, f6, yawWrapped, yaw, pitch, 0.0625F, renderer);
 		}
 	}
@@ -126,6 +176,69 @@ public class ModEventHandlerRenderer {
 			}
 		}
 	}
+	
+	@SubscribeEvent
+	public void onRenderHeldGun(RenderPlayerEvent.Pre event) {
+
+		EntityPlayer player = event.entityPlayer;
+		RenderPlayer renderer = event.renderer;
+		ItemStack held = player.getHeldItem();
+		
+		if(held != null && player.getHeldItem().getItem() instanceof ItemGunBaseNT) {
+			renderer.modelBipedMain.aimedBow = true;
+			renderer.modelArmor.aimedBow = true;
+			renderer.modelArmorChestplate.aimedBow = true;
+
+			//technically not necessary but it probably fixes some issues with mods that implement their armor weirdly
+			IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+			if(customRenderer instanceof ItemRenderWeaponBase) {
+				ItemRenderWeaponBase renderGun = (ItemRenderWeaponBase) customRenderer;
+				if(renderGun.isAkimbo()) {
+					ModelBiped biped = renderer.modelBipedMain;
+					renderer.modelArmorChestplate.bipedLeftArm.rotateAngleY = renderer.modelArmor.bipedLeftArm.rotateAngleY = biped.bipedLeftArm.rotateAngleY = 0.1F + biped.bipedHead.rotateAngleY;
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onRenderAkimbo(RenderPlayerEvent.Specials.Pre event) {
+
+		EntityPlayer player = event.entityPlayer;
+		RenderPlayer renderer = event.renderer;
+		ItemStack held = player.getHeldItem();
+		if(held == null) return;
+
+		IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+		
+		if(customRenderer instanceof ItemRenderWeaponBase) {
+			ItemRenderWeaponBase renderWeapon = (ItemRenderWeaponBase) customRenderer;
+			if(renderWeapon.isAkimbo()) {
+				GL11.glPushMatrix();
+				renderer.modelBipedMain.bipedLeftArm.isHidden = false;
+				renderer.modelBipedMain.bipedLeftArm.postRender(0.0625F);
+				//vanilla bullshit
+				GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
+				float scale = 0.375F;
+				GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+				GL11.glScalef(scale, scale, scale);
+				GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
+				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+				// forge bullshit
+				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+				GL11.glTranslatef(0.0F, -0.3F, 0.0F);
+				GL11.glScalef(1.5F, 1.5F, 1.5F);
+				GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+				GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+				GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
+				renderWeapon.setupThirdPersonAkimbo(held);
+				renderWeapon.renderEquippedAkimbo(held);
+				GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+				GL11.glPopMatrix();
+			}
+		}
+	}
 
 	@SubscribeEvent
 	public void onRenderHeldItem(RenderPlayerEvent.Specials.Pre event) {
@@ -134,9 +247,7 @@ public class ModEventHandlerRenderer {
 		//RenderPlayer renderer = event.renderer;
 
 		boolean isManly = PermaSyncHandler.boykissers.contains(player.getEntityId());
-
-		if(!isManly)
-			return;
+		if(!isManly) return;
 
 		if(manlyModel == null)
 			manlyModel = new ModelMan();
@@ -164,8 +275,8 @@ public class ModEventHandlerRenderer {
 			enumaction = held.getItemUseAction();
 		}
 
-		net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient.getItemRenderer(held, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
-		boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, held, net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
+		IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+		boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(IItemRenderer.ItemRenderType.EQUIPPED, held, IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
 		if(is3D || held.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(held.getItem()).getRenderType())) {
 			f2 = 0.5F;
@@ -398,14 +509,30 @@ public class ModEventHandlerRenderer {
 		}
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onRenderHUD(RenderGameOverlayEvent.Pre event) {
 		
-		if(event.type == ElementType.HOTBAR && (ModEventHandlerClient.shakeTimestamp + ModEventHandlerClient.shakeDuration - System.currentTimeMillis()) > 0) {
+		if(event.type == ElementType.HOTBAR && (ModEventHandlerClient.shakeTimestamp + ModEventHandlerClient.shakeDuration - System.currentTimeMillis()) > 0 && ClientConfig.NUKE_HUD_SHAKE.get()) {
 			double mult = (ModEventHandlerClient.shakeTimestamp + ModEventHandlerClient.shakeDuration - System.currentTimeMillis()) / (double) ModEventHandlerClient.shakeDuration * 2;
 			double horizontal = MathHelper.clamp_double(Math.sin(System.currentTimeMillis() * 0.02), -0.7, 0.7) * 15;
 			double vertical = MathHelper.clamp_double(Math.sin(System.currentTimeMillis() * 0.01 + 2), -0.7, 0.7) * 3;
 			GL11.glTranslated(horizontal * mult, vertical * mult, 0);
+		}
+	}
+
+	@SubscribeEvent
+	public void onRenderHand(RenderHandEvent event) {
+		
+		//can't use plaxer.getHeldItem() here because the item rendering persists for a few frames after hitting the switch key
+		ItemStack toRender = Minecraft.getMinecraft().entityRenderer.itemRenderer.itemToRender;
+		
+		if(toRender != null) {
+			IItemRenderer renderer = MinecraftForgeClient.getItemRenderer(toRender, ItemRenderType.EQUIPPED_FIRST_PERSON);
+			
+			if(renderer instanceof ItemRenderWeaponBase) {
+				((ItemRenderWeaponBase) renderer).setPerspectiveAndRender(toRender, event.partialTicks);
+				event.setCanceled(true);
+			}
 		}
 	}
 

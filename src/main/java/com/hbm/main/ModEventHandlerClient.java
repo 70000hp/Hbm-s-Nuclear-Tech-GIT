@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL11;
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockAshes;
+import com.hbm.config.ClientConfig;
 import com.hbm.config.GeneralConfig;
 import com.hbm.entity.mob.EntityHunterChopper;
 import com.hbm.entity.projectile.EntityChopperMine;
@@ -24,7 +25,9 @@ import com.hbm.handler.ArmorModHandler;
 import com.hbm.handler.GunConfiguration;
 import com.hbm.handler.HTTPHandler;
 import com.hbm.handler.HazmatRegistry;
+import com.hbm.handler.HbmKeybinds;
 import com.hbm.handler.ImpactWorldHandler;
+import com.hbm.handler.HbmKeybinds.EnumKeybind;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.interfaces.IHoldableWeapon;
 import com.hbm.interfaces.IItemHUD;
@@ -33,26 +36,29 @@ import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.gui.GUIArmorTable;
 import com.hbm.inventory.gui.GUIScreenPreview;
 import com.hbm.inventory.gui.GUIScreenWikiRender;
-import com.hbm.items.ISyncButtons;
 import com.hbm.items.ModItems;
 import com.hbm.items.armor.ArmorFSB;
 import com.hbm.items.armor.ArmorFSBPowered;
 import com.hbm.items.armor.ArmorNo9;
 import com.hbm.items.armor.ItemArmorMod;
 import com.hbm.items.armor.JetpackBase;
+import com.hbm.items.armor.JetpackFueledBase;
 import com.hbm.items.machine.ItemDepletedFuel;
 import com.hbm.items.machine.ItemFluidDuct;
 import com.hbm.items.machine.ItemRBMKPellet;
 import com.hbm.items.weapon.ItemGunBase;
+import com.hbm.items.weapon.sedna.GunConfig;
+import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.lib.Library;
 import com.hbm.lib.RefStrings;
-import com.hbm.packet.AuxButtonPacket;
-import com.hbm.packet.GunButtonPacket;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.SyncButtonsPacket;
+import com.hbm.packet.toserver.AuxButtonPacket;
+import com.hbm.packet.toserver.GunButtonPacket;
+import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.render.anim.HbmAnimations;
 import com.hbm.render.anim.HbmAnimations.Animation;
 import com.hbm.render.block.ct.CTStitchReceiver;
+import com.hbm.render.item.weapon.sedna.ItemRenderWeaponBase;
 import com.hbm.render.util.RenderAccessoryUtility;
 import com.hbm.render.util.RenderOverhead;
 import com.hbm.render.util.RenderScreenOverlay;
@@ -63,7 +69,6 @@ import com.hbm.sound.MovingSoundChopper;
 import com.hbm.sound.MovingSoundChopperMine;
 import com.hbm.sound.MovingSoundCrashing;
 import com.hbm.sound.MovingSoundPlayerLoop;
-import com.hbm.sound.MovingSoundXVL1456;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom.CustomNukeEntry;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom.EnumEntryType;
@@ -77,11 +82,9 @@ import com.hbm.wiaj.cannery.CanneryBase;
 import com.hbm.wiaj.cannery.Jars;
 import com.hbm.util.ArmorRegistry;
 import com.hbm.util.ArmorUtil;
+import com.hbm.util.DamageResistanceHandler;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-
-import api.hbm.item.IButtonReceiver;
-import api.hbm.item.IClickReceiver;
 
 import com.hbm.sound.MovingSoundPlayerLoop.EnumHbmSound;
 
@@ -91,7 +94,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
-import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
@@ -132,7 +134,9 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderSurface;
 import net.minecraftforge.client.GuiIngameForge;
+import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.IRenderHandler;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.MouseEvent;
@@ -161,7 +165,7 @@ public class ModEventHandlerClient {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		
 		/// NUKE FLASH ///
-		if(event.type == ElementType.CROSSHAIRS && (flashTimestamp + flashDuration - System.currentTimeMillis()) > 0) {
+		if(event.type == ElementType.CROSSHAIRS && (flashTimestamp + flashDuration - System.currentTimeMillis()) > 0 && ClientConfig.NUKE_HUD_FLASH.get()) {
 			int width = event.resolution.getScaledWidth();
 			int height = event.resolution.getScaledHeight();
 			Tessellator tess = Tessellator.instance;
@@ -205,7 +209,7 @@ public class ModEventHandlerClient {
 		}
 
 		/// DODD DIAG HOOK FOR RBMK
-		if(event.type == ElementType.CROSSHAIRS) {
+		if(event.type == ElementType.CROSSHAIRS && ClientConfig.DODD_RBMK_DIAGNOSTIC.get()) {
 			Minecraft mc = Minecraft.getMinecraft();
 			World world = mc.theWorld;
 			MovingObjectPosition mop = mc.objectMouseOver;
@@ -326,19 +330,21 @@ public class ModEventHandlerClient {
 		/// HANLDE ANIMATION BUSES ///
 		
 		for(int i = 0; i < HbmAnimations.hotbar.length; i++) {
-			
-			Animation animation = HbmAnimations.hotbar[i];
-			
-			if(animation == null)
-				continue;
-
-			if(animation.holdLastFrame)
-				continue;
-			
-			long time = System.currentTimeMillis() - animation.startMillis;
-			
-			if(time > animation.animation.getDuration())
-				HbmAnimations.hotbar[i] = null;
+			for(int j = 0; j < HbmAnimations.hotbar[i].length; j++) {
+				
+				Animation animation = HbmAnimations.hotbar[i][j];
+				
+				if(animation == null)
+					continue;
+	
+				if(animation.holdLastFrame)
+					continue;
+				
+				long time = System.currentTimeMillis() - animation.startMillis;
+				
+				if(time > animation.animation.getDuration())
+					HbmAnimations.hotbar[i][j] = null;
+			}
 		}
 			
 		if(!ducked && Keyboard.isKeyDown(Keyboard.KEY_O) && Minecraft.getMinecraft().currentScreen == null) {
@@ -355,6 +361,15 @@ public class ModEventHandlerClient {
 			if(config.scopeTexture != null) {
 				ScaledResolution resolution = event.resolution;
 				RenderScreenOverlay.renderScope(resolution, config.scopeTexture);
+			}
+		}
+		
+		if(held != null && held.getItem() instanceof ItemGunBaseNT && ItemGunBaseNT.aimingProgress == ItemGunBaseNT.prevAimingProgress && ItemGunBaseNT.aimingProgress == 1F && event.type == event.type.HOTBAR)  {
+			ItemGunBaseNT gun = (ItemGunBaseNT) held.getItem();
+			GunConfig cfg = gun.getConfig(held, 0);
+			if(cfg.getScopeTexture(held) != null) {
+				ScaledResolution resolution = event.resolution;
+				RenderScreenOverlay.renderScope(resolution, cfg.getScopeTexture(held));
 			}
 		}
 		
@@ -443,11 +458,11 @@ public class ModEventHandlerClient {
 
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-			} else if(player.inventory.armorInventory[2] != null && player.inventory.armorInventory[2].getItem() instanceof JetpackBase) {
+			} else if(player.inventory.armorInventory[2] != null && player.inventory.armorInventory[2].getItem() instanceof JetpackFueledBase) {
 
 				ItemStack stack = player.inventory.armorInventory[2];
 
-				float tot = (float) ((JetpackBase) stack.getItem()).getFuel(stack) / (float) ((JetpackBase) stack.getItem()).getMaxFill(stack);
+				float tot = (float) ((JetpackFueledBase) stack.getItem()).getFuel(stack) / (float) ((JetpackFueledBase) stack.getItem()).getMaxFill(stack);
 				
 				int top = height - GuiIngameForge.left_height + 3;
 
@@ -491,6 +506,20 @@ public class ModEventHandlerClient {
 		} else {
 			event.newfov += config.zoomFOV;
 		}
+	}
+	
+	@SubscribeEvent
+	public void setupNewFOV(FOVUpdateEvent event) {
+		
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		ItemStack held = player.getHeldItem();
+		
+		if(held == null) return;
+		
+		IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(held, IItemRenderer.ItemRenderType.EQUIPPED);
+		if(!(customRenderer instanceof ItemRenderWeaponBase)) return;
+		ItemRenderWeaponBase renderGun = (ItemRenderWeaponBase) customRenderer;
+		event.newfov = renderGun.getViewFOV(held, event.fov);
 	}
 	
 	public static boolean ducked = false;
@@ -593,15 +622,6 @@ public class ModEventHandlerClient {
 			
 			Item held = player.getHeldItem().getItem();
 			
-			if(held instanceof IClickReceiver) {
-				IClickReceiver rec = (IClickReceiver) held;
-				
-				if(rec.handleMouseInput(player.getHeldItem(), player, event.button, event.buttonstate)) {
-					event.setCanceled(true);
-					return;
-				}
-			}
-			
 			if(held instanceof ItemGunBase) {
 				
 				if(event.button == 0)
@@ -619,30 +639,6 @@ public class ModEventHandlerClient {
 					PacketDispatcher.wrapper.sendToServer(new GunButtonPacket(true, (byte) 1));
 					item.startActionClient(player.getHeldItem(), player.worldObj, player, false);
 				}
-			}
-			
-			if(held instanceof ISyncButtons) {
-				ISyncButtons rec = (ISyncButtons) held;
-				
-				if(rec.canReceiveMouse(player, player.getHeldItem(), event, event.button, event.buttonstate)) {
-					PacketDispatcher.wrapper.sendToServer(new SyncButtonsPacket(event.buttonstate, event.button));
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void keyEvent(KeyInputEvent event) {
-		
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		
-		if(player.getHeldItem() != null) {
-			
-			Item held = player.getHeldItem().getItem();
-			
-			if(held instanceof IButtonReceiver) {
-				IButtonReceiver rec = (IButtonReceiver) held;
-				rec.handleKeyboardInput(player.getHeldItem(), player);
 			}
 		}
 	}
@@ -674,19 +670,6 @@ public class ModEventHandlerClient {
 		//A winner is you.
 		//Conglaturations.
 		//Fuck you.
-
-		if(r.toString().equals("hbm:misc.nullTau") && Library.getClosestPlayerForSound(wc, e.sound.getXPosF(), e.sound.getYPosF(), e.sound.getZPosF(), 2) != null)
-		{
-			EntityPlayer ent = Library.getClosestPlayerForSound(wc, e.sound.getXPosF(), e.sound.getYPosF(), e.sound.getZPosF(), 2);
-			
-			if(MovingSoundPlayerLoop.getSoundByPlayer(ent, EnumHbmSound.soundTauLoop) == null) {
-				MovingSoundPlayerLoop.globalSoundList.add(new MovingSoundXVL1456(new ResourceLocation("hbm:weapon.tauChargeLoop2"), ent, EnumHbmSound.soundTauLoop));
-				MovingSoundPlayerLoop.getSoundByPlayer(ent, EnumHbmSound.soundTauLoop).setPitch(0.5F);
-			} else {
-				if(MovingSoundPlayerLoop.getSoundByPlayer(ent, EnumHbmSound.soundTauLoop).getPitch() < 1.5F)
-				MovingSoundPlayerLoop.getSoundByPlayer(ent, EnumHbmSound.soundTauLoop).setPitch(MovingSoundPlayerLoop.getSoundByPlayer(ent, EnumHbmSound.soundTauLoop).getPitch() + 0.01F);
-			}
-		}
 		
 		if(r.toString().equals("hbm:misc.nullChopper") && Library.getClosestChopperForSound(wc, e.sound.getXPosF(), e.sound.getYPosF(), e.sound.getZPosF(), 2) != null)
 		{
@@ -733,6 +716,9 @@ public class ModEventHandlerClient {
 		
 		ItemStack stack = event.itemStack;
 		List<String> list = event.toolTip;
+		
+		/// DAMAGE RESISTANCE ///
+		DamageResistanceHandler.addInfo(stack, list);
 		
 		/// HAZMAT INFO ///
 		List<HazardClass> hazInfo = ArmorRegistry.hazardClasses.get(stack.getItem());
@@ -785,7 +771,7 @@ public class ModEventHandlerClient {
 		/// HAZARDS ///
 		HazardSystem.addFullTooltip(stack, event.entityPlayer, list);
 		
-		if(event.showAdvancedItemTooltips) {
+		if(event.showAdvancedItemTooltips && ClientConfig.ITEM_TOOLTIP_SHOW_OREDICT.get()) {
 			List<String> names = ItemStackUtil.getOreDictNames(stack);
 			
 			if(names.size() > 0) {
@@ -807,18 +793,21 @@ public class ModEventHandlerClient {
 		
 		/// CUSTOM NUKE ///
 		ComparableStack comp = new ComparableStack(stack).makeSingular();
-		CustomNukeEntry entry = TileEntityNukeCustom.entries.get(comp);
 		
-		if(entry != null) {
+		if(ClientConfig.ITEM_TOOLTIP_SHOW_CUSTOM_NUKE.get()) {
+			CustomNukeEntry entry = TileEntityNukeCustom.entries.get(comp);
 			
-			if(!list.isEmpty())
-				list.add("");
-			
-			if(entry.entry == EnumEntryType.ADD)
-				list.add(EnumChatFormatting.GOLD + "Adds " + entry.value + " to the custom nuke stage " + entry.type);
-
-			if(entry.entry == EnumEntryType.MULT)
-				list.add(EnumChatFormatting.GOLD + "Adds multiplier " + entry.value + " to the custom nuke stage " + entry.type);
+			if(entry != null) {
+				
+				if(!list.isEmpty())
+					list.add("");
+				
+				if(entry.entry == EnumEntryType.ADD)
+					list.add(EnumChatFormatting.GOLD + "Adds " + entry.value + " to the custom nuke stage " + entry.type);
+	
+				if(entry.entry == EnumEntryType.MULT)
+					list.add(EnumChatFormatting.GOLD + "Adds multiplier " + entry.value + " to the custom nuke stage " + entry.type);
+			}
 		}
 		
 		try {
@@ -921,7 +910,7 @@ public class ModEventHandlerClient {
 	static boolean isRenderingItems = false;
 	
 	@SubscribeEvent
-	public void clentTick(ClientTickEvent event) {
+	public void clientTick(ClientTickEvent event) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		ArmorNo9.updateWorldHook(mc.theWorld);
@@ -958,7 +947,7 @@ public class ModEventHandlerClient {
 			}
 		}
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_F1)) {
+		if(Keyboard.isKeyDown(Keyboard.KEY_F1) && Minecraft.getMinecraft().currentScreen != null) {
 			
 			ComparableStack comp = canneryTimestamp > System.currentTimeMillis() - 100 ? lastCannery : null;
 			
@@ -1023,9 +1012,10 @@ public class ModEventHandlerClient {
 		} else {
 			isRenderingItems = false;
 		}
+
+		EntityPlayer player = mc.thePlayer;
 		
 		if(event.phase == Phase.START) {
-			EntityPlayer player = mc.thePlayer;
 			
 			float discriminator = 0.003F;
 			float defaultStepSize = 0.5F;
@@ -1040,6 +1030,31 @@ public class ModEventHandlerClient {
 				player.stepHeight = newStepSize + discriminator;
 			} else {
 				for(int i = 1; i < 4; i++) if(player.stepHeight == i + discriminator) player.stepHeight = defaultStepSize;
+			}
+		}
+		
+		if(event.phase == Phase.END) {
+			
+			if(ClientConfig.GUN_VISUAL_RECOIL.get()) {
+				ItemGunBaseNT.offsetVertical += ItemGunBaseNT.recoilVertical;
+				ItemGunBaseNT.offsetHorizontal += ItemGunBaseNT.recoilHorizontal;
+				player.rotationPitch -= ItemGunBaseNT.recoilVertical;
+				player.rotationYaw -= ItemGunBaseNT.recoilHorizontal;
+	
+				ItemGunBaseNT.recoilVertical *= ItemGunBaseNT.recoilDecay;
+				ItemGunBaseNT.recoilHorizontal *= ItemGunBaseNT.recoilDecay;
+				float dV = ItemGunBaseNT.offsetVertical * ItemGunBaseNT.recoilRebound;
+				float dH = ItemGunBaseNT.offsetHorizontal * ItemGunBaseNT.recoilRebound;
+				
+				ItemGunBaseNT.offsetVertical -= dV;
+				ItemGunBaseNT.offsetHorizontal -= dH;
+				player.rotationPitch += dV;
+				player.rotationYaw += dH;
+			} else {
+				ItemGunBaseNT.offsetVertical = 0;
+				ItemGunBaseNT.offsetHorizontal = 0;
+				ItemGunBaseNT.recoilVertical = 0;
+				ItemGunBaseNT.recoilHorizontal = 0;
 			}
 		}
 	}
@@ -1106,12 +1121,30 @@ public class ModEventHandlerClient {
 				}
 			}
 		}
+
+		if(event.phase == Phase.START) {
+			
+			Minecraft mc = Minecraft.getMinecraft();
+			
+			if(mc.currentScreen != null && mc.currentScreen.allowUserInput) {
+				HbmPlayerProps props = HbmPlayerProps.getData(MainRegistry.proxy.me());
+				
+				for(EnumKeybind key : EnumKeybind.values()) {
+					boolean last = props.getKeyPressed(key);
+					
+					if(last) {
+						PacketDispatcher.wrapper.sendToServer(new KeybindPacket(key, !last));
+						props.setKeyPressed(key, !last);
+					}
+				}
+			}
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onMouseClicked(InputEvent.KeyInputEvent event) {
-
+	@SubscribeEvent(priority = EventPriority.LOW)
+	public void onMouseClicked(InputEvent.MouseInputEvent event) {
+		
 		Minecraft mc = Minecraft.getMinecraft();
 		if(GeneralConfig.enableKeybindOverlap && (mc.currentScreen == null || mc.currentScreen.allowUserInput)) {
 			boolean state = Mouse.getEventButtonState();
@@ -1122,18 +1155,37 @@ public class ModEventHandlerClient {
 				KeyBinding key = (KeyBinding) o;
 				
 				if(key.getKeyCode() == keyCode && KeyBinding.hash.lookup(key.getKeyCode()) != key) {
-					
+
 					key.pressed = state;
-					if(state) {
-						key.pressTime++;
+					if(state && key.pressTime == 0) {
+						key.pressTime = 1;
 					}
+				}
+			}
+			
+			boolean gunKey = keyCode == HbmKeybinds.gunPrimaryKey.getKeyCode() || keyCode == HbmKeybinds.gunSecondaryKey.getKeyCode() ||
+					keyCode == HbmKeybinds.gunTertiaryKey.getKeyCode() || keyCode == HbmKeybinds.reloadKey.getKeyCode();
+			
+			EntityPlayer player = mc.thePlayer;
+			
+			if(player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemGunBaseNT) {
+				
+				/* Shoot in favor of attacking */
+				if(gunKey && keyCode == mc.gameSettings.keyBindAttack.getKeyCode()) {
+					mc.gameSettings.keyBindAttack.pressed = false;
+					mc.gameSettings.keyBindAttack.pressTime = 0;
+				}
+				
+				if(gunKey && keyCode == mc.gameSettings.keyBindPickBlock.getKeyCode()) {
+					mc.gameSettings.keyBindPickBlock.pressed = false;
+					mc.gameSettings.keyBindPickBlock.pressTime = 0;
 				}
 			}
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onKeyTyped(InputEvent.KeyInputEvent event) {
 
 		Minecraft mc = Minecraft.getMinecraft();
@@ -1148,8 +1200,8 @@ public class ModEventHandlerClient {
 				if(keyCode != 0 && key.getKeyCode() == keyCode && KeyBinding.hash.lookup(key.getKeyCode()) != key) {
 					
 					key.pressed = state;
-					if(state) {
-						key.pressTime++;
+					if(state && key.pressTime == 0) {
+						key.pressTime = 1;
 					}
 				}
 			}
@@ -1286,28 +1338,11 @@ public class ModEventHandlerClient {
 			}
 		}
 	}
-	
-	/*@SubscribeEvent
-	public void setupFog(RenderFogEvent event) {
-		event.setResult(Result.DENY);
-	}
-	
-	@SubscribeEvent
-	public void thickenFog(FogDensity event) {
-		event.density = 0.05F;
-		event.setCanceled(true);
-	}
-	
-	@SubscribeEvent
-	public void tintFog(FogColors event) {
-		event.red = 0.5F;
-		event.green = 0.0F;
-		event.blue = 0.0F;
-	}*/
 
 	public static IIcon particleBase;
 	public static IIcon particleLeaf;
 	public static IIcon particleSplash;
+	public static IIcon particleAshes;
 
 	@SubscribeEvent
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
@@ -1316,6 +1351,7 @@ public class ModEventHandlerClient {
 			particleBase = event.map.registerIcon(RefStrings.MODID + ":particle/particle_base");
 			particleLeaf = event.map.registerIcon(RefStrings.MODID + ":particle/dead_leaf");
 			particleSplash = event.map.registerIcon(RefStrings.MODID + ":particle/particle_splash");
+			particleAshes = event.map.registerIcon(RefStrings.MODID + ":particle/particle_ashes");
 		}
 	}
 
@@ -1387,7 +1423,7 @@ public class ModEventHandlerClient {
 	@SubscribeEvent
 	public void onOpenGUI(GuiOpenEvent event) {
 		
-		if(event.gui instanceof GuiMainMenu) {
+		if(event.gui instanceof GuiMainMenu && ClientConfig.MAIN_MENU_WACKY_SPLASHES.get()) {
 			GuiMainMenu main = (GuiMainMenu) event.gui;
 			int rand = (int)(Math.random() * 150);
 			

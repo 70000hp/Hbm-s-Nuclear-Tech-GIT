@@ -7,9 +7,6 @@ import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.extprop.HbmPlayerProps;
 import com.hbm.handler.CompatHandler.OCComponent;
 import com.hbm.handler.MultiblockHandlerXR;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
@@ -22,13 +19,9 @@ import com.hbm.inventory.gui.GUIMachineFluidTank;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.lib.Library;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.tileentity.IGUIProvider;
-import com.hbm.tileentity.IOverpressurable;
-import com.hbm.tileentity.IPersistentNBT;
-import com.hbm.tileentity.IRepairable;
-import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.tileentity.*;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.util.ParticleUtil;
 import com.hbm.util.fauxpointtwelve.DirPos;
 import cpw.mods.fml.common.Optional;
@@ -40,7 +33,6 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -56,7 +48,7 @@ import java.util.List;
 import java.util.Random;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")})
-public class TileEntityMachineFluidTank extends TileEntityMachineBase implements IFluidContainer, SimpleComponent, OCComponent, IFluidSource, IFluidAcceptor, IFluidStandardTransceiver, IPersistentNBT, IOverpressurable, IGUIProvider, IRepairable {
+public class TileEntityMachineFluidTank extends TileEntityMachineBase implements SimpleComponent, OCComponent, IFluidStandardTransceiver, IPersistentNBT, IOverpressurable, IGUIProvider, IRepairable, IFluidCopiable{
 	
 	public FluidTank tank;
 	public short mode = 0;
@@ -68,7 +60,6 @@ public class TileEntityMachineFluidTank extends TileEntityMachineBase implements
 	public Explosion lastExplosion = null;
 	
 	public int age = 0;
-	public List<IFluidAcceptor> list = new ArrayList();
 	
 	public TileEntityMachineFluidTank() {
 		super(6);
@@ -118,9 +109,6 @@ public class TileEntityMachineFluidTank extends TileEntityMachineBase implements
 				this.sendingBrake = true;
 				tank.setFill(TileEntityBarrel.transmitFluidFairly(worldObj, tank, this, tank.getFill(), this.mode == 0 || this.mode == 1, this.mode == 1 || this.mode == 2, getConPos()));
 				this.sendingBrake = false;
-				
-				if((mode == 1 || mode == 2) && (age == 9 || age == 19))
-					fillFluidInit(tank.getTankType());
 				
 				tank.loadTank(2, 3, slots);
 				tank.setType(0, 1, slots);
@@ -312,72 +300,6 @@ public class TileEntityMachineFluidTank extends TileEntityMachineBase implements
 	public double getMaxRenderDistanceSquared() {
 		return 65536.0D;
 	}
-
-	@Override
-	public void setFillForSync(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setTypeForSync(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		
-		if(mode == 2 || mode == 3 || this.sendingBrake)
-			return 0;
-		
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getMaxFill() : 0;
-	}
-
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord + 2, this.yCoord, this.zCoord - 1, getTact(), type);
-		fillFluid(this.xCoord + 2, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord - 2, this.yCoord, this.zCoord - 1, getTact(), type);
-		fillFluid(this.xCoord - 2, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord + 2, getTact(), type);
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord + 2, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord - 2, getTact(), type);
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord - 2, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return this.list;
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		this.list.clear();
-	}
 	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
@@ -455,13 +377,23 @@ public class TileEntityMachineFluidTank extends TileEntityMachineBase implements
 	}
 
 	@Override
+	public int[] getFluidIDToCopy() {
+		return new int[] {tank.getTankType().getID()};
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return tank;
+	}
+
+	@Override
 	public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new ContainerMachineFluidTank(player.inventory, (TileEntityMachineFluidTank) world.getTileEntity(x, y, z));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineFluidTank(player.inventory, (TileEntityMachineFluidTank) world.getTileEntity(x, y, z));
 	}
 
