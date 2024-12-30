@@ -183,6 +183,7 @@ public class Fluids {
 	public static FluidType STELLAR_FLUX;
 	public static FluidType VITRIOL;
 	public static FluidType SLOP;
+	public static FluidType NITROGEN;
 
 	/* Lagacy names for compatibility purposes */
 	@Deprecated public static FluidType ACID;	//JAOPCA uses this, apparently
@@ -387,11 +388,12 @@ public class Fluids {
 		VITRIOL =				new FluidType("VITRIOL",			0x6E5222, 2, 0, 1, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
 		SLOP =					new FluidType("SLOP",				0x929D45, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
 		LEAD =					new FluidType("LEAD",				0x666672, 4, 0, 0, EnumSymbol.NONE).setTemp(350).addTraits(LIQUID, VISCOUS);
-		LEAD_HOT =				new FluidType(143, "LEAD_HOT",		0x776563, 4, 0, 0, EnumSymbol.NONE).setTemp(1500).addTraits(LIQUID, VISCOUS);
-		MONAZITE_MUD = 			new FluidType("MONAZITE_MUD", 0xFF8A4D, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS, new FT_Corrosive(60));
-		MONAZITE_SOLUTION = 	new FluidType("MONAZITE_SOLUTION", 0x8F8F5F, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
-		COMP_AIR =				new FluidType(144,"COMP_AIR",	0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);	
-		
+		LEAD_HOT =				new FluidType("LEAD_HOT",		0x776563, 4, 0, 0, EnumSymbol.NONE).setTemp(1500).addTraits(LIQUID, VISCOUS);
+		MONAZITE_MUD = 			new FluidType("MONAZITE_MUD", 0xFF8A4D, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
+		MONAZITE_SOLUTION = 	new FluidType("MONAZITE_SOLUTION", 0x8F8F5F, 0, 0, 0, EnumSymbol.ACID).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
+		COMP_AIR =				new FluidType("COMP_AIR",	0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
+		NITROGEN =				new FluidType("NITROGEN",	0xBAB572, 0, 0, 0, EnumSymbol.ASPHYXIANT).addTraits(GASEOUS);
+
 		// ^ ^ ^ ^ ^ ^ ^ ^
 		//ADD NEW FLUIDS HERE
 
@@ -534,6 +536,7 @@ public class Fluids {
 		metaOrder.add(CALCIUM_CHLORIDE);
 		metaOrder.add(CALCIUM_SOLUTION);
 		metaOrder.add(COMP_AIR);
+		metaOrder.add(NITROGEN);
 		//solutions and working fluids
 		metaOrder.add(FRACKSOL);
 		//the fun guys

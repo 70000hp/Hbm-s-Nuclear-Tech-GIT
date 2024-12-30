@@ -1,5 +1,6 @@
 package com.hbm.items.machine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.items.ItemEnumMulti;
@@ -10,6 +11,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 
 public class ItemCircuit extends ItemEnumMulti {
 
@@ -62,11 +64,11 @@ public class ItemCircuit extends ItemEnumMulti {
 		CONTROLLER_QUANTUM,
 		ATOMIC_CLOCK,
 	}
-	
+
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		/*List<String> lines = new ArrayList();
-		
+		List<String> lines = new ArrayList();
+
 		switch(stack.getItemDamage()) {
 		case 0: lines.add("We taught this filament how to think."); break;
 		case 1: lines.add("3300µF"); break;
@@ -80,10 +82,11 @@ public class ItemCircuit extends ItemEnumMulti {
 		case 9: lines.add("It's red, that means it's better."); break;
 		case 10: lines.add("Uses that exceptionally stanky 90s yellow PCB."); break;
 		case 11: lines.add("Can do up to three different things (instead of two)!"); break;
+		case 16: lines.add(">quantum computer"); lines.add(">looks inside"); lines.add(">bricked");break;
 		}
-		
+
 		for(String line : lines) {
 			list.add(EnumChatFormatting.ITALIC + line);
-		}*/
+		}
 	}
 }
