@@ -19,7 +19,7 @@ import com.hbm.items.machine.ItemFluidIcon;
 import net.minecraft.item.ItemStack;
 
 public class ElectrolyserFluidRecipes extends SerializableRecipe {
-	
+
 	public static HashMap<FluidType, ElectrolysisRecipe> recipes = new HashMap();
 
 	@Override
@@ -34,21 +34,21 @@ public class ElectrolyserFluidRecipes extends SerializableRecipe {
 	}
 
 	public static HashMap getRecipes() {
-		
+
 		HashMap<Object, Object[]> recipes = new HashMap<Object, Object[]>();
-		
+
 		for(Entry<FluidType, ElectrolysisRecipe> entry : ElectrolyserFluidRecipes.recipes.entrySet()) {
-			
+
 			ElectrolysisRecipe recipe = entry.getValue();
 			FluidStack input = new FluidStack(entry.getKey(), recipe.amount);
 			List outputs = new ArrayList();
 			if(recipe.output1.type != Fluids.NONE) outputs.add(ItemFluidIcon.make(recipe.output1));
 			if(recipe.output2.type != Fluids.NONE) outputs.add(ItemFluidIcon.make(recipe.output2));
 			for(ItemStack byproduct : recipe.byproduct) outputs.add(byproduct);
-			
+
 			recipes.put(ItemFluidIcon.make(input), outputs.toArray());
 		}
-		
+
 		return recipes;
 	}
 	public static ElectrolysisRecipe getRecipe(FluidType type) {
@@ -79,30 +79,30 @@ public class ElectrolyserFluidRecipes extends SerializableRecipe {
 		FluidStack input = this.readFluidStack(obj.get("input").getAsJsonArray());
 		FluidStack output1 = this.readFluidStack(obj.get("output1").getAsJsonArray());
 		FluidStack output2 = this.readFluidStack(obj.get("output2").getAsJsonArray());
-		
+
 		int duration = 20;
 		if(obj.has("duraion")) duration = obj.get("duration").getAsInt();
-		
+
 		ItemStack[] byproducts = new ItemStack[0];
 		if(obj.has("byproducts")) byproducts = this.readItemStackArray(obj.get("byproducts").getAsJsonArray());
-		
+
 		recipes.put(input.type, new ElectrolysisRecipe(input.fill, output1, output2, duration, byproducts));
 	}
 
 	@Override
 	public void writeRecipe(Object recipe, JsonWriter writer) throws IOException {
 		Entry<FluidType, ElectrolysisRecipe> rec = (Entry) recipe;
-		
+
 		writer.name("input"); this.writeFluidStack(new FluidStack(rec.getKey(), rec.getValue().amount), writer);
 		writer.name("output1"); this.writeFluidStack(rec.getValue().output1, writer);
 		writer.name("output2"); this.writeFluidStack(rec.getValue().output2, writer);
-		
+
 		if(rec.getValue().byproduct != null && rec.getValue().byproduct.length > 0) {
 			writer.name("byproducts").beginArray();
 			for(ItemStack stack : rec.getValue().byproduct) this.writeItemStack(stack, writer);
 			writer.endArray();
 		}
-		
+
 		writer.name("duration").value(rec.getValue().duration);
 	}
 
@@ -112,7 +112,7 @@ public class ElectrolyserFluidRecipes extends SerializableRecipe {
 		public int amount;
 		public ItemStack[] byproduct;
 		public int duration;
-		
+
 		public ElectrolysisRecipe(int amount, FluidStack output1, FluidStack output2, ItemStack... byproduct) {
 			this.output1 = output1;
 			this.output2 = output2;
