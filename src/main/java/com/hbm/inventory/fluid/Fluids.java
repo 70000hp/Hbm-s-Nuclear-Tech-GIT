@@ -181,7 +181,6 @@ public class Fluids {
 	public static FluidType VITRIOL;
 	public static FluidType SLOP;
 	public static FluidType LYE;
-	public static FluidType SODIUM_ALUMINATE;
 
 	/* Lagacy names for compatibility purposes */
 	@Deprecated public static FluidType ACID;	//JAOPCA uses this, apparently
@@ -387,8 +386,7 @@ public class Fluids {
 		SLOP =					new FluidType("SLOP",				0x929D45, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
 		LEAD =					new FluidType("LEAD",				0x666672, 4, 0, 0, EnumSymbol.NONE).setTemp(350).addTraits(LIQUID, VISCOUS);
 		LEAD_HOT =				new FluidType("LEAD_HOT",		0x776563, 4, 0, 0, EnumSymbol.NONE).setTemp(1500).addTraits(LIQUID, VISCOUS);
-		LYE =					new FluidType("LYE",			0xFFECCC, 3, 0, 1, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID);
-		SODIUM_ALUMINATE =		new FluidType(145, "SODIUM_ALUMINATE",			0xFFD191, 0, 0, 0, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID);
+		LYE =					new FluidType(144, "LYE",			0xFFECCC, 3, 0, 1, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID);
 
 		// ^ ^ ^ ^ ^ ^ ^ ^
 		//ADD NEW FLUIDS HERE
@@ -532,7 +530,6 @@ public class Fluids {
 		//solutions and working fluids
 		metaOrder.add(FRACKSOL);
 		metaOrder.add(LYE);
-		metaOrder.add(SODIUM_ALUMINATE);
 		//the fun guys
 		metaOrder.add(PHOSGENE);
 		metaOrder.add(MUSTARDGAS);
