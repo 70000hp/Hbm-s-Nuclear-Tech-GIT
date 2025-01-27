@@ -51,7 +51,8 @@
  import com.hbm.particle.*;
  import com.hbm.particle.helper.ParticleCreators;
  import com.hbm.particle.psys.engine.EventHandlerParticleEngine;
- import com.hbm.render.anim.BusAnimation;
+import com.hbm.qmaw.QMAWLoader;
+import com.hbm.render.anim.BusAnimation;
  import com.hbm.render.anim.BusAnimationSequence;
  import com.hbm.render.anim.HbmAnimations;
  import com.hbm.render.anim.HbmAnimations.Animation;
@@ -80,7 +81,8 @@
  import com.hbm.tileentity.bomb.*;
  import com.hbm.tileentity.deco.*;
  import com.hbm.tileentity.machine.*;
- import com.hbm.tileentity.machine.oil.*;
+import com.hbm.tileentity.machine.albion.*;
+import com.hbm.tileentity.machine.oil.*;
  import com.hbm.tileentity.machine.rbmk.*;
  import com.hbm.tileentity.machine.storage.*;
  import com.hbm.tileentity.network.*;
@@ -103,6 +105,7 @@
  import net.minecraft.client.renderer.entity.RenderSnowball;
  import net.minecraft.client.renderer.texture.TextureManager;
  import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+ import net.minecraft.client.resources.IReloadableResourceManager;
  import net.minecraft.client.resources.Language;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityLivingBase;
@@ -154,6 +157,8 @@ public class ClientProxy extends ServerProxy {
 		registerBlockRenderer();
 
 		Jars.initJars();
+		
+		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new QMAWLoader());
 
 		if(GeneralConfig.enableSoundExtension) {
 			SoundSystemConfig.setNumberNormalChannels(GeneralConfig.normalSoundChannels);
@@ -243,6 +248,12 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePuF6Tank.class, new RenderPuF6Tank());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineIGenerator.class, new RenderIGenerator());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineCyclotron.class, new RenderCyclotron());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPASource.class, new RenderPASource());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPABeamline.class, new RenderPABeamline());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPARFC.class, new RenderPARFC());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPAQuadrupole.class, new RenderPAQuadrupole());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPADipole.class, new RenderPADipole());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPADetector.class, new RenderPADetector());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineExposureChamber.class, new RenderExposureChamber());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineOilWell.class, new RenderDerrick());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachineGasFlare.class, new RenderGasFlare());
@@ -793,6 +804,7 @@ public class ClientProxy extends ServerProxy {
 		RenderingRegistry.registerBlockHandler(new RenderBoxDuct());
 		RenderingRegistry.registerBlockHandler(new RenderBlockDecoModel(ModBlocks.deco_computer.getRenderType(), ResourceManager.deco_computer));
 		RenderingRegistry.registerBlockHandler(new RenderReeds());
+		RenderingRegistry.registerBlockHandler(new RenderHangingVine());
 		RenderingRegistry.registerBlockHandler(new RenderRTTY());
 		RenderingRegistry.registerBlockHandler(new RenderDiFurnaceExtension());
 		RenderingRegistry.registerBlockHandler(new RenderSplitter());
