@@ -392,13 +392,6 @@ public class ChemplantRecipes extends SerializableRecipe {
 						new ItemStack(ModItems.niter, 3))
 				.outputFluids(new FluidStack(Fluids.SALIENT, 250)));
 
-		recipes.add(new ChemRecipe(104, "SODIUM_ALUMINATE", 50)
-			.inputItems(new ComparableStack(ModBlocks.stone_resource, 1, BlockEnums.EnumStoneType.BAUXITE.ordinal()))
-			.inputFluids(new FluidStack(Fluids.LYE, 75))
-			.outputFluids(
-						new FluidStack(Fluids.SODIUM_ALUMINATE, 300),
-						new FluidStack(Fluids.REDMUD, 250)));
-
 	}
 
 	public static void registerOtherOil() {
