@@ -81,6 +81,9 @@ public class CrystallizerRecipes extends SerializableRecipe {
 		//registerRecipe(STAR.ore(),		new CrystallizerRecipe(ModItems.crystal_starmetal, baseTime), sulfur);
 		registerRecipe(CO.ore(),		new CrystallizerRecipe(ModItems.crystal_cobalt, baseTime), sulfur);
 
+		registerRecipe(new ComparableStack(ModItems.powder_calcium),	new CrystallizerRecipe(new ItemStack(ModItems.powder_cement, 8), utilityTime), new FluidStack(Fluids.REDMUD, 75));
+
+
 		registerRecipe("oreRareEarth",	new CrystallizerRecipe(ModItems.crystal_rare, baseTime), sulfur);
 		registerRecipe("oreCinnabar",	new CrystallizerRecipe(ModItems.crystal_cinnebar, baseTime));
 
@@ -129,7 +132,7 @@ public class CrystallizerRecipes extends SerializableRecipe {
 		FluidStack hiperf = new FluidStack(Fluids.RADIOSOLVENT, 500);
 
 		int oreTime = 200;
-		
+
 		for(EnumBedrockOre ore : EnumBedrockOre.values()) {
 			int i = ore.ordinal();
 
