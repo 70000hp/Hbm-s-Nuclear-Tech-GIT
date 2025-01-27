@@ -82,7 +82,7 @@ public class CrystallizerRecipes extends SerializableRecipe {
 		registerRecipe(LI.ore(),		new CrystallizerRecipe(ModItems.crystal_lithium, baseTime), sulfur);
 		//registerRecipe(STAR.ore(),		new CrystallizerRecipe(ModItems.crystal_starmetal, baseTime), sulfur);
 		registerRecipe(CO.ore(),		new CrystallizerRecipe(ModItems.crystal_cobalt, baseTime), sulfur);
-		registerRecipe(new ComparableStack(ModBlocks.stone_resource, 1, BlockEnums.EnumStoneType.BAUXITE.ordinal()),		new CrystallizerRecipe(new ItemStack(ModItems.chunk_ore, 1, ItemEnums.EnumChunkType.ALUMINATE.ordinal()), baseTime), new FluidStack(Fluids.LYE, 75));
+		registerRecipe(new ComparableStack(ModBlocks.stone_resource, 1, BlockEnums.EnumStoneType.BAUXITE.ordinal()),		new CrystallizerRecipe(new ItemStack(ModItems.chunk_ore, 1, ItemEnums.EnumChunkType.ALUMINATE.ordinal()), baseTime), new FluidStack(Fluids.LYE, 50));
 
 		registerRecipe("oreRareEarth",	new CrystallizerRecipe(ModItems.crystal_rare, baseTime), sulfur);
 		registerRecipe("oreCinnabar",	new CrystallizerRecipe(ModItems.crystal_cinnebar, baseTime));
