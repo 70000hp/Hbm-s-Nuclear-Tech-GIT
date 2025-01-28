@@ -107,7 +107,7 @@ public class SILEXRecipes {
 				.addOut(new ItemStack(ModItems.sulfur), 15)
 				);
 
-		recipes.put(new ComparableStack(ModItems.fluid_icon, 1, Fluids.REDMUD.getID()), new SILEXRecipe(250, 50, EnumWavelengths.VISIBLE)
+		recipes.put(new ComparableStack(ModItems.fluid_icon, 1, Fluids.REDMUD.getID()), new SILEXRecipe(300, 50, EnumWavelengths.VISIBLE)
 			.addOut(new ItemStack(ModItems.powder_aluminium), 10)
 			.addOut(new ItemStack(ModItems.powder_neodymium_tiny, 3), 5)
 			.addOut(new ItemStack(ModItems.powder_boron_tiny, 3), 5)
