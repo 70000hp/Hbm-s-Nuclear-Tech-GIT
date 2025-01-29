@@ -52,6 +52,7 @@ public class ItemEnums {
 
 	public static enum EnumChunkType {
 		RARE,
+		MALACHITE,
 		CRYOLITE
 	}
 
