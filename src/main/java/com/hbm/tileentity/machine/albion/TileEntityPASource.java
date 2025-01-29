@@ -5,9 +5,9 @@ import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.ContainerPASource;
 import com.hbm.inventory.gui.GUIPASource;
 import com.hbm.lib.Library;
-import com.hbm.particle.helper.ExplosionSmallCreator;
 import com.hbm.tileentity.IConditionalInvAccess;
 import com.hbm.tileentity.IGUIProvider;
+import com.hbm.util.EnumUtil;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
@@ -26,24 +26,42 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityPASource extends TileEntityCooledBase implements IGUIProvider, IConditionalInvAccess, IControlReceiver {
 	
-	public static final long usage = 1_000_000;
+	public static final long usage = 100_000;
 	public Particle particle;
+	public PAState state = PAState.IDLE;
+	
+	public int lastSpeed;
 	
 	public int debugSpeed;
+	
+	public static enum PAState {
+		IDLE(0x8080ff),					//no particle active
+		RUNNING(0xffff00),				//running without further issue
+		SUCCESS(0x00ff00),				//completed recipe
+		PAUSE_UNLOADED(0x808080),		//particle suspended because it entered unloaded chunks
+		CRASH_DEFOCUS(0xff0000),		//crash from excessive defocus
+		CRASH_DERAIL(0xff0000),			//crash due to leaving the beamline
+		CRASH_CANNOT_ENTER(0xff0000),	//crash due to hitting PA component from invalid side
+		CRASH_NOCOOL(0xff0000),			//crash due to lack of cooling
+		CRASH_NOPOWER(0xff0000),		//crash due to power outage
+		CRASH_NOCOIL(0xff0000),			//crash due to no coil installed (QP, DP)
+		CRASH_OVERSPEED(0xff0000);		//crash due to coil max speed exceeded (QP, DP)
+		
+		public int color;
+		
+		private PAState(int color) {
+			this.color = color;
+		}
+	}
+	
+	public void updateState(PAState state) { this.state = state; }
 	
 	public TileEntityPASource() {
 		super(5);
 	}
 
-	@Override
-	public String getName() {
-		return "container.paSource";
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return 1;
-	}
+	@Override public String getName() { return "container.paSource"; }
+	@Override public int getInventoryStackLimit() { return 1; }
 
 	@Override
 	public void updateEntity() {
@@ -51,12 +69,16 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 		if(!worldObj.isRemote) {
 			this.power = Library.chargeTEFromItems(slots, 0, power, this.getMaxPower());
 			
-			if(particle != null) {
-				steppy();
-				this.debugSpeed = particle.momentum;
-				if(particle.invalid) this.particle = null;
-			} else if(this.power >= this.usage && slots[1] != null && slots[2] != null) {
-				tryRun();
+			for(int i = 0; i < 10; i++) {
+				if(particle != null) {
+					this.state = PAState.RUNNING;
+					steppy();
+					this.debugSpeed = particle.momentum;
+					if(particle.invalid) this.particle = null;
+				} else if(this.power >= this.usage && slots[1] != null && slots[2] != null) {
+					tryRun();
+					break;
+				}
 			}
 		}
 		
@@ -64,37 +86,37 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 	}
 	
 	public void steppy() {
-		if(!worldObj.getChunkProvider().chunkExists(particle.x >> 4, particle.z >> 4)) return; //halt if we reach unloaded areas
-		System.out.println("ticking");
-		ExplosionSmallCreator.composeEffect(worldObj, particle.x + 0.5, particle.y + 0.5, particle.z + 0.5, 10, 1, 1);
+		if(!worldObj.getChunkProvider().chunkExists(particle.x >> 4, particle.z >> 4)) { this.state = PAState.PAUSE_UNLOADED; return; } //halt if we reach unloaded areas
+		//ExplosionSmallCreator.composeEffect(worldObj, particle.x + 0.5, particle.y + 0.5, particle.z + 0.5, 10, 1, 1);
 		
 		Block b = worldObj.getBlock(particle.x, particle.y, particle.z);
 		if(b instanceof BlockDummyable) {
 			int[] pos = ((BlockDummyable) b).findCore(worldObj, particle.x, particle.y, particle.z);
-			if(pos == null) { particle.crash(); return; }
+			if(pos == null) { particle.crash(PAState.CRASH_DERAIL); return; }
 			TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
-			if(!(tile instanceof IParticleUser)) { particle.crash(); return; }
+			if(!(tile instanceof IParticleUser)) { particle.crash(PAState.CRASH_DERAIL); return; }
 			IParticleUser pa = (IParticleUser) tile;
-			System.out.println(pa + "");
 			if(pa.canParticleEnter(particle, particle.dir, particle.x, particle.y, particle.z)) {
 				pa.onEnter(particle, particle.dir);
 				BlockPos exit = pa.getExitPos(particle);
-				particle.move(exit);
-			} else { particle.crash(); worldObj.createExplosion(null, particle.x + 0.5, particle.y + 0.5, particle.z + 0.5, 5, false); return; }
+				if(exit != null) particle.move(exit);
+			} else { particle.crash(PAState.CRASH_CANNOT_ENTER); return; }
 		} else {
-			System.out.println("derailed!");
-			particle.crash();
+			particle.crash(PAState.CRASH_DERAIL);
 		}
 	}
 	
 	public void tryRun() {
 		if(slots[1].getItem().hasContainerItem(slots[1]) && slots[3] != null) return;
 		if(slots[2].getItem().hasContainerItem(slots[2]) && slots[4] != null) return;
+
+		if(slots[1].getItem().hasContainerItem(slots[1])) slots[3] = slots[1].getItem().getContainerItem(slots[1]).copy();
+		if(slots[2].getItem().hasContainerItem(slots[2])) slots[4] = slots[2].getItem().getContainerItem(slots[2]).copy();
 		
 		this.power -= usage;
 		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - 10);
-		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
-		this.particle = new Particle(xCoord + rot.offsetX * 5, yCoord, zCoord + rot.offsetZ * 5, rot, slots[1], slots[2]);
+		ForgeDirection rot = dir.getRotation(ForgeDirection.DOWN);
+		this.particle = new Particle(this, xCoord + rot.offsetX * 5, yCoord, zCoord + rot.offsetZ * 5, rot, slots[1], slots[2]);
 		this.slots[1] = null;
 		this.slots[2] = null;
 		this.markDirty();
@@ -104,12 +126,19 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 	public void serialize(ByteBuf buf) {
 		super.serialize(buf);
 		buf.writeInt(debugSpeed);
+		buf.writeByte((byte) this.state.ordinal());
+		buf.writeInt(particle != null ? particle.momentum : 0);
 	}
 
 	@Override
 	public void deserialize(ByteBuf buf) {
 		super.deserialize(buf);
 		debugSpeed = buf.readInt();
+		state = EnumUtil.grabEnumSafely(PAState.class, buf.readByte());
+		int lastSpeed = buf.readInt();
+		if(lastSpeed != 0) {
+			this.lastSpeed = lastSpeed;
+		}
 	}
 	
 	@Override
@@ -199,11 +228,15 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 
 	@Override
 	public void receiveControl(NBTTagCompound data) {
-		if(data.hasKey("cancel")) this.particle = null;
+		if(data.hasKey("cancel")) {
+			this.particle = null;
+			this.state = PAState.IDLE;
+		}
 	}
 	
 	public static class Particle {
 
+		private TileEntityPASource source;
 		public int x;
 		public int y;
 		public int z;
@@ -216,7 +249,8 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 		public ItemStack input1;
 		public ItemStack input2;
 		
-		public Particle(int x, int y, int z, ForgeDirection dir, ItemStack input1, ItemStack input2) {
+		public Particle(TileEntityPASource source, int x, int y, int z, ForgeDirection dir, ItemStack input1, ItemStack input2) {
+			this.source = source;
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -225,8 +259,9 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 			this.input2 = input2;
 		}
 		
-		public void crash() {
+		public void crash(PAState state) {
 			this.invalid = true;
+			this.source.updateState(state);
 		}
 		
 		public void move(BlockPos pos) {
@@ -237,7 +272,7 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 		
 		public void defocus(int amount) {
 			this.defocus += amount;
-			if(this.defocus > this.maxDefocus) this.crash();
+			if(this.defocus > this.maxDefocus) this.crash(PAState.CRASH_DEFOCUS);
 		}
 		
 		public void focus(int amount) {

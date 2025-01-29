@@ -20,6 +20,8 @@ import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.MaterialShapes;
+import com.hbm.inventory.material.Mats;
+import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ItemEnums.EnumPlantType;
@@ -27,6 +29,7 @@ import com.hbm.items.ItemEnums.EnumTarType;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemChemicalDye.EnumChemDye;
 import com.hbm.items.machine.ItemFluidIcon;
+import com.hbm.items.machine.ItemScraps;
 import com.hbm.items.special.ItemBedrockOreNew;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
@@ -82,7 +85,7 @@ public class CrystallizerRecipes extends SerializableRecipe {
 		registerRecipe(CO.ore(),		new CrystallizerRecipe(ModItems.crystal_cobalt, baseTime), sulfur);
 
 		registerRecipe(new ComparableStack(ModItems.powder_calcium),	new CrystallizerRecipe(new ItemStack(ModItems.powder_cement, 8), utilityTime), new FluidStack(Fluids.REDMUD, 75));
-
+		registerRecipe(MALACHITE.ingot(), new CrystallizerRecipe(ItemScraps.create(new MaterialStack(Mats.MAT_COPPER, MaterialShapes.INGOT.q(1))), 300), new FluidStack(Fluids.SULFURIC_ACID, 250));
 
 		registerRecipe("oreRareEarth",	new CrystallizerRecipe(ModItems.crystal_rare, baseTime), sulfur);
 		registerRecipe("oreCinnabar",	new CrystallizerRecipe(ModItems.crystal_cinnebar, baseTime));

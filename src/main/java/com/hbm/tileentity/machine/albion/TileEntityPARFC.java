@@ -4,6 +4,7 @@ import com.hbm.inventory.container.ContainerPARFC;
 import com.hbm.inventory.gui.GUIPARFC;
 import com.hbm.lib.Library;
 import com.hbm.tileentity.IGUIProvider;
+import com.hbm.tileentity.machine.albion.TileEntityPASource.PAState;
 import com.hbm.tileentity.machine.albion.TileEntityPASource.Particle;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
@@ -18,7 +19,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityPARFC extends TileEntityCooledBase implements IGUIProvider, IParticleUser {
 	
-	public static final long usage = 1_000_000;
+	public static final long usage = 100_000;
 	public static final int momentumGain = 100;
 	public static final int defocusGain = 100;
 	
@@ -28,7 +29,7 @@ public class TileEntityPARFC extends TileEntityCooledBase implements IGUIProvide
 
 	@Override
 	public long getMaxPower() {
-		return 10_000_000;
+		return 1_000_000;
 	}
 
 	@Override
@@ -45,10 +46,11 @@ public class TileEntityPARFC extends TileEntityCooledBase implements IGUIProvide
 
 	@Override
 	public void onEnter(Particle particle, ForgeDirection dir) {
-		if(!isCool() || this.power < this.usage) {
-			particle.crash();
-			return;
-		}
+
+		if(!isCool())				particle.crash(PAState.CRASH_NOCOOL);
+		if(this.power < this.usage)	particle.crash(PAState.CRASH_NOPOWER);
+		
+		if(particle.invalid) return;
 		
 		particle.momentum += this.momentumGain;
 		particle.defocus(defocusGain);
