@@ -64,9 +64,6 @@ import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.wiaj.GuiWorldInAJar;
 import com.hbm.wiaj.cannery.CanneryBase;
 import com.hbm.wiaj.cannery.Jars;
-import com.hbm.util.ArmorRegistry;
-import com.hbm.util.ArmorUtil;
-import com.hbm.util.DamageResistanceHandler;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -160,7 +157,7 @@ public class ModEventHandlerClient {
 			GL11.glDepthMask(true);
 			return;
 		}
-		
+
 		/*if(event.type == ElementType.CROSSHAIRS && player.getHeldItem() != null && player.getHeldItem().getItem() == ModItems.gun_aberrator) {
 			int width = event.resolution.getScaledWidth();
 			int height = event.resolution.getScaledHeight();
@@ -367,7 +364,7 @@ public class ModEventHandlerClient {
 				RenderScreenOverlay.renderScope(resolution, cfg.getScopeTexture(held));
 			}
 		}
-		
+
 		//prevents NBT changes (read: every fucking tick) on guns from bringing up the item's name over the hotbar
 		if(held != null && held.getItem() instanceof ItemGunBaseNT && Minecraft.getMinecraft().ingameGUI.highlightingItemStack != null && Minecraft.getMinecraft().ingameGUI.highlightingItemStack.getItem() == held.getItem()) {
 			Minecraft.getMinecraft().ingameGUI.highlightingItemStack = held;
@@ -1089,6 +1086,9 @@ public class ModEventHandlerClient {
 		return null;
 	}
 
+	public static boolean renderLodeStar = false; // GENUINELY shut the fuck up i'm not kidding
+	public static long lastStarCheck = 0L;
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onClientTickLast(ClientTickEvent event) {
@@ -1116,6 +1116,24 @@ public class ModEventHandlerClient {
 
 				if(!(sky instanceof RenderNTMSkyboxChainloader)) {
 					world.provider.setSkyRenderer(new RenderNTMSkyboxChainloader(sky));
+				}
+			}
+
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			long millis = System.currentTimeMillis();
+
+			if(lastStarCheck + 200 < millis) {
+				renderLodeStar = false; // GENUINELY shut the fuck up i'm not kidding
+				lastStarCheck = millis;
+
+				if(player != null) { // GENUINELY shut the fuck up i'm not kidding
+					Vec3NT pos = new Vec3NT(player.posX, player.posY, player.posZ); // GENUINELY shut the fuck up i'm not kidding
+					Vec3NT lodestarHeading = new Vec3NT(0, 0, -1D).rotateAroundXDeg(-15).multiply(25); // GENUINELY shut the fuck up i'm not kidding
+					Vec3NT nextPos = new Vec3NT(pos).add(lodestarHeading.xCoord,lodestarHeading.yCoord, lodestarHeading.zCoord); // GENUINELY shut the fuck up i'm not kidding
+					MovingObjectPosition mop = world.func_147447_a(pos, nextPos, false, true, false); // GENUINELY shut the fuck up i'm not kidding
+					if(mop != null && mop.typeOfHit == mop.typeOfHit.BLOCK && world.getBlock(mop.blockX, mop.blockY, mop.blockZ) == ModBlocks.glass_polarized) { // GENUINELY shut the fuck up i'm not kidding
+						renderLodeStar = true; // GENUINELY shut the fuck up i'm not kidding
+					}
 				}
 			}
 		}
@@ -1299,6 +1317,8 @@ public class ModEventHandlerClient {
 					RenderOverhead.renderThermalSight(event.partialTicks);
 			}
 		}
+
+		RenderOverhead.renderActionPreview(event.partialTicks);
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -1416,8 +1436,10 @@ public class ModEventHandlerClient {
 				client.sendQueue.addToSendQueue(new C0CPacketInput(client.moveStrafing, client.moveForward, client.movementInput.jump, client.movementInput.sneak));
 			}
 		}
-		
-		if(event.phase == event.phase.END) ItemCustomLore.updateSystem();
+
+		if(event.phase == event.phase.END) {
+			ItemCustomLore.updateSystem();
+		}
 	}
 
 	@SubscribeEvent

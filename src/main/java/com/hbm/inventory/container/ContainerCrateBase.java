@@ -1,8 +1,10 @@
 package com.hbm.inventory.container;
 
+import com.hbm.items.block.ItemBlockStorageCrate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 
 public class ContainerCrateBase extends ContainerBase {
 
@@ -12,6 +14,21 @@ public class ContainerCrateBase extends ContainerBase {
 	public ContainerCrateBase(InventoryPlayer invPlayer, IInventory tedf) {
 		super(invPlayer, tedf);
 		tile.openInventory();
+	}
+
+	@Override
+	public ItemStack slotClick(int index, int button, int mode, EntityPlayer player) {
+		// prevents the player from moving around the currently open box
+		if(player.inventory.getStackInSlot(player.inventory.currentItem) != null &&
+			player.inventory.getStackInSlot(player.inventory.currentItem).getItem() instanceof ItemBlockStorageCrate) {
+			if (mode == 2 && button == player.inventory.currentItem) {
+				return null;
+			}
+			if (index == player.inventory.currentItem + 27 + this.tile.getSizeInventory()) {
+				return null;
+			}
+		}
+		return super.slotClick(index, button, mode, player);
 	}
 
 	@Override

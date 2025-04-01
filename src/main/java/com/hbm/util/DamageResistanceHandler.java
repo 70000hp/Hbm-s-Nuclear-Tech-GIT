@@ -1,11 +1,17 @@
 package com.hbm.util;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.items.ModItems;
+import com.hbm.main.MainRegistry;
 import com.hbm.util.Tuple.Quartet;
 
 import api.hbm.entity.IResistanceProvider;
@@ -39,6 +45,8 @@ public class DamageResistanceHandler {
 	public static final String CATEGORY_PROJECTILE = "PROJ";
 	public static final String CATEGORY_ENERGY = "EN";
 
+	public static final Gson gson = new Gson();
+	
 	public static HashMap<Item, ResistanceStats> itemStats = new HashMap();
 	public static HashMap<Quartet<Item, Item, Item, Item>, ResistanceStats> setStats = new HashMap();
 	public static HashMap<Class<? extends Entity>, ResistanceStats> entityStats = new HashMap();
@@ -46,13 +54,44 @@ public class DamageResistanceHandler {
 	public static HashMap<Item, List<Quartet<Item, Item, Item, Item>>> itemInfoSet = new HashMap();
 
 	public static void init() {
+		File folder = MainRegistry.configHbmDir;
+
+		File config = new File(folder.getAbsolutePath() + File.separatorChar + "hbmArmor.json");
+		File template = new File(folder.getAbsolutePath() + File.separatorChar + "_hbmArmor.json");
 		
 		itemStats.clear();
 		setStats.clear();
 		entityStats.clear();
 		itemInfoSet.clear();
 		
-		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.5F));
+		if(!config.exists()) {
+			initDefaults();
+			writeDefault(template);
+		} else {
+			///
+		}
+	}
+	
+	private static void writeDefault(File file) {
+
+		try {
+			JsonWriter writer = new JsonWriter(new FileWriter(file));
+			writer.setIndent("  ");
+			writer.beginObject();
+			writer.name("comment").value("Template file, remove the underscore ('_') from the name to enable the config.");
+			
+			serialize(writer);
+			
+			writer.endObject();
+			writer.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void initDefaults() {
+		
+		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.25F));
 
 		itemStats.put(ModItems.jackt, new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F));
@@ -111,12 +150,12 @@ public class DamageResistanceHandler {
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
 				.setOther(0F, 0.15F));
 		registerSet(ModItems.rpa_helmet, ModItems.rpa_plate, ModItems.rpa_legs, ModItems.rpa_boots, new ResistanceStats()
-				.addCategory(CATEGORY_PROJECTILE, 20F, 0.65F)
-				.addCategory(CATEGORY_FIRE, 10F, 0.75F)
+				.addCategory(CATEGORY_PROJECTILE, 25F, 0.65F)
+				.addCategory(CATEGORY_FIRE, 10F, 0.9F)
 				.addCategory(CATEGORY_EXPLOSION, 15F, 0.25F)
-				.addExact(DamageClass.LASER.name(), 10F, 0.75F)
+				.addExact(DamageClass.LASER.name(), 25F, 0.75F)
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
-				.setOther(10F, 0.15F));
+				.setOther(15F, 0.3F));
 		ResistanceStats bj = new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F)
 				.addCategory(CATEGORY_FIRE, 2.5F, 0.5F)
@@ -151,6 +190,12 @@ public class DamageResistanceHandler {
 		registerSet(ModItems.dns_helmet, ModItems.dns_plate, ModItems.dns_legs, ModItems.dns_boots, new ResistanceStats()
 				.addCategory(CATEGORY_EXPLOSION, 100F, 0.99F)
 				.setOther(100F, 1F));
+		registerSet(ModItems.taurun_helmet, ModItems.taurun_plate, ModItems.taurun_legs, ModItems.taurun_boots, new ResistanceStats()
+				.addCategory(CATEGORY_PROJECTILE, 2F, 0.15F)
+				.addCategory(CATEGORY_FIRE, 1F, 0.25F)
+				.addCategory(CATEGORY_EXPLOSION, 0F, 0.25F)
+				.addExact(DamageSource.fall.damageType, 4F, 0.5F)
+				.setOther(2F, 0.1F));
 		registerSet(ModItems.trenchmaster_helmet, ModItems.trenchmaster_plate, ModItems.trenchmaster_legs, ModItems.trenchmaster_boots, new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F)
 				.addCategory(CATEGORY_FIRE, 5F, 0.5F)
@@ -242,6 +287,47 @@ public class DamageResistanceHandler {
 				desc.addAll(toAdd);
 			}
 		}
+	}
+	
+	public static void serialize(JsonWriter writer) throws IOException {
+		/// ITEMS ///
+		writer.name("itemStats").beginArray();
+		for(Entry<Item, ResistanceStats> entry : itemStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(Item.itemRegistry.getNameForObject(entry.getKey())).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
+
+		/// SETS ///
+		writer.name("setStats").beginArray();
+		for(Entry<Quartet<Item, Item, Item, Item>, ResistanceStats> entry : setStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(Item.itemRegistry.getNameForObject(entry.getKey().getW()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getX()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getY()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getZ())).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
+
+		/// ENTITIES ///
+		writer.name("entityStats").beginArray();
+		for(Entry<Class<? extends Entity>, ResistanceStats> entry : entityStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(entry.getKey().getName()).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
 	}
 	
 	public static enum DamageClass {
@@ -381,12 +467,38 @@ public class DamageResistanceHandler {
 			if(exact != null) return exact;
 			Resistance category = categoryResistances.get(typeToCategory(source));
 			if(category != null) return category;
-			return otherResistance;
+			return source.isUnblockable() ? null : otherResistance;
 		}
 
 		public ResistanceStats addExact(String type, float threshold, float resistance) { exactResistances.put(type, new Resistance(threshold, resistance)); return this; }
 		public ResistanceStats addCategory(String type, float threshold, float resistance) { categoryResistances.put(type, new Resistance(threshold, resistance)); return this; }
 		public ResistanceStats setOther(float threshold, float resistance) { otherResistance = new Resistance(threshold, resistance); return this; }
+		
+		public void serialize(JsonWriter writer) throws IOException {
+			
+			if(!exactResistances.isEmpty()) {
+				writer.name("exact").beginArray();
+				for(Entry<String, Resistance> entry : exactResistances.entrySet()) {
+					writer.beginArray().setIndent("");
+					writer.value(entry.getKey()).value(entry.getValue().threshold).value(entry.getValue().resistance).endArray().setIndent("  ");
+				}
+				writer.endArray();
+			}
+
+			if(!categoryResistances.isEmpty()) {
+				writer.name("category").beginArray();
+				for(Entry<String, Resistance> entry : categoryResistances.entrySet()) {
+					writer.beginArray().setIndent("");
+					writer.value(entry.getKey()).value(entry.getValue().threshold).value(entry.getValue().resistance).endArray().setIndent("  ");
+				}
+				writer.endArray();
+			}
+			
+			if(otherResistance != null) {
+				writer.name("other").beginArray().setIndent("");
+				writer.value(otherResistance.threshold).value(otherResistance.resistance).endArray().setIndent("  ");
+			}
+		}
 	}
 	
 	public static class Resistance {
