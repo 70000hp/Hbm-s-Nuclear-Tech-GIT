@@ -1,25 +1,38 @@
 ## Added
-* Double barrel shotgun
-  * Special weapon, spawns as part of certain loot pools
-  * Uses the new 10 gauge caliber
-  * Will reload after each shot, however it is not belt-fed, if ammo is depleted, the next reload must be triggered manually
+* Laser pistol
+  * Saturnite-tier pistol using capacitors
+  * Also has variants
 
 ## Changed
-* Removed the old casing items
-* Reduced the flicker on the autoshotgun's holo sights
+* Trenchmaster armor now has the fast reload and more ammo traits again
+  * Fast reload now also plays the animation twice as fast
+  * More ammo does not apply to weapons that can only hold one round, like nuke and rocket launchers
+* Ace of spades now works as advertised again
+* Clay tablets now have "pools", tablets obtained from a black room no longer shows recipes for things not related to black rooms
+* Pedestal crafting extras `GOOD_KARMA` and `BAD_KARMA` are now properly implemented
+  * If you don't know what this means, just ignore it
+* Pneumatic tubes now have a special case when supplying autocrafters, they will only send single items since larger stacks are not accepted
+* Simplified turbofan recipe
+* Solar boilers will now show a tooltip when they are too cold
+* Updated the satellite dish structure, due to the new spawn rules it's also no longer obscenely rare
+* The rare small lab structures have been removed and replaced with a new lighthouse
+* ReaSim connectors will no longer function if ReaSim boilers are disabled
+* Updated the placed geiger counter model
+* Updated random gear on hostile mobs, there's now more variety in what armor/weapons mobs can have
+* Removed the cryo cannon. It was the last true weapon to use the NT system and may return later
+* Mines will no longer trigger from all ambient creatures (originally just bats) and water creatures
+* Mines can no longer be triggered if a non-air block is above them
+* Moved the cooling tower particle toggle from `hbm.cfg` to the client config, named `COOLING_TOWER_PARTICLES`
+* Updated HSS textures
+* The diesel generator and turbofan will both now halt operation when powered by redstone
+* Infinite batteries will now also drain energy when put into a charging slot
+* TOREX effects now cause the sky to go fullbright again for 10 seconds after they spawn
 
 ## Fixed
-* Fixed the bullet casing molds being unobtainable
-* Fixed instant crash caused by smelting certain things in the crucible
-* Fixed the SPAS' alt fire having a delay of only 10 ticks instead of 20
-* Fixed 240mm nuclear shells not triggering properly if they hit their target within 3 ticks of being spawned
-* Fixed some items that are supposed to be hidden in NEI being visible
-* Fixed dual lever action shotguns having inconsistent damage
-* Fixed entities (especially players) not being affected at all by their own explosions (rockets, 40mm grenades, etc)
-  * To keep rocket jumping at least somewhat viable, self-damage from explosions is reduced by 50%, the knockback remains the same
-* Fixed missing localization for the casing molds
-* Fixed the broken CIWS turret crashing instantly
-* Added safeguards to prevent any unnamed casing config from crashing
-* Fixed one of the break action revolver's faces having incorrect normals, making it invisible
-* Fixed the fluid trait config not loading correctly
-  * Fluids are now subject to the /ntmreload command
+* Fixed fatal gamebreaking hard drive corrupting issue where taurun leggings were misspelled
+* Fixed minor display issue where compressed air ducts would visually connect to non-ejector pneumatic tubes
+* Fixed special creeper types being able to spawn in other dimensions
+* Fixed modeled armor using weird rotation rules, causing issues with Customizable Player Models
+* Fixed rotation issues for certain blocks using the new structure system
+* Fixed ReaSim water never moving if the reactor is at 20°
+* Fixed strand caster LPS gauge exceeding the limit

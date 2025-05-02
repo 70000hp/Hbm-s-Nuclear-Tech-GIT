@@ -32,6 +32,7 @@ import api.hbm.fluid.IFluidStandardTransceiver;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -45,8 +46,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityWatz extends TileEntityMachineBase implements IFluidStandardTransceiver, IControlReceiver, IGUIProvider, IFluidCopiable {
-	
+
 	public FluidTank[] tanks;
+	public FluidTank[] sharedTanks;
 	public int heat;
 	public double fluxLastBase;		//flux created by the previous passive emission, only used for display
 	public double fluxLastReaction;	//flux created by the previous reaction, used for the next reaction
@@ -64,15 +66,28 @@ public class TileEntityWatz extends TileEntityMachineBase implements IFluidStand
 		this.tanks[0] = new FluidTank(Fluids.COOLANT, 64_000);
 		this.tanks[1] = new FluidTank(Fluids.COOLANT_HOT, 64_000);
 		this.tanks[2] = new FluidTank(Fluids.WATZ, 64_000);
+		resetSharedTanks();
 	}
 
 	@Override
 	public String getName() {
 		return "container.watz";
 	}
+	
+	protected void resetSharedTanks() {
+		this.sharedTanks = new FluidTank[3];
+		this.sharedTanks[0] = new FluidTank(Fluids.COOLANT, 64_000);
+		this.sharedTanks[1] = new FluidTank(Fluids.COOLANT_HOT, 64_000);
+		this.sharedTanks[2] = new FluidTank(Fluids.WATZ, 64_000);
+		this.sharedTanks[0].setFill(tanks[0].getFill());
+		this.sharedTanks[1].setFill(tanks[1].getFill());
+		this.sharedTanks[2].setFill(tanks[2].getFill());
+	}
 
 	@Override
 	public void updateEntity() {
+		
+		if(!worldObj.isRemote) resetSharedTanks();
 		
 		if(!worldObj.isRemote && !updateLock()) {
 			
@@ -119,8 +134,11 @@ public class TileEntityWatz extends TileEntityMachineBase implements IFluidStand
 			
 			/* send sync packets (order doesn't matter) */
 			for(TileEntityWatz segment : segments) {
+				segment.sharedTanks[0] = sharedTanks[0];
+				segment.sharedTanks[1] = sharedTanks[1];
+				segment.sharedTanks[2] = sharedTanks[2];
 				segment.isOn = turnedOn;
-				segment.sendPacket(sharedTanks);
+				segment.networkPackNT(25);
 				segment.heat *= 0.99; //cool 1% per tick
 			}
 			
@@ -277,30 +295,28 @@ public class TileEntityWatz extends TileEntityMachineBase implements IFluidStand
 			}
 		}
 	}
-	
-	public void sendPacket(FluidTank[] tanks) {
-		
-		NBTTagCompound data = new NBTTagCompound();
-		data.setInteger("heat", this.heat);
-		data.setBoolean("isOn", isOn);
-		data.setBoolean("lock", isLocked);
-		data.setDouble("flux", this.fluxLastReaction + this.fluxLastBase);
-		for(int i = 0; i < tanks.length; i++) {
-			tanks[i].writeToNBT(data, "t" + i);
+
+	@Override
+	public void serialize(ByteBuf buf) {
+		super.serialize(buf);
+		buf.writeInt(this.heat);
+		buf.writeBoolean(isOn);
+		buf.writeBoolean(isLocked);
+		buf.writeDouble(this.fluxLastReaction + this.fluxLastBase);
+		for(FluidTank tank : sharedTanks) {
+			tank.serialize(buf);
 		}
-		this.networkPack(data, 25);
 	}
 
 	@Override
-	public void networkUnpack(NBTTagCompound nbt) {
-		super.networkUnpack(nbt);
-		
-		this.heat = nbt.getInteger("heat");
-		this.isOn = nbt.getBoolean("isOn");
-		this.isLocked = nbt.getBoolean("lock");
-		this.fluxDisplay = nbt.getDouble("flux");
-		for(int i = 0; i < tanks.length; i++) {
-			tanks[i].readFromNBT(nbt, "t" + i);
+	public void deserialize(ByteBuf buf) {
+		super.deserialize(buf);
+		this.heat = buf.readInt();
+		this.isOn = buf.readBoolean();
+		this.isLocked = buf.readBoolean();
+		this.fluxDisplay = buf.readDouble();
+		for(FluidTank tank : tanks) {
+			tank.deserialize(buf);
 		}
 	}
 	

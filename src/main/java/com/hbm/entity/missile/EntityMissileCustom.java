@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.blocks.bomb.BlockTaint;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.logic.EntityBalefire;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
@@ -22,6 +21,7 @@ import com.hbm.items.weapon.ItemCustomMissilePart.WarheadType;
 import com.hbm.main.MainRegistry;
 
 import api.hbm.entity.IRadarDetectableNT;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -78,7 +78,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 			ExplosionLarge.spawnShrapnelShower(worldObj, posX, posY, posZ, motionX, motionY, motionZ, 15, 0.075);
 		}
 	}
-	
+
 	@Override
 	public void onUpdate() {
 
@@ -87,11 +87,11 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		if(type != null && type.updateCustom != null) {
 			type.updateCustom.accept(this);
 		}
-		
+
 		if(!worldObj.isRemote) {
 			if(this.hasPropulsion()) this.fuel -= this.consumption;
 		}
-		
+
 		super.onUpdate();
 	}
 
@@ -131,7 +131,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		nbt.setInteger("fins", this.dataWatcher.getWatchableObjectInt(11));
 		nbt.setInteger("thruster", this.dataWatcher.getWatchableObjectInt(12));
 	}
-	
+
 	@Override
 	protected void spawnContrail() {
 
@@ -148,7 +148,16 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		case XENON: break;
 		}
 
-		if(!smoke.isEmpty()) for(int i = 0; i < velocity; i++) MainRegistry.proxy.spawnParticle(posX - v.xCoord * i, posY - v.yCoord * i, posZ - v.zCoord * i, smoke, null);
+		if(!smoke.isEmpty()) {
+			for (int i = 0; i < velocity; i++) {
+				NBTTagCompound data = new NBTTagCompound();
+				data.setDouble("posX", posX - v.xCoord * i);
+				data.setDouble("posY", posY - v.yCoord * i);
+				data.setDouble("posZ", posZ - v.zCoord * i);
+				data.setString("type", smoke);
+				MainRegistry.proxy.effectNT(data);
+			}
+		}
 	}
 
 	@Override
@@ -158,7 +167,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 
 		WarheadType type = (WarheadType) part.attributes[0];
 		float strength = (Float) part.attributes[1];
-		
+
 		if(type.impactCustom != null) {
 			type.impactCustom.accept(this);
 			return;
@@ -202,7 +211,8 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 				int a = rand.nextInt(r) + (int) posX - (r / 2 - 1);
 				int b = rand.nextInt(r) + (int) posY - (r / 2 - 1);
 				int c = rand.nextInt(r) + (int) posZ - (r / 2 - 1);
-				if(worldObj.getBlock(a, b, c).isReplaceable(worldObj, a, b, c) && BlockTaint.hasPosNeightbour(worldObj, a, b, c)) {
+				Block block = worldObj.getBlock(a, b, c);
+				if(block.isNormalCube() && !block.isAir(worldObj, a, b, c)) {
 					worldObj.setBlock(a, b, c, ModBlocks.taint, rand.nextInt(3) + 4, 2);
 				}
 			}
@@ -244,7 +254,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		if(top == PartSize.SIZE_15 && bottom == PartSize.SIZE_15) return "radar.target.custom15";
 		if(top == PartSize.SIZE_15 && bottom == PartSize.SIZE_20) return "radar.target.custom1520";
 		if(top == PartSize.SIZE_20 && bottom == PartSize.SIZE_20) return "radar.target.custom20";
-		
+
 		return "radar.target.custom";
 	}
 
@@ -260,7 +270,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		if(top == PartSize.SIZE_15 && bottom == PartSize.SIZE_15) return IRadarDetectableNT.TIER15;
 		if(top == PartSize.SIZE_15 && bottom == PartSize.SIZE_20) return IRadarDetectableNT.TIER15_20;
 		if(top == PartSize.SIZE_20 && bottom == PartSize.SIZE_20) return IRadarDetectableNT.TIER20;
-		
+
 		return IRadarDetectableNT.TIER1;
 	}
 

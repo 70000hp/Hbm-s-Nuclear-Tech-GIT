@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 
 public class MagazineBelt implements IMagazine<BulletConfig> {
 
-	protected List<BulletConfig> acceptedBullets = new ArrayList();
+	public List<BulletConfig> acceptedBullets = new ArrayList();
 	
 	public MagazineBelt addConfigs(BulletConfig... cfgs) { for(BulletConfig cfg : cfgs) acceptedBullets.add(cfg); return this; }
 
@@ -28,6 +28,8 @@ public class MagazineBelt implements IMagazine<BulletConfig> {
 
 	@Override
 	public void useUpAmmo(ItemStack stack, IInventory inventory, int amount) {
+		if(inventory == null) return;
+		if(!IMagazine.shouldUseUpTrenchie(inventory)) return;
 		
 		BulletConfig first = this.getFirstConfig(stack, inventory);
 		
@@ -39,6 +41,8 @@ public class MagazineBelt implements IMagazine<BulletConfig> {
 					int toRemove = Math.min(slot.stackSize, amount);
 					amount -= toRemove;
 					inventory.decrStackSize(i, toRemove);
+					IMagazine.handleAmmoBag(inventory, first, toRemove);
+					if(amount <= 0) return;
 				}
 			}
 		}
@@ -56,6 +60,7 @@ public class MagazineBelt implements IMagazine<BulletConfig> {
 
 	@Override
 	public int getAmount(ItemStack stack, IInventory inventory) {
+		if(inventory == null) return 1; // for EntityAIFireGun
 		BulletConfig first = this.getFirstConfig(stack, inventory);
 		int count = 0;
 		for(int i = 0; i < inventory.getSizeInventory(); i++) {

@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.util.BobMathUtil;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -25,6 +26,8 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 
 public class FluidTank {
+	
+	public static final FluidTank[] EMPTY_ARRAY = new FluidTank[0];
 
 	public static final List<FluidLoadingHandler> loadingHandlers = new ArrayList<FluidLoadingHandler>();
 	public static final Set<Item> noDualUnload = new HashSet<Item>();
@@ -46,9 +49,7 @@ public class FluidTank {
 	}
 	
 	public FluidTank withPressure(int pressure) {
-		
 		if(this.pressure != pressure) this.setFill(0);
-		
 		this.pressure = pressure;
 		return this;
 	}
@@ -253,6 +254,7 @@ public class FluidTank {
 			
 			if(this.pressure != 0) {
 				list.add(EnumChatFormatting.RED + "Pressure: " + this.pressure + " PU");
+				list.add((BobMathUtil.getBlink() ? EnumChatFormatting.RED : EnumChatFormatting.DARK_RED) + "Pressurized, use compressor!");
 			}
 			
 			type.addInfo(list);

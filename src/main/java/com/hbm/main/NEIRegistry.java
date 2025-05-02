@@ -1,19 +1,18 @@
 package com.hbm.main;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import codechicken.nei.recipe.TemplateRecipeHandler;
 import com.hbm.config.VersatileConfig;
 import com.hbm.handler.nei.*;
 
-import codechicken.nei.recipe.TemplateRecipeHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NEIRegistry {
 
 	public static List<TemplateRecipeHandler> handlers = new ArrayList();
-	
+
 	public static List<TemplateRecipeHandler> listAllHandlers() {
-		
+
 		if(!handlers.isEmpty()) return handlers;
 
 		handlers.add(new AnvilRecipeHandler());
@@ -33,17 +32,20 @@ public class NEIRegistry {
 		handlers.add(new ReformingHandler());
 		handlers.add(new HydrotreatingHandler());
 		handlers.add(new ChemplantRecipeHandler());
+		handlers.add(new OreSlopperHandler()); //before acidizing
 		handlers.add(new CrystallizerRecipeHandler());
 		handlers.add(new BookRecipeHandler());
 		handlers.add(new FusionRecipeHandler());
-		handlers.add(new HadronRecipeHandler());
 		handlers.add(new SILEXRecipeHandler());
 		handlers.add(new FuelPoolHandler());
+		handlers.add(new RBMKRodDisassemblyHandler());
+		handlers.add(new RBMKWasteDecayHandler());
 		handlers.add(new CrucibleSmeltingHandler());
 		handlers.add(new CrucibleAlloyingHandler());
 		handlers.add(new CrucibleCastingHandler());
 		handlers.add(new ToolingHandler());
 		handlers.add(new ConstructionHandler());
+		handlers.add(new SatelliteHandler());
 
 		//universal boyes
 		handlers.add(new ZirnoxRecipeHandler());
@@ -68,10 +70,13 @@ public class NEIRegistry {
 		handlers.add(new ArcFurnaceFluidHandler());
 		handlers.add(new RotaryFurnaceHandler());
 		handlers.add(new AmmoPressHandler());
+		handlers.add(new CompressorHandler());
+		handlers.add(new ParticleAcceleratorHandler());
+		handlers.add(new DeuteriumHandler());
 
 		//this shit comes last
 		handlers.add(new FluidRecipeHandler());
-		
+
 		return handlers;
 	}
 }
