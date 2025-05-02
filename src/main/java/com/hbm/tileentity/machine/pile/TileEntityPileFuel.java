@@ -17,7 +17,7 @@ public class TileEntityPileFuel extends TileEntityPileBase implements IPileNeutr
 	public int neutrons;
 	public int lastNeutrons;
 	public int progress;
-	public static final int maxProgress = GeneralConfig.enable528 ? 75000 : 50000; //might double to reduce compact setup's effectiveness
+	public static final int maxProgress = 50000; //might double to reduce compact setup's effectiveness
 
 	@Override
 	public void updateEntity() {

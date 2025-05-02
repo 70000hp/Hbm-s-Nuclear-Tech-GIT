@@ -24,7 +24,7 @@ public class HazardTypeHot extends HazardTypeBase {
 		
 		boolean reacher = false;
 		
-		if(target instanceof EntityPlayer && !GeneralConfig.enable528)
+		if(target instanceof EntityPlayer)
 			reacher = ((EntityPlayer) target).inventory.hasItem(ModItems.reacher);
 		
 		if(!reacher && !target.isWet() && level > 0)

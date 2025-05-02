@@ -24,6 +24,7 @@ public class CompressorRecipes extends SerializableRecipe {
 	public void registerDefaults() {
 		recipes.put(new Pair(Fluids.PETROLEUM, 0), new CompressorRecipe(2_000, new FluidStack(Fluids.PETROLEUM, 2_000, 1), 20));
 		recipes.put(new Pair(Fluids.PETROLEUM, 1), new CompressorRecipe(2_000, new FluidStack(Fluids.LPG, 1_000, 0), 20));
+		recipes.put(new Pair(Fluids.NONE, 1), new CompressorRecipe(0, new FluidStack(Fluids.COMP_AIR, 1_000, 0), 80));
 
 		recipes.put(new Pair(Fluids.BLOOD, 3), new CompressorRecipe(1_000, new FluidStack(Fluids.HEAVYOIL, 250, 0), 200));
 

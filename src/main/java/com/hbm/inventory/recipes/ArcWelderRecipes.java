@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.config.GeneralConfig;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon.AStack;
@@ -32,12 +33,28 @@ public class ArcWelderRecipes extends SerializableRecipe {
 
 	@Override
 	public void registerDefaults() {
+		boolean enabled528 = GeneralConfig.enable528;
 
 		//Parts
+
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.coil_copper_torus, 2), 100, 1_000L,
+				new ComparableStack(ModItems.coil_copper, 2), new OreDictStack(STEEL.plate(), 2)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.coil_advanced_torus, 1), 100, 2_000L,
+				new ComparableStack(ModItems.coil_advanced_alloy, 2), new OreDictStack(STEEL.plate(), 2)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.coil_gold_torus, 1), 100, 2_000L,
+				new ComparableStack(ModItems.coil_gold, 2), new OreDictStack(STEEL.plate(), 2)));
+
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.tank_steel, 6), 200, 2_000L,
+				new OreDictStack(STEEL.plateCast(), 3), new OreDictStack(TI.plateCast(), 1)));
+
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor, 2), 100, 200L,
-				new OreDictStack(IRON.plate(), 2), new ComparableStack(ModItems.coil_copper), new ComparableStack(ModItems.coil_copper_torus)));
+				new OreDictStack(IRON.plate(), 3), new ComparableStack(ModItems.coil_copper, 3)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor, 2), 100, 400L,
-				new OreDictStack(STEEL.plate(), 1), new ComparableStack(ModItems.coil_copper), new ComparableStack(ModItems.coil_copper_torus)));
+				new OreDictStack(STEEL.plate(), 2), new ComparableStack(ModItems.coil_copper, 3)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor_desh, 2), 100, 2_000L, new FluidStack(Fluids.PETROLEUM, 100),
+				new OreDictStack(DESH.ingot(), 4), new ComparableStack(ModItems.coil_gold, 4), new ComparableStack(ModItems.motor, 1)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor_bismuth, 2), 100, 10_000L, new FluidStack(Fluids.UNSATURATEDS, 100),
+				new OreDictStack(BI.nugget(), 4), new ComparableStack(ModBlocks.hadron_coil_gold, 4), new ComparableStack(ModItems.motor, 1)));
 		recipes.add(new ArcWelderRecipe(DictFrame.fromOne(ModItems.part_generic, EnumPartType.LDE), 200, 5_000L,
 				new OreDictStack(AL.plate(), 4), new OreDictStack(FIBER.ingot(), 4), new OreDictStack(ANY_HARDPLASTIC.ingot())));
 		recipes.add(new ArcWelderRecipe(DictFrame.fromOne(ModItems.part_generic, EnumPartType.LDE), 200, 10_000L,
@@ -59,26 +76,69 @@ public class ArcWelderRecipes extends SerializableRecipe {
 		//high-demand mid-game parts
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_STEEL.id), 100, 500L,
 				new OreDictStack(STEEL.plateCast(), 2)));
-		//literally just the combination oven
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_COPPER.id), 200, 1_000L,
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_STEEL.id), 50, 250L, new FluidStack(Fluids.OXYGEN, 100),
+				new OreDictStack(STEEL.plateCast(), 2)));
+		if(!enabled528) {
+
+			//literally just the strand caster(for now)(not in 528)
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_COPPER.id), 200, 1_000L,
+					new OreDictStack(CU.plateCast(), 2)));
+			//mid-game, single combustion engine running on LPG
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TITANIUM.id), 600, 50_000L,
+					new OreDictStack(TI.plateCast(), 2)));
+			//mid-game PWR
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ZIRCONIUM.id), 600, 10_000L,
+					new OreDictStack(ZR.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ALUMINIUM.id), 300, 10_000L,
+					new OreDictStack(AL.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_LEAD.id), 300, 10_000L,
+					new OreDictStack(PB.plateCast(), 2)));
+			//late-game fusion
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ALLOY.id), 300, 5_000L, new FluidStack(Fluids.UNSATURATEDS, 150),
+					new OreDictStack(ALLOY.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TCALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 1_000),
+					new OreDictStack(TCALLOY.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CDALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 1_000),
+					new OreDictStack(CDALLOY.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TUNGSTEN.id), 1_200, 250_000L, new FluidStack(Fluids.OXYGEN, 1_000),
+					new OreDictStack(W.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CMB.id), 1_200, 10_000_000L, new FluidStack(Fluids.REFORMGAS, 1_000),
+					new OreDictStack(CMB.plateCast(), 2)));
+		} else {
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TCALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 16_000),
+					new OreDictStack(TCALLOY.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CDALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 16_000),
+					new OreDictStack(CDALLOY.plateCast(), 2)));
+			recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CMB.id), 1_200, 10_000_000L, new FluidStack(Fluids.REFORMGAS, 4_000),
+					new OreDictStack(CMB.plateCast(), 2)));
+		}
+
+		//Recipe alternatives, use less power and are faster at the cost of needing a welding gas/ are the sole options in 528
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_COPPER.id), 100, 1_000L, new FluidStack(Fluids.OXYGEN, 250),
 				new OreDictStack(CU.plateCast(), 2)));
-		//mid-game, single combustion engine running on LPG
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TITANIUM.id), 600, 50_000L,
+
+		//in lieu of another inert gas, xenon gas, shouldn't be too annoying i hope
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TITANIUM.id), 300, 10_000L, new FluidStack(Fluids.XENON, 200),
 				new OreDictStack(TI.plateCast(), 2)));
-		//mid-game PWR
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ZIRCONIUM.id), 600, 10_000L,
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ZIRCONIUM.id), 300, 10_000L, new FluidStack(Fluids.XENON, 200),
 				new OreDictStack(ZR.plateCast(), 2)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ALUMINIUM.id), 300, 10_000L,
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ALUMINIUM.id), 300, 5_000L, new FluidStack(Fluids.XENON, 200),
 				new OreDictStack(AL.plateCast(), 2)));
+
+		//one instance of hydrogen welding to catch you off guard :3
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_LEAD.id), 100, 5_000L, new FluidStack(Fluids.HYDROGEN, 1_000),
+				new OreDictStack(PB.plateCast(), 2)));
+		//not used too often but whatever
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ALLOY.id), 300, 5_000L, new FluidStack(Fluids.UNSATURATEDS, 150),
+				new OreDictStack(ALLOY.plateCast(), 2)));
 		//late-game fusion
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TCALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 1_000),
-				new OreDictStack(TCALLOY.plateCast(), 2)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CDALLOY.id), 1_200, 1_000_000L, new FluidStack(Fluids.OXYGEN, 1_000),
-				new OreDictStack(CDALLOY.plateCast(), 2)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TUNGSTEN.id), 1_200, 250_000L, new FluidStack(Fluids.OXYGEN, 1_000),
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TUNGSTEN.id), 800, 200_000L, new FluidStack(Fluids.XENON, 750),
 				new OreDictStack(W.plateCast(), 2)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CMB.id), 1_200, 10_000_000L, new FluidStack(Fluids.REFORMGAS, 1_000),
-				new OreDictStack(CMB.plateCast(), 2)));
+		//late-game fusion alt
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TCALLOY.id), 800, 800_000L, new FluidStack(Fluids.UNSATURATEDS, 1_000),
+				new OreDictStack(TCALLOY.plateCast(), 2)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CDALLOY.id), 800, 800_000L, new FluidStack(Fluids.UNSATURATEDS, 1_000),
+				new OreDictStack(CDALLOY.plateCast(), 2)));
 		//pre-DFC
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_OSMIRIDIUM.id), 6_000, 20_000_000L, new FluidStack(Fluids.REFORMGAS, 16_000),
 				new OreDictStack(OSMIRIDIUM.plateCast(), 2)));
@@ -89,7 +149,7 @@ public class ArcWelderRecipes extends SerializableRecipe {
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.thruster_large), 200, 5_000L, new OreDictStack(DURA.ingot(), 10), new ComparableStack(ModItems.motor, 1), new OreDictStack(OreDictManager.getReflector(), 12)));
 
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_small), 60, 1_000L, new OreDictStack(AL.plate(), 6), new OreDictStack(CU.plate(), 4), new ComparableStack(ModBlocks.steel_scaffold, 4)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_medium), 100, 2_000L, new OreDictStack(AL.plateCast(), 4), new OreDictStack(TI.plate(), 8), new ComparableStack(ModBlocks.steel_scaffold, 12)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_medium), 100, 2_000L, new OreDictStack(AL.plateAdv528(), 4), new OreDictStack(TI.plate(), 8), new ComparableStack(ModBlocks.steel_scaffold, 12)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_large), 200, 5_000L, new OreDictStack(AL.plateWelded(), 8), new OreDictStack(BIGMT.plate(), 12), new ComparableStack(ModBlocks.steel_scaffold, 16)));
 
 		//Missiles

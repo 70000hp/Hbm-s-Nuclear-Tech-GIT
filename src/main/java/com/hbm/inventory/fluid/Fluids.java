@@ -162,6 +162,8 @@ public class Fluids {
 	public static FluidType SUNFLOWEROIL;
 	public static FluidType NITROGLYCERIN;
 	public static FluidType REDMUD;
+	public static FluidType MONAZITE_MUD;
+	public static FluidType MONAZITE_SOLUTION;
 	public static FluidType CHLOROCALCITE_SOLUTION;
 	public static FluidType CHLOROCALCITE_MIX;
 	public static FluidType CHLOROCALCITE_CLEANED;
@@ -181,13 +183,18 @@ public class Fluids {
 	public static FluidType THORIUM_SALT_HOT;
 	public static FluidType THORIUM_SALT_DEPLETED;
 	public static FluidType FULLERENE;
+	public static FluidType COMP_AIR;
 	public static FluidType STELLAR_FLUX;
 	public static FluidType VITRIOL;
 	public static FluidType SLOP;
+
+	public static FluidType NITROGEN;
+
 	public static FluidType LYE;
 	public static FluidType SODIUM_ALUMINATE;
 	public static FluidType BAUXITE_SOLUTION;
 	public static FluidType ALUMINA;
+
 
 	/* Lagacy names for compatibility purposes */
 	@Deprecated public static FluidType ACID;	//JAOPCA uses this, apparently
@@ -401,6 +408,11 @@ public class Fluids {
 		BAUXITE_SOLUTION =		new FluidType("BAUXITE_SOLUTION",	0xE2560F, 3, 0, 3, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID, VISCOUS);
 		ALUMINA =				new FluidType("ALUMINA",			0xDDFFFF, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
 		AIR =					new FluidType(151, "AIR",			0xE7EAEB, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
+    MONAZITE_MUD = 			new FluidType("MONAZITE_MUD", 0xFF8A4D, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
+		MONAZITE_SOLUTION = 	new FluidType("MONAZITE_SOLUTION", 0x8F8F5F, 0, 0, 0, EnumSymbol.ACID).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
+		NITROGEN =				new FluidType("NITROGEN",	0xBAB572, 0, 0, 0, EnumSymbol.ASPHYXIANT).addTraits(GASEOUS);
+    COMP_AIR =				new FluidType("COMP_AIR",	0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
+
 
 		// ^ ^ ^ ^ ^ ^ ^ ^
 		//ADD NEW FLUIDS HERE
@@ -536,6 +548,8 @@ public class Fluids {
 		metaOrder.add(DEATH);
 		metaOrder.add(WATZ);
 		metaOrder.add(REDMUD);
+		metaOrder.add(MONAZITE_MUD);
+		metaOrder.add(MONAZITE_SOLUTION);
 		metaOrder.add(FULLERENE);
 		metaOrder.add(EGG);
 		metaOrder.add(CHOLESTEROL);
@@ -545,9 +559,14 @@ public class Fluids {
 		metaOrder.add(POTASSIUM_CHLORIDE);
 		metaOrder.add(CALCIUM_CHLORIDE);
 		metaOrder.add(CALCIUM_SOLUTION);
+
+		metaOrder.add(COMP_AIR);
+		metaOrder.add(NITROGEN);
+
 		metaOrder.add(SODIUM_ALUMINATE);
 		metaOrder.add(BAUXITE_SOLUTION);
 		metaOrder.add(ALUMINA);
+
 		//solutions and working fluids
 		metaOrder.add(FRACKSOL);
 		metaOrder.add(LYE);

@@ -99,7 +99,8 @@ public class ItemBedrockOre extends ItemEnumMulti {
 		FLUORITE("Fluorite", 0xF6F3E7, 				B_SILICON, 	B_LITHIUM, 	B_ALUMINIUM), //different silicon-bearing gemstones, generic lithium, aluminium from sodium compound trailings
 		HEMATITE("Hematite", 0xA37B72,				B_SULFUR,	B_TITANIUM,	B_TITANIUM), //titanium, sulfur from pyrite
 		MALACHITE("Malachite", 0x66B48C,			B_SULFUR,	B_SULFUR,	B_SULFUR), //sulfur sulfur sulfur sulfur
-		NEODYMIUM("Neodymium", 0x8F8F5F,			B_LITHIUM,	B_SILICON,	B_BISMUTH); //yeah whatever
+		NEODYMIUM("Neodymium", 0x8F8F5F,			B_LITHIUM,	B_SILICON,	B_BISMUTH), //yeah whatever
+		MONAZITE("Monazite", 0xFF8A4D,			B_SILICON,	B_TITANIUM,	B_RADIUM);//IRL monazite has thorium also, but eh whatever
 		
 		public String oreName;
 		public int color;

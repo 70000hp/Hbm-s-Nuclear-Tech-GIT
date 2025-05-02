@@ -128,13 +128,24 @@ public class ItemBedrockOreNew extends Item {
 	}
 
 	public static enum BedrockOreType {
+
+		/**											primary						sulfuric						solvent							radsolvent
+		LIGHT_METAL(	0xFFFFFF, 0x353535, "light",	IRON, CU,					TI, AL, AL,						TI, LI, NA,			CD, LI, NA),
+		HEAVY_METAL(	0x868686, 0x000000, "heavy",	W, PB,						GOLD, GOLD, BE,					W, PB, BE,					TA, GOLD, BI),
+		RARE_EARTH(		0xE6E6B6, 0x1C1C00, "rare",		CO, EnumChunkType.RARE,		B, LA, NB,						ND, B, ZR,						NB, ND, SR),
+		ACTINIDE(		0xC1C7BD, 0x2B3227, "actinide",	U, TH232,					RA226, RA226, U,			RA226, PO210, PO210,			BI, NP237, PU),
+		NON_METAL(		0xAFAFAF, 0x0F0F0F, "nonmetal",	COAL, S,					LIGNITE, KNO, F,				P_RED, F, KNO,					CHLOROCALCITE, BR, I),
+		CRYSTALLINE(	0xE2FFFA, 0x1E8A77, "crystal",	REDSTONE, CINNABAR,			SODALITE, ASBESTOS, DIAMOND,	CINNABAR, ASBESTOS, EMERALD,	BORAX, MOLYSITE, SODALITE);
+		**/
 		//												primary									sulfuric															solvent																		radsolvent
+
 		LIGHT_METAL(	0xFFFFFF, 0x353535, "light",	o(MAT_IRON, 9),		o(MAT_COPPER, 9),	o(MAT_TITANIUM, 6),	o(MAT_BAUXITE, 9),	o(MAT_CRYOLITE, 3),	o(MAT_CHLOROCALCITE, 5),	o(MAT_LITHIUM, 5),		o(MAT_SODIUM, 3),		o(MAT_CHLOROCALCITE, 6),	o(MAT_LITHIUM, 6),		o(MAT_SODIUM, 6)),
 		HEAVY_METAL(	0x868686, 0x000000, "heavy",	o(MAT_TUNGSTEN, 9),	o(MAT_LEAD, 9),		o(MAT_GOLD, 2),		o(MAT_GOLD, 2),			o(MAT_BERYLLIUM, 3),	o(MAT_TUNGSTEN, 9),			o(MAT_LEAD, 9),			o(MAT_GOLD, 5),			o(MAT_BISMUTH, 1),			o(MAT_BISMUTH, 1),		o(MAT_GOLD, 6)),
 		RARE_EARTH(		0xE6E6B6, 0x1C1C00, "rare",		o(MAT_COBALT, 5),	o(MAT_RAREEARTH, 5),o(MAT_BORON, 5),	o(MAT_LANTHANIUM, 3),	o(MAT_NIOBIUM, 4),		o(MAT_NEODYMIUM, 3),		o(MAT_STRONTIUM, 3),	o(MAT_ZIRCONIUM, 3),	o(MAT_NIOBIUM, 5),			o(MAT_NEODYMIUM, 5),	o(MAT_STRONTIUM, 3)),
-		ACTINIDE(		0xC1C7BD, 0x2B3227, "actinide",	o(MAT_URANIUM, 4),	o(MAT_THORIUM, 4),	o(MAT_RADIUM, 2),	o(MAT_RADIUM, 2),		o(MAT_POLONIUM, 2),		o(MAT_RADIUM, 2),			o(MAT_RADIUM, 2),		o(MAT_POLONIUM, 2),		o(MAT_TECHNETIUM, 1),		o(MAT_TECHNETIUM, 1),	o(MAT_U238, 1)),
+		ACTINIDE(		0xC1C7BD, 0x2B3227, "actinide",	o(MAT_URANIUM, 4),	o(MAT_THORIUM, 4),	o(MAT_RADIUM, 2),	o(MAT_RADIUM, 2),		o(MAT_URANIUM, 2),		o(MAT_RADIUM, 2),			o(MAT_POLONIUM, 2),		o(MAT_POLONIUM, 2),		o(MAT_BISMUTH, 1),		o(MAT_TECHNETIUM, 1),	o(MAT_PLUTONIUM, 1)),
 		NON_METAL(		0xAFAFAF, 0x0F0F0F, "nonmetal",	o(MAT_COAL, 9),		o(MAT_SULFUR, 9),	o(MAT_LIGNITE, 9),	o(MAT_KNO, 6),			o(MAT_FLUORITE, 6),		o(MAT_PHOSPHORUS, 5),		o(MAT_FLUORITE, 6),		o(MAT_SULFUR, 6),		o(MAT_CHLOROCALCITE, 6),	o(MAT_SILICON, 2),		o(MAT_SILICON, 2)),
 		CRYSTALLINE(	0xE2FFFA, 0x1E8A77, "crystal",	o(MAT_REDSTONE, 9),	o(MAT_CINNABAR, 4),	o(MAT_SODALITE, 9),	o(MAT_ASBESTOS, 6),		o(MAT_DIAMOND, 3),		o(MAT_CINNABAR, 3),			o(MAT_ASBESTOS, 5),		o(MAT_EMERALD, 3),		o(MAT_BORAX, 3),			o(MAT_MOLYSITE, 3),		o(MAT_SODALITE, 9));
+
 		//sediment
 
 		public int light;

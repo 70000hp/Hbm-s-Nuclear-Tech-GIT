@@ -235,6 +235,7 @@ public class OreDictManager {
 	public static final DictFrame BORAX = new DictFrame("Borax");
 	public static final DictFrame CHLOROCALCITE = new DictFrame("Chlorocalcite");
 	public static final DictFrame MOLYSITE = new DictFrame("Molysite");
+	public static final DictFrame MONAZITE = new DictFrame("Monazite");
 	public static final DictFrame SODALITE = new DictFrame("Sodalite");
 	public static final DictFrame VOLCANIC = new DictFrame("Volcanic");
 	public static final DictFrame HEMATITE = new DictFrame("Hematite");
@@ -440,6 +441,7 @@ public class OreDictManager {
 		CINNABAR	.crystal(cinnebar)	.gem(cinnebar)																					.ore(ore_cinnebar, ore_depth_cinnebar);
 		BORAX																			.dust(powder_borax)								.ore(ore_depth_borax);
 		CHLOROCALCITE																	.dust(powder_chlorocalcite);
+		MONAZITE																		.dust(powder_monazite);
 		MOLYSITE																		.dust(powder_molysite)							.ore(DictFrame.fromOne(ore_basalt, EnumBasaltOreType.MOLYSITE));
 		SODALITE						.gem(gem_sodalite);
 		VOLCANIC						.gem(gem_volcanic)																				.ore(DictFrame.fromOne(ore_basalt, EnumBasaltOreType.GEM));
@@ -778,7 +780,10 @@ public class OreDictManager {
 		public String[] all(MaterialShapes shape) {				return appendToAll(shape.prefixes); }
 
 		/** Returns cast (triple) plates if 528 mode is enabled or normal plates if not */
-		public String plate528() { return GeneralConfig.enable528 ? plateCast() : plate(); }
+
+		public String plate528() { return GeneralConfig.enable528 || GeneralConfig.enableExpensiveMode ? plateCast() : plate(); }
+		/** Returns welded (sextuple) plates if 528 mode is enabled or cast (triple) plates if not */
+		public String plateAdv528() { return GeneralConfig.enable528 || GeneralConfig.enableExpensiveMode ? plateWelded() : plateCast(); }
 
 		private String[] appendToAll(String... prefix) {
 

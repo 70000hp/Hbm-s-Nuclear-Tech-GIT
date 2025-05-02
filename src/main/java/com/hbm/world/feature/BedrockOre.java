@@ -35,8 +35,8 @@ public class BedrockOre {
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.BORAX,													3,	new FluidStack(Fluids.SULFURIC_ACID, 500)),		WorldConfig.bedrockBoraxSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.CHLOROCALCITE,											3,	new FluidStack(Fluids.SULFURIC_ACID, 500)),		WorldConfig.bedrockChlorocalciteSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.ASBESTOS,												2),													WorldConfig.bedrockAsbestosSpawn);
-		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.NIOBIUM,												2,	new FluidStack(Fluids.PEROXIDE, 500)),				WorldConfig.bedrockNiobiumSpawn);
-		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.NEODYMIUM,												3,	new FluidStack(Fluids.PEROXIDE, 500)),				WorldConfig.bedrockNeodymiumSpawn);
+		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.NIOBIUM,												2,	new FluidStack(Fluids.ACID, 500)),				WorldConfig.bedrockNiobiumSpawn);
+		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.MONAZITE,												3,	new FluidStack(Fluids.ACID, 500)),				WorldConfig.bedrockNeodymiumSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.TITANIUM,												2,	new FluidStack(Fluids.SULFURIC_ACID, 500)),		WorldConfig.bedrockTitaniumSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.TUNGSTEN,												2,	new FluidStack(Fluids.PEROXIDE, 500)),				WorldConfig.bedrockTungstenSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.GOLD,													1),													WorldConfig.bedrockGoldSpawn);
@@ -53,9 +53,11 @@ public class BedrockOre {
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.glowstone_dust, 4),		1,	0xF9FF4D),							WorldConfig.bedrockGlowstoneSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.powder_fire, 4),		1,	0xD7341F),							WorldConfig.bedrockPhosphorusSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.quartz, 4),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
+		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(EnumBedrockOre.NEODYMIUM,												3,	new FluidStack(Fluids.ACID, 500)),				WorldConfig.bedrockNeodymiumSpawn);
 
 		replacements.put("ore" + EnumBedrockOre.IRON.oreName, new BedrockOreDefinition(EnumBedrockOre.HEMATITE, 1));
 		replacements.put("ore" + EnumBedrockOre.COPPER.oreName, new BedrockOreDefinition(EnumBedrockOre.MALACHITE, 1));
+		replacements.put("ore" + EnumBedrockOre.NEODYMIUM.oreName, new BedrockOreDefinition(EnumBedrockOre.MONAZITE, 3));
 	}
 	
 	public static void registerBedrockOre(List list, BedrockOreDefinition def, int weight) {
