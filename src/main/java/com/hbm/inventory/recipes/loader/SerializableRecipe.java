@@ -24,10 +24,12 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.MatDistribution;
 import com.hbm.inventory.recipes.*;
+import com.hbm.inventory.recipes.anvil.AnvilRecipes;
 import com.hbm.items.ModItems;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.Tuple.Pair;
 
+import api.hbm.recipe.IRecipeRegisterListener;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -36,6 +38,7 @@ public abstract class SerializableRecipe {
 	
 	public static final Gson gson = new Gson();
 	public static List<SerializableRecipe> recipeHandlers = new ArrayList();
+	public static List<IRecipeRegisterListener> additionalListeners = new ArrayList();
 	
 	public boolean modified = false;
 	
@@ -73,8 +76,11 @@ public abstract class SerializableRecipe {
 		recipeHandlers.add(new ArcWelderRecipes());
 		recipeHandlers.add(new RotaryFurnaceRecipes());
 		recipeHandlers.add(new ExposureChamberRecipes());
+		recipeHandlers.add(new ParticleAcceleratorRecipes());
 		recipeHandlers.add(new AmmoPressRecipes());
 		recipeHandlers.add(new AssemblerRecipes());
+		//AFTER Assembler
+		recipeHandlers.add(new AnvilRecipes());
 		recipeHandlers.add(new PedestalRecipes());
 		
 		recipeHandlers.add(new MatDistribution());
@@ -110,6 +116,10 @@ public abstract class SerializableRecipe {
 				MainRegistry.logger.info("No recipe file found, registering defaults for " + recipe.getFileName());
 				recipe.registerDefaults();
 				
+				for(IRecipeRegisterListener listener : additionalListeners) {
+					listener.onRecipeLoad(recipe.getClass().getSimpleName());
+				}
+				
 				File recTemplate = new File(recDir.getAbsolutePath() + File.separatorChar + "_" + recipe.getFileName());
 				MainRegistry.logger.info("Writing template file " + recTemplate.getName());
 				recipe.writeTemplateFile(recTemplate);
@@ -137,7 +147,7 @@ public abstract class SerializableRecipe {
 	public abstract void writeRecipe(Object recipe, JsonWriter writer) throws IOException;
 	/** Registers the default recipes */
 	public abstract void registerDefaults();
-	/** Deletes all existing recipes, currenly unused */
+	/** Deletes all existing recipes, currently unused */
 	public abstract void deleteRecipes();
 	/** A routine called after registering all recipes, whether it's a template or not. Good for IMC functionality. */
 	public void registerPost() { }

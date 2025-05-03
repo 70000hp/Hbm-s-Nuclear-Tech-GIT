@@ -19,7 +19,7 @@ public abstract class MagazineSingleTypeBase implements IMagazine<BulletConfig> 
 	public static final String KEY_MAG_PREV = "magprev";
 	public static final String KEY_MAG_AFTER = "magafter";
 
-	protected List<BulletConfig> acceptedBullets = new ArrayList();
+	public List<BulletConfig> acceptedBullets = new ArrayList();
 	
 	/** A number so the gun tell multiple mags apart */
 	public int index;
@@ -69,7 +69,9 @@ public abstract class MagazineSingleTypeBase implements IMagazine<BulletConfig> 
 
 	@Override
 	public void useUpAmmo(ItemStack stack, IInventory inventory, int amount) {
+		if(!IMagazine.shouldUseUpTrenchie(inventory) && getCapacity(stack) != 1) return;
 		this.setAmount(stack, this.getAmount(stack, inventory) - amount);
+		IMagazine.handleAmmoBag(inventory, this.getType(stack, inventory), amount);
 	}
 
 	@Override public int getCapacity(ItemStack stack) { return capacity; }

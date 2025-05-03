@@ -37,6 +37,7 @@ public class Fluids {
 	public static final Gson gson = new Gson();
 
 	public static FluidType NONE;
+	public static FluidType AIR;
 	public static FluidType WATER;
 	public static FluidType STEAM;
 	public static FluidType HOTSTEAM;
@@ -44,6 +45,9 @@ public class Fluids {
 	public static FluidType ULTRAHOTSTEAM;
 	public static FluidType COOLANT;
 	public static FluidType COOLANT_HOT;
+	public static FluidType PERFLUOROMETHYL;
+	public static FluidType PERFLUOROMETHYL_COLD;
+	public static FluidType PERFLUOROMETHYL_HOT;
 	public static FluidType LAVA;
 	public static FluidType DEUTERIUM;
 	public static FluidType TRITIUM;
@@ -183,7 +187,14 @@ public class Fluids {
 	public static FluidType STELLAR_FLUX;
 	public static FluidType VITRIOL;
 	public static FluidType SLOP;
+
 	public static FluidType NITROGEN;
+
+	public static FluidType LYE;
+	public static FluidType SODIUM_ALUMINATE;
+	public static FluidType BAUXITE_SOLUTION;
+	public static FluidType ALUMINA;
+
 
 	/* Lagacy names for compatibility purposes */
 	@Deprecated public static FluidType ACID;	//JAOPCA uses this, apparently
@@ -388,11 +399,20 @@ public class Fluids {
 		VITRIOL =				new FluidType("VITRIOL",			0x6E5222, 2, 0, 1, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
 		SLOP =					new FluidType("SLOP",				0x929D45, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS);
 		LEAD =					new FluidType("LEAD",				0x666672, 4, 0, 0, EnumSymbol.NONE).setTemp(350).addTraits(LIQUID, VISCOUS);
-		LEAD_HOT =				new FluidType("LEAD_HOT",		0x776563, 4, 0, 0, EnumSymbol.NONE).setTemp(1500).addTraits(LIQUID, VISCOUS);
-		MONAZITE_MUD = 			new FluidType("MONAZITE_MUD", 0xFF8A4D, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
+		LEAD_HOT =				new FluidType("LEAD_HOT",			0x776563, 4, 0, 0, EnumSymbol.NONE).setTemp(1500).addTraits(LIQUID, VISCOUS);
+		PERFLUOROMETHYL =		new FluidType("PERFLUOROMETHYL",	0xBDC8DC, 1, 0, 1, EnumSymbol.NONE).setTemp(15).addTraits(LIQUID);
+		PERFLUOROMETHYL_COLD =	new FluidType("PERFLUOROMETHYL_COLD",0x99DADE, 1, 0, 1, EnumSymbol.NONE).setTemp(-150).addTraits(LIQUID);
+		PERFLUOROMETHYL_HOT =	new FluidType("PERFLUOROMETHYL_HOT",0xB899DE, 1, 0, 1, EnumSymbol.NONE).setTemp(250).addTraits(LIQUID);
+		LYE =					new FluidType("LYE",				0xFFECCC, 3, 0, 1, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID);
+		SODIUM_ALUMINATE =		new FluidType("SODIUM_ALUMINATE",	0xFFD191, 3, 0, 1, EnumSymbol.ACID).addTraits(new FT_Corrosive(30), LIQUID);
+		BAUXITE_SOLUTION =		new FluidType("BAUXITE_SOLUTION",	0xE2560F, 3, 0, 3, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID, VISCOUS);
+		ALUMINA =				new FluidType("ALUMINA",			0xDDFFFF, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
+		AIR =					new FluidType(151, "AIR",			0xE7EAEB, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
+    MONAZITE_MUD = 			new FluidType("MONAZITE_MUD", 0xFF8A4D, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
 		MONAZITE_SOLUTION = 	new FluidType("MONAZITE_SOLUTION", 0x8F8F5F, 0, 0, 0, EnumSymbol.ACID).addTraits(LIQUID, VISCOUS, new FT_Corrosive(50));
-		COMP_AIR =				new FluidType("COMP_AIR",	0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
 		NITROGEN =				new FluidType("NITROGEN",	0xBAB572, 0, 0, 0, EnumSymbol.ASPHYXIANT).addTraits(GASEOUS);
+    COMP_AIR =				new FluidType("COMP_AIR",	0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
+
 
 		// ^ ^ ^ ^ ^ ^ ^ ^
 		//ADD NEW FLUIDS HERE
@@ -408,6 +428,7 @@ public class Fluids {
 		//null
 		metaOrder.add(NONE);
 		//vanilla
+		metaOrder.add(AIR);
 		metaOrder.add(WATER);
 		metaOrder.add(HEAVYWATER);
 		metaOrder.add(HEAVYWATER_HOT);
@@ -422,6 +443,9 @@ public class Fluids {
 		metaOrder.add(CARBONDIOXIDE);
 		metaOrder.add(COOLANT);
 		metaOrder.add(COOLANT_HOT);
+		metaOrder.add(PERFLUOROMETHYL);
+		metaOrder.add(PERFLUOROMETHYL_COLD);
+		metaOrder.add(PERFLUOROMETHYL_HOT);
 		metaOrder.add(CRYOGEL);
 		metaOrder.add(MUG);
 		metaOrder.add(MUG_HOT);
@@ -535,10 +559,17 @@ public class Fluids {
 		metaOrder.add(POTASSIUM_CHLORIDE);
 		metaOrder.add(CALCIUM_CHLORIDE);
 		metaOrder.add(CALCIUM_SOLUTION);
+
 		metaOrder.add(COMP_AIR);
 		metaOrder.add(NITROGEN);
+
+		metaOrder.add(SODIUM_ALUMINATE);
+		metaOrder.add(BAUXITE_SOLUTION);
+		metaOrder.add(ALUMINA);
+
 		//solutions and working fluids
 		metaOrder.add(FRACKSOL);
+		metaOrder.add(LYE);
 		//the fun guys
 		metaOrder.add(PHOSGENE);
 		metaOrder.add(MUSTARDGAS);
@@ -619,6 +650,10 @@ public class Fluids {
 
 		COOLANT.addTraits(new FT_Heatable().setEff(HeatingType.HEATEXCHANGER, 1.0D).setEff(HeatingType.PWR, 1.0D).setEff(HeatingType.ICF, 1.0D).addStep(300, 1, COOLANT_HOT, 1));
 		COOLANT_HOT.addTraits(new FT_Coolable(COOLANT, 1, 1, 300).setEff(CoolingType.HEATEXCHANGER, 1.0D));
+
+		PERFLUOROMETHYL_COLD.addTraits(new FT_Heatable().setEff(HeatingType.PA, 1.0D).addStep(300, 1, PERFLUOROMETHYL, 1));
+		PERFLUOROMETHYL.addTraits(new FT_Heatable().setEff(HeatingType.HEATEXCHANGER, 1.0D).setEff(HeatingType.PWR, 1.0D).setEff(HeatingType.ICF, 1.0D).addStep(300, 1, PERFLUOROMETHYL_HOT, 1));
+		PERFLUOROMETHYL_HOT.addTraits(new FT_Coolable(PERFLUOROMETHYL, 1, 1, 300).setEff(CoolingType.HEATEXCHANGER, 1.0D));
 
 		MUG.addTraits(new FT_Heatable().setEff(HeatingType.HEATEXCHANGER, 1.0D).setEff(HeatingType.PWR, 1.0D).setEff(HeatingType.ICF, 1.25D).addStep(400, 1, MUG_HOT, 1), new FT_PWRModerator(1.15D));
 		MUG_HOT.addTraits(new FT_Coolable(MUG, 1, 1, 400).setEff(CoolingType.HEATEXCHANGER, 1.0D));
