@@ -54,11 +54,11 @@ public class XFactory762mm {
 				.setCasing(casing762.clone().register("r762fmj"));
 		r762_jhp = new BulletConfig().setItem(EnumAmmo.R762_JHP).setCasing(EnumCasingType.SMALL, 6).setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F)
 				.setCasing(casing762.clone().register("r762jhp"));
-		r762_ap = new BulletConfig().setItem(EnumAmmo.R762_AP).setCasing(EnumCasingType.SMALL_STEEL, 6).setDoesPenetrate(true).setDamageFalloutByPen(false).setDamage(1.5F).setThresholdNegation(12.5F).setArmorPiercing(0.15F)
+		r762_ap = new BulletConfig().setItem(EnumAmmo.R762_AP).setCasing(EnumCasingType.SMALL_STEEL, 6).setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.25F).setThresholdNegation(12.5F).setArmorPiercing(0.15F)
 				.setCasing(casing762.clone().setColor(SpentCasing.COLOR_CASE_44).register("r762ap"));
-		r762_du = new BulletConfig().setItem(EnumAmmo.R762_DU).setCasing(EnumCasingType.SMALL_STEEL, 6).setDoesPenetrate(true).setDamageFalloutByPen(false).setDamage(2.5F).setThresholdNegation(15F).setArmorPiercing(0.25F)
+		r762_du = new BulletConfig().setItem(EnumAmmo.R762_DU).setCasing(EnumCasingType.SMALL_STEEL, 6).setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(15F).setArmorPiercing(0.25F)
 				.setCasing(casing762.clone().setColor(SpentCasing.COLOR_CASE_44).register("r762du"));
-		r762_he = new BulletConfig().setItem(EnumAmmo.R762_HE).setCasing(EnumCasingType.SMALL_STEEL, 6).setWear(3F).setDamage(2F).setOnImpact(LAMBDA_TINY_EXPLODE)
+		r762_he = new BulletConfig().setItem(EnumAmmo.R762_HE).setCasing(EnumCasingType.SMALL_STEEL, 6).setWear(3F).setDamage(1.75F).setOnImpact(LAMBDA_TINY_EXPLODE)
 				.setCasing(casing762.clone().setColor(SpentCasing.COLOR_CASE_44).register("r762he"));
 		
 		energy_lacunae = new BulletConfig().setItem(EnumAmmo.CAPACITOR).setCasing(new ItemStack(ModItems.ingot_polymer, 2), 4 * 40).setupDamageClass(DamageClass.LASER).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5).setRenderRotations(false).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
@@ -124,14 +124,15 @@ public class XFactory762mm {
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_LACUNAE = (stack, ctx) -> { };
 
 	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_CARBINE_ANIMS = (stack, type) -> {
-		boolean empty = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, MainRegistry.proxy.me().inventory) <= 0;
+		int ammo = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, MainRegistry.proxy.me().inventory);
+		boolean empty = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, MainRegistry.proxy.me().inventory) <= ammo;
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(45, 0, 0, 0).addPos(0, 0, 0, 500, IType.SIN_FULL));
 		case CYCLE: return new BusAnimation()
 				.addBus("RECOIL", new BusAnimationSequence().addPos(0, 0, ItemGunBaseNT.getIsAiming(stack) ? -0.25 : -0.5, 50, IType.SIN_DOWN).addPos(0, 0, 0, 100, IType.SIN_FULL))
 				.addBus("SLIDE", new BusAnimationSequence().addPos(0, 0, -1, 50, IType.SIN_DOWN).addPos(0, 0, 0, 100, IType.SIN_UP))
-				.addBus(empty ? "NULL" : "REL", new BusAnimationSequence().addPos(0, 0, 0.25, 50).addPos(0, 0.125, 1.25, 100, IType.SIN_UP));
+				.addBus(ammo <= 1 ? "NULL" : "REL", new BusAnimationSequence().addPos(0, 0, 0.25, 50).addPos(0, 0.125, 1.25, 100, IType.SIN_UP));
 		case CYCLE_DRY: return new BusAnimation()
 				.addBus("SLIDE", new BusAnimationSequence().addPos(0, 0, 0, 500).addPos(0, 0, -1, 100, IType.SIN_DOWN).addPos(0, 0, -1, 50).addPos(0, 0, 0, 100, IType.SIN_UP));
 		case RELOAD: return new BusAnimation()

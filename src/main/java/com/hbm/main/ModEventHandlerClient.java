@@ -58,7 +58,6 @@ import com.hbm.sound.MovingSoundPlayerLoop.EnumHbmSound;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom.CustomNukeEntry;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom.EnumEntryType;
-import com.hbm.tileentity.machine.TileEntityNukeFurnace;
 import com.hbm.util.*;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.wiaj.GuiWorldInAJar;
@@ -134,7 +133,7 @@ public class ModEventHandlerClient {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
 		/// NUKE FLASH ///
-		if(event.type == ElementType.CROSSHAIRS && (flashTimestamp + flashDuration - System.currentTimeMillis()) > 0 && ClientConfig.NUKE_HUD_FLASH.get()) {
+		if(event.type == ElementType.CROSSHAIRS && (flashTimestamp + flashDuration - Clock.get_ms()) > 0 && ClientConfig.NUKE_HUD_FLASH.get()) {
 			int width = event.resolution.getScaledWidth();
 			int height = event.resolution.getScaledHeight();
 			Tessellator tess = Tessellator.instance;
@@ -144,7 +143,7 @@ public class ModEventHandlerClient {
 			GL11.glAlphaFunc(GL11.GL_GEQUAL, 0.0F);
 			GL11.glDepthMask(false);
 			tess.startDrawingQuads();
-			float brightness = (flashTimestamp + flashDuration - System.currentTimeMillis()) / (float) flashDuration;
+			float brightness = (flashTimestamp + flashDuration - Clock.get_ms()) / (float) flashDuration;
 			tess.setColorRGBA_F(1F, 1F, 1F, brightness * 1F);
 			tess.addVertex(width, 0, 0);
 			tess.addVertex(0, 0, 0);
@@ -228,6 +227,8 @@ public class ModEventHandlerClient {
 						((ILookOverlay) entity).printHook(event, world, 0, 0, 0);
 					}
 				}
+				
+				GL11.glColor4f(1F, 1F, 1F, 1F);
 			}
 
 			/*List<String> text = new ArrayList();
@@ -332,7 +333,7 @@ public class ModEventHandlerClient {
 				if(animation.holdLastFrame)
 					continue;
 
-				long time = System.currentTimeMillis() - animation.startMillis;
+				long time = Clock.get_ms() - animation.startMillis;
 
 				if(time > animation.animation.getDuration())
 					HbmAnimations.hotbar[i][j] = null;
@@ -779,13 +780,6 @@ public class ModEventHandlerClient {
 			}
 		}
 
-		/// NUCLEAR FURNACE FUELS ///
-		int breeder = TileEntityNukeFurnace.getFuelValue(stack);
-
-		if(breeder != 0) {
-			list.add(EnumChatFormatting.YELLOW + I18nUtil.resolveKey("trait.furnace", breeder));
-		}
-
 		/// CUSTOM NUKE ///
 		ComparableStack comp = new ComparableStack(stack).makeSingular();
 
@@ -810,7 +804,7 @@ public class ModEventHandlerClient {
 			if(cannery != null) {
 				list.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey("cannery.f1"));
 				lastCannery = comp;
-				canneryTimestamp = System.currentTimeMillis();
+				canneryTimestamp = Clock.get_ms();
 			}
 		} catch(Exception ex) {
 			list.add(EnumChatFormatting.RED + "Error loading cannery: " + ex.getLocalizedMessage());
@@ -855,7 +849,7 @@ public class ModEventHandlerClient {
 
 		int w = resolution.getScaledWidth();
 		int h = resolution.getScaledHeight();
-		double off = System.currentTimeMillis() / -10000D % 10000D;
+		double off = Clock.get_ms() / -10000D % 10000D;
 		double aw = 25;
 
 		Tessellator tessellator = Tessellator.instance;
@@ -944,7 +938,7 @@ public class ModEventHandlerClient {
 
 		if(Keyboard.isKeyDown(Keyboard.KEY_F1) && Minecraft.getMinecraft().currentScreen != null) {
 
-			ComparableStack comp = canneryTimestamp > System.currentTimeMillis() - 100 ? lastCannery : null;
+			ComparableStack comp = canneryTimestamp > Clock.get_ms() - 100 ? lastCannery : null;
 
 			if(comp == null) {
 				ItemStack stack = getMouseOverStack();
@@ -990,11 +984,17 @@ public class ModEventHandlerClient {
 					ItemDepletedFuel.class,
 					ItemFluidDuct.class
 				);
+				
+				String prefix = "Gun ";
+				int scale = 8;
+				boolean ignoreNonNTM = true;
 
 				List<ItemStack> stacks = new ArrayList<ItemStack>();
 				for (Object reg : Item.itemRegistry) {
 					Item item = (Item) reg;
+					if(ignoreNonNTM && !Item.itemRegistry.getNameForObject(item).startsWith("hbm:")) continue;
 					if(ignoredItems.contains(item)) continue;
+					if(!(item instanceof ItemGunBaseNT) && prefix.toLowerCase(Locale.US).startsWith("gun")) continue;
 					if(collapsedClasses.contains(item.getClass())) {
 						stacks.add(new ItemStack(item));
 					} else {
@@ -1002,7 +1002,7 @@ public class ModEventHandlerClient {
 					}
 				}
 
-				FMLCommonHandler.instance().showGuiScreen(new GUIScreenWikiRender(stacks.toArray(new ItemStack[0]), "Block ", "wiki-block-renders-256", 8));
+				FMLCommonHandler.instance().showGuiScreen(new GUIScreenWikiRender(stacks.toArray(new ItemStack[0]), prefix, "wiki-block-renders-256", scale));
 			}
 		} else {
 			isRenderingItems = false;
@@ -1120,7 +1120,7 @@ public class ModEventHandlerClient {
 			}
 
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			long millis = System.currentTimeMillis();
+			long millis = Clock.get_ms();
 
 			if(lastStarCheck + 200 < millis) {
 				renderLodeStar = false; // GENUINELY shut the fuck up i'm not kidding
@@ -1228,6 +1228,8 @@ public class ModEventHandlerClient {
 	@SubscribeEvent
 	public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
 
+		Clock.update();
+
 		GL11.glPushMatrix();
 
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
@@ -1254,8 +1256,8 @@ public class ModEventHandlerClient {
 			GL11.glRotated(80, 0, 0, 1);
 			GL11.glRotated(30, 0, 1, 0);
 
-			double sine = Math.sin(System.currentTimeMillis() * 0.0005) * 5;
-			double sin3 = Math.sin(System.currentTimeMillis() * 0.0005 + Math.PI * 0.5) * 5;
+			double sine = Math.sin(Clock.get_ms() * 0.0005) * 5;
+			double sin3 = Math.sin(Clock.get_ms() * 0.0005 + Math.PI * 0.5) * 5;
 			GL11.glRotated(sine, 0, 0, 1);
 			GL11.glRotated(sin3, 1, 0, 0);
 
@@ -1263,7 +1265,7 @@ public class ModEventHandlerClient {
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 6500F, 30F);
 			SoyuzPronter.prontCapsule();
 
-			GL11.glRotated(System.currentTimeMillis() * 0.025 % 360, 0, -1, 0);
+			GL11.glRotated(Clock.get_ms() * 0.025 % 360, 0, -1, 0);
 
 			int rand = new Random(MainRegistry.startupTime).nextInt(HTTPHandler.capsule.size());
 			String msg = HTTPHandler.capsule.get(rand);

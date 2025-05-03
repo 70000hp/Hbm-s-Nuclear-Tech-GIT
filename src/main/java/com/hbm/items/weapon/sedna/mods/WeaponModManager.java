@@ -88,7 +88,7 @@ public class WeaponModManager {
 				ModItems.gun_spas12,
 				ModItems.gun_panzerschreck };
 		Item[] wsteelGuns = new Item[] {
-				ModItems.gun_g3,
+				ModItems.gun_g3, ModItems.gun_g3_zebra,
 				ModItems.gun_stinger,
 				ModItems.gun_chemthrower };
 		Item[] ferroGuns = new Item[] {
@@ -101,6 +101,7 @@ public class WeaponModManager {
 				ModItems.gun_missile_launcher,
 				ModItems.gun_tesla_cannon };
 		Item[] bigmtGuns = new Item[] {
+				ModItems.gun_laser_pistol, ModItems.gun_laser_pistol_pew_pew,
 				ModItems.gun_stg77,
 				ModItems.gun_fatman,
 				ModItems.gun_tau };
@@ -125,12 +126,12 @@ public class WeaponModManager {
 		new WeaponModDefinition(EnumModGeneric.BRONZE_DURA).addMod(bronzeGuns, new WeaponModGenericDurability(117));
 
 		new WeaponModDefinition(EnumModSpecial.SPEEDLOADER).addMod(ModItems.gun_liberator, new WeaponModLiberatorSpeedloader(200));
-		new WeaponModDefinition(EnumModSpecial.SILENCER).addMod(new Item[] {ModItems.gun_uzi, ModItems.gun_uzi_akimbo, ModItems.gun_g3}, new WeaponModSilencer(ID_SILENCER));
+		new WeaponModDefinition(EnumModSpecial.SILENCER).addMod(new Item[] {ModItems.gun_am180, ModItems.gun_uzi, ModItems.gun_uzi_akimbo, ModItems.gun_g3}, new WeaponModSilencer(ID_SILENCER));
 		new WeaponModDefinition(EnumModSpecial.SCOPE).addMod(new Item[] {ModItems.gun_heavy_revolver, ModItems.gun_g3, ModItems.gun_mas36}, new WeaponModScope(ID_SCOPE));
 		new WeaponModDefinition(EnumModSpecial.SAW)
 			.addMod(new Item[] {ModItems.gun_maresleg, ModItems.gun_double_barrel}, new WeaponModSawedOff(ID_SAWED_OFF))
 			.addMod(ModItems.gun_panzerschreck, new WeaponModPanzerschreckSawedOff(ID_NO_SHIELD))
-			.addMod(ModItems.gun_g3, new WeapnModG3SawedOff(ID_NO_STOCK));
+			.addMod(new Item[] {ModItems.gun_g3, ModItems.gun_g3_zebra}, new WeapnModG3SawedOff(ID_NO_STOCK));
 		new WeaponModDefinition(EnumModSpecial.GREASEGUN).addMod(ModItems.gun_greasegun, new WeaponModGreasegun(ID_GREASEGUN_CLEAN));
 		new WeaponModDefinition(EnumModSpecial.SLOWDOWN).addMod(ModItems.gun_minigun, new WeaponModSlowdown(207));
 		new WeaponModDefinition(EnumModSpecial.SPEEDUP)

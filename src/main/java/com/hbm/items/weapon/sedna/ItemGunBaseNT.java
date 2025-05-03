@@ -14,7 +14,9 @@ import com.hbm.handler.HbmKeybinds.EnumKeybind;
 import com.hbm.interfaces.IItemHUD;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.gui.GUIWeaponTable;
+import com.hbm.items.IEquipReceiver;
 import com.hbm.items.IKeybindReceiver;
+import com.hbm.items.armor.ArmorTrenchmaster;
 import com.hbm.items.weapon.sedna.hud.IHUDComponent;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mods.WeaponModManager;
@@ -47,7 +49,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.Pre;
 
-public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD {
+public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD, IEquipReceiver {
 
 	/** Timestamp for rendering smoke nodes and muzzle flashes */
 	public long[] lastShot;
@@ -180,6 +182,10 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD {
 				}
 			}
 			
+			float maxDura = config.getDurability(stack);
+			int dura = MathHelper.clamp_int((int)((maxDura - this.getWear(stack, i)) * 100 / maxDura), 0, 100);
+			list.add("Condition: " + dura + "%");
+			
 			for(ItemStack upgrade : WeaponModManager.getUpgradeItems(stack, i)) {
 				list.add(EnumChatFormatting.YELLOW + upgrade.getDisplayName());
 			}
@@ -230,8 +236,10 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD {
 		}
 	}
 
+	@Override
 	public void onEquip(EntityPlayer player, ItemStack stack) {
 		for(int i = 0; i < this.configs_DNA.length; i++) {
+			if(this.getLastAnim(stack, i) == AnimType.EQUIP && this.getAnimTimer(stack, i) < 5) continue; 
 			playAnimation(player, stack, AnimType.EQUIP, i);
 			this.setPrimary(stack, i, false);
 			this.setSecondary(stack, i, false);
@@ -311,13 +319,14 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD {
 					this.setState(stack, i, GunState.DRAWING);
 					this.setTimer(stack, i, configs[i].getDrawDuration(stack));
 				}
+				this.setLastAnim(stack, i, AnimType.CYCLE); //prevents new guns from initializing with DRAWING, 0
 			}
 			this.setIsAiming(stack, false);
 			this.setReloadCancel(stack, false);
 			return;
 		}
 		
-		for(int i = 0; i < confNo; i++) {
+		for(int i = 0; i < confNo; i++) for(int k = 0; k == 0 || (k < 2 && ArmorTrenchmaster.isTrenchMaster(player) && this.getState(stack, i) == GunState.RELOADING); k++) {
 			BiConsumer<ItemStack, LambdaContext> orchestra = configs[i].getOrchestra(stack);
 			if(orchestra != null) orchestra.accept(stack, ctx[i]);
 			

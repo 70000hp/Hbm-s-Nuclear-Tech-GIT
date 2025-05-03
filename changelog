@@ -1,18 +1,34 @@
+## Added
+* Infinite ammo bag
+  * Identical to the regular ammo bag, but ammo is never depleted
+  * Provides 9,999 units of ammo for the purposes of reloading/belts, meaning that even a single bullet in the bag allows a full reload
+  * Obviously creative-only
+
 ## Changed
-* .75 bolts now work as advertised
-* Updated lead pipe texture
-* Removed recipes from a few ancient melee weapons, as well as the creative tab listing
-* Removed flat magnets
-* Taint should now also affect non-solid blocks that are full cubes
-* Reduced the AoE size of 7.62mm, .50 BMG and 10 gauge explosive projectiles
-* Removed the old gun mechanism items, turrets now use the new cast parts
-* A secret weapon and its variant have become craftable
-* NEI now shows RBMK fuel rod recycling and cooling
-* Removed most of the old unused siege mobs
+* Nerfed AP and DU round damage multiplier
+  * Effective damage is still much higher than on gunmetal ammo due to the armor piercing effect
+* Increased flamethrower turret detection range from 32 to 48 blocks
+* Flamethrower turrets and chemthrower now use the green fire effect when using balefire fuel
+* Flamethrower turret projectile damage is now capped to 20
+  * Balefire fuel should no longer instantly vaporize bosses
+* Tobacco and Hemp plants are now biome tinted and are no longer radioactive green
+* Most chemthrower ammo types with variable damage output are now capped to 15 damage per shot (that is still a ton)
+* Chemthrower combustible liquids now use SEDNA type fire particles
+* Halved recoil on the zebra rifle
+* The laser pistols now make a click when dry firing
+* Solid fuel in the rotary furnace no longer ticks down if no recipe is actually being done
+* Pneumatic tube round robin will now progress even if a destination is not accessible, preventing cases where the tubes are stuck if one of the containers has run full
+* Tesla cannons now accept low-wavelength capacitors
+  * The resulting beam is non-penetrating and 20% less powerful than standard capacitor beams
+  * In addition to the splash damage, the beam will split and fire smaller beams at any living entity in a 20 block radius, with half damage
+  * Sub-beams do not cause splash damage
+  * Sub-beams will strike the initially hit entity again, meaning that the more sub-beams there are, the more powerful the initial strike ends up being
+* Renamed the default capacitor ammo to "capacitor (standard)" to avoid confusion
 
 ## Fixed
-* Fixed taint destroying bedrock
-* Fixed ferrouranium plate not being castable
-* Fixed bayonet not rendering properly in third person
-* Fixed xenon poison gauge in the RBMK control panel not showing up on colums (oops)
-* Fixed hitscan projectiles colliding with dead mobs
+* Fixed a potential crash caused by cargo dropships landing on cargo docks with no satellite chip installed
+* Fixed potential crash related to hazard handling for dropped items
+* Fixed errors thrown when loading in old system bullet entities
+* Fixed dupe regarding breaking transport drones
+* Fixed 12 gauge flechette DT negation not being the intended value
+* Fixed carbine mistakenly showing a round being chambered even after firing the last loaded round

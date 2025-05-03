@@ -23,6 +23,7 @@ public interface INBTTransformable {
 	 */
 
 	public static int transformMetaDeco(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		switch(coordBaseMode) {
 		case 1: //West
 			switch(meta) {
@@ -50,6 +51,7 @@ public interface INBTTransformable {
 	}
 
 	public static int transformMetaDecoModel(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		int rot = (meta + coordBaseMode) % 4;
 		int type = (meta / 4) * 4;
 
@@ -57,6 +59,7 @@ public interface INBTTransformable {
 	}
 
 	public static int transformMetaStairs(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		switch(coordBaseMode) {
 		case 1: //West
 			if((meta & 3) < 2) //Flip second bit for E/W
@@ -74,12 +77,11 @@ public interface INBTTransformable {
 				meta = meta ^ 2;
 			break;
 		}
-
 		return meta;
 	}
 
 	public static int transformMetaPillar(int meta, int coordBaseMode) {
-		if(coordBaseMode == 2) return meta;
+		if(coordBaseMode == 0 || coordBaseMode == 2) return meta;
 		int type = meta & 3;
 		int rot = meta & 12;
 
@@ -90,6 +92,7 @@ public interface INBTTransformable {
 	}
 
 	public static int transformMetaDirectional(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		int rot = meta & 3;
 		int other = meta & 12;
 
@@ -108,6 +111,7 @@ public interface INBTTransformable {
 	}
 
 	public static int transformMetaTorch(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		switch(coordBaseMode) {
 		case 1: //West
 			switch(meta) {
@@ -135,12 +139,14 @@ public interface INBTTransformable {
 	}
 
 	public static int transformMetaDoor(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		if(meta == 8 || meta == 9) return meta; // ignore top parts
 
 		return transformMetaDirectional(meta, coordBaseMode);
 	}
 
 	public static int transformMetaLever(int meta, int coordBaseMode) {
+		if(coordBaseMode == 0) return meta;
 		if(meta <= 0 || meta >= 7) { //levers suck ass
 			switch(coordBaseMode) {
 			case 1: case 3: //west / east
@@ -158,4 +164,46 @@ public interface INBTTransformable {
 		return meta;
 	}
 
+	public static int transformMetaVine(int meta, int coordBaseMode) { //Sloppppp coddee aa
+		int result = 0;
+
+		for (int i = 0; i < 4; i++) {
+			int bit = 1 << i;
+			if ((meta & bit) != 0) {
+				result |= rotateVineBit(bit, coordBaseMode);
+			}
+		}
+
+		return result;
+	}
+
+	static int rotateVineBit(int bit, int coordBaseMode) {
+		int index = -1;
+
+		switch (bit) {
+			case 1: index = 0; break; // south
+			case 2: index = 1; break; // west
+			case 4: index = 2; break; // north
+			case 8: index = 3; break; // east
+			default: return 0;
+		}
+
+		int rotated = index;
+
+		switch (coordBaseMode) {
+			case 1: rotated = (index + 1) % 4; break; // 90°
+			case 2: rotated = (index + 2) % 4; break; // 180°
+			case 3: rotated = (index + 3) % 4; break; // 270°
+			// case 0: vines work ughhggh (im dragging it)
+		}
+
+		switch (rotated) {
+			case 0: return 1; // south
+			case 1: return 2; // west
+			case 2: return 4; // north
+			case 3: return 8; // east
+		}
+
+		return 0;
+	}
 }

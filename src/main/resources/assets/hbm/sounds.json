@@ -65,6 +65,8 @@
     "block.hephaestusRunning": {"category": "block", "sounds": [{"name": "block/hephaestusRunning", "stream": false}]},
     "block.squeakyToy": {"category": "block", "sounds": [{"name": "block/squeakyToy", "stream": false}]},
     "block.pyroOperate": {"category": "block", "sounds": [{"name": "block/pyroOperate", "stream": false}]},
+    "block.motor": {"category": "block", "sounds": [{"name": "block/motor", "stream": false}]},
+    "block.engine": {"category": "block", "sounds": [{"name": "block/engine", "stream": false}]},
     
     "door.TransitionSealOpen": {"category": "block", "sounds": [{"name": "block/door/transition_seal_open", "stream": true}]},
     "door.wghStart": {"category": "block", "sounds": [{"name": "block/door/wgh_start", "stream": true}]},
@@ -238,6 +240,7 @@
     "weapon.fire.loudestNoiseOnEarth": {"category": "player", "sounds": ["weapon/fire/loudestNoiseOnEarth"]},
     "weapon.fire.disintegration": {"category": "player", "sounds": ["weapon/fire/disintegration"]},
     "weapon.fire.laser": {"category": "player", "sounds": ["weapon/fire/laser"]},
+    "weapon.fire.laserPistol": {"category": "player", "sounds": ["weapon/fire/laserPistol"]},
     "weapon.fire.laserGatling": {"category": "player", "sounds": ["weapon/fire/laserGatling"]},
     "weapon.fire.silenced": {"category": "player", "sounds": ["weapon/fire/silenced"]},
     "weapon.fire.assault": {"category": "player", "sounds": ["weapon/fire/assault"]},
