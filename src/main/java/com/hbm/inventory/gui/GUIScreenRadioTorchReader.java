@@ -28,9 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class GUIScreenRadioTorchReader extends GuiScreen {
 	
 	protected static final ResourceLocation texture = new ResourceLocation(RefStrings.MODID + ":textures/gui/machine/gui_rtty_reader.png");
-	
 	public TileEntityRadioTorchReader rtty;
-	
 	protected int xSize = 256;
 	protected int ySize = 204;
 	protected int guiLeft;

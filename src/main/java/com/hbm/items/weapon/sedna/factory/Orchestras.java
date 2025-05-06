@@ -1356,7 +1356,7 @@ public class Orchestras {
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity,
 						0.375, aiming ? 0 : -0.125, aiming ? 0 : -0.25D,
 						-0.05, 0.2, -0.025,
-						0.01, -10F + (float) entity.getRNG().nextGaussian() * 10F, (float) entity.getRNG().nextGaussian() * 12.5F, casing.getName());
+						0.01, -10F + (float) entity.getRNG().nextGaussian() * 10F, (float) entity.getRNG().nextGaussian() * 12.5F, casing.getName(), true, 60, 0.5D, 10);
 			}
 		}
 		
@@ -1382,6 +1382,17 @@ public class Orchestras {
 		if(type == AnimType.INSPECT) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltOpen", 0.5F, 1F);
 			if(timer == 17) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltClose", 0.5F, 1F);
+		}
+	};
+
+	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_CHARGE_THROWER = (stack, ctx) -> {
+		EntityLivingBase entity = ctx.entity;
+		if(entity.worldObj.isRemote) return;
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+
+		if(type == AnimType.RELOAD) {
+			if(timer == 32) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertRocket", 1F, 1F);
 		}
 	};
 }
