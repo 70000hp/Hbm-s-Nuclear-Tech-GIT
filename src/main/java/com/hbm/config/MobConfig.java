@@ -28,6 +28,7 @@ public class MobConfig {
 	public static boolean enableDucks = true;
 	public static boolean enableMobGear = true;
 	public static boolean enableMobWeapons = true;
+	public static boolean enableMunCows = true;
 	
 	public static boolean enableHives = true;
 	public static int hiveSpawn = 256;
@@ -96,6 +97,7 @@ public class MobConfig {
 		enableDucks = CommonConfig.createConfigBool(config, CATEGORY, "12.D00_enableDucks", "Whether pressing O should allow the player to duck", true);
 		enableMobGear = CommonConfig.createConfigBool(config, CATEGORY, "12.D01_enableMobGear", "Whether zombies and skeletons should have additional gear when spawning", true);
 		enableMobWeapons = CommonConfig.createConfigBool(config, CATEGORY, "12.D02_enableMobWeapons", "Whether skeletons should have bows replaced with guns when spawning at higher soot levels", true);
+		enableMunCows = CommonConfig.createConfigBool(config, CATEGORY, "12.D03_enableMunCows", "Whether Mun Cows should spawn on the Mun", true);
 
 		enableHives = CommonConfig.createConfigBool(config, CATEGORY, "12.G00_enableHives", "Whether glyphid hives should spawn", true);
 		hiveSpawn = CommonConfig.createConfigInt(config, CATEGORY, "12.G01_hiveSpawn", "The average amount of chunks per hive", 256);

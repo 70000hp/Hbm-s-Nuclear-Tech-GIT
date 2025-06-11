@@ -175,11 +175,7 @@ public class BedrockOre {
 	}
 
 	public static void generate(World world, int x, int z, ItemStack stack, FluidStack acid, int color, int tier) {
-		generate(world, x, z, stack, acid, color, tier, Blocks.stone, ModBlocks.stone_depth);
-	}
-
-	public static void generate(World world, int x, int z, ItemStack stack, FluidStack acid, int color, int tier, Block depthRock) {
-		generate(world, x, z, stack, acid, color, tier, Blocks.stone, depthRock);
+		generate(world, x, z, stack, acid, color, tier, ModBlocks.stone_depth, Blocks.stone);
 	}
 
 	public static void generate(World world, int x, int z, ItemStack stack, FluidStack acid, int color, int tier, Block depthRock, Block targetBlock) {

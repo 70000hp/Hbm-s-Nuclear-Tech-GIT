@@ -4,8 +4,6 @@ uniform float iTime;
 uniform sampler2D iChannel1;
 uniform float iOffset;
 
-varying vec3 vPosition;
-
 #define PI 3.1415926538
 
 vec2 quantize(vec2 inp, vec2 period) {

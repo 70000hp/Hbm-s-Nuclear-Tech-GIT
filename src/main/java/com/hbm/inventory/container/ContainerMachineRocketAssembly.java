@@ -6,13 +6,16 @@ import com.hbm.inventory.SlotRocket.SlotCapsule;
 import com.hbm.inventory.SlotRocket.SlotDrive;
 import com.hbm.inventory.SlotRocket.SlotRocketPart;
 import com.hbm.items.weapon.ItemCustomMissilePart.PartType;
+import com.hbm.tileentity.machine.TileEntityMachineRocketAssembly;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 public class ContainerMachineRocketAssembly extends ContainerBase {
 
-	public ContainerMachineRocketAssembly(InventoryPlayer invPlayer, IInventory machine) {
+	public ContainerMachineRocketAssembly(InventoryPlayer invPlayer, TileEntityMachineRocketAssembly machine) {
 		super(invPlayer, machine);
 
 		int slotId = 0;
@@ -31,11 +34,48 @@ public class ContainerMachineRocketAssembly extends ContainerBase {
 		addSlotToContainer(new SlotRocket(machine, slotId++, 42, 91));
 
 		// Drives
-		addSlotToContainer(new SlotDrive(machine, slotId++, 165, 54));
-		addSlotToContainer(new SlotDrive(machine, slotId++, 165, 87));
+		for(int i = 0; i < RocketStruct.MAX_STAGES; i++) {
+			addSlotToContainer(new SlotDrive(machine, slotId++, 161, 54, i));
+			addSlotToContainer(new SlotDrive(machine, slotId++, 170, 87, i));
+		}
 
 		addSlots(invPlayer, 9, 8, 142, 3, 9); // Player inventory
 		addSlots(invPlayer, 0, 8, 200, 1, 9); // Player hotbar
+	}
+
+	@Override
+	public ItemStack slotClick(int index, int button, int mode, EntityPlayer player) {
+
+		//L/R: 0
+		//M3: 3
+		//SHIFT: 1
+		//DRAG: 5
+
+		if(index >= tile.getSizeInventory() && mode == 1) {
+			return null;
+		}
+
+		if(index < tile.getSizeInventory() - RocketStruct.MAX_STAGES * 2 || index >= tile.getSizeInventory()) {
+			return super.slotClick(index, button, mode, player);
+		}
+
+		Slot slot = this.getSlot(index);
+
+		ItemStack ret = null;
+		ItemStack held = player.inventory.getItemStack();
+
+		if(slot.getHasStack())
+			ret = slot.getStack().copy();
+
+		slot.putStack(held != null ? held.copy() : null);
+
+		if(slot.getHasStack()) {
+			slot.getStack().stackSize = 1;
+		}
+
+		slot.onSlotChanged();
+
+		return ret;
 	}
 
 }

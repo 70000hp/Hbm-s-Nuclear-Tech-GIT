@@ -24,6 +24,7 @@ public class RenderLaunchPadRocket extends TileEntitySpecialRenderer implements 
 
 			GL11.glTranslated(x + 0.5D, y, z + 0.5D);
 			GL11.glEnable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
 
 			switch(tileEntity.getBlockMetadata() - BlockDummyable.offset) {
@@ -46,7 +47,7 @@ public class RenderLaunchPadRocket extends TileEntitySpecialRenderer implements 
 
 					bindTexture(ResourceManager.rocket_pad_support_tex);
 					ResourceManager.rocket_pad.renderPart("Tower_Base");
-	
+
 					for(int oy = 8; oy < pad.height - 2; oy += 3) {
 						ResourceManager.rocket_pad.renderPart("Tower_Segment");
 						GL11.glTranslatef(0, 3, 0);
@@ -103,5 +104,5 @@ public class RenderLaunchPadRocket extends TileEntitySpecialRenderer implements 
 	public Item getItemForRenderer() {
 		return Item.getItemFromBlock(ModBlocks.launch_pad_rocket);
 	}
-	
+
 }

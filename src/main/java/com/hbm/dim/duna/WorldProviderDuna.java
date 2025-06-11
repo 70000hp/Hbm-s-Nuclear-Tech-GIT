@@ -5,9 +5,10 @@ import com.hbm.dim.WorldChunkManagerCelestial;
 import com.hbm.dim.WorldProviderCelestial;
 import com.hbm.dim.WorldTypeTeleport;
 import com.hbm.dim.WorldChunkManagerCelestial.BiomeGenLayers;
-import com.hbm.dim.duna.GenLayerDuna.GenLayerDiversifyDuna;
-import com.hbm.dim.duna.GenLayerDuna.GenLayerDunaBiomes;
-import com.hbm.dim.duna.GenLayerDuna.GenLayerDunaLowlands;
+import com.hbm.dim.duna.genlayer.GenLayerDiversifyDuna;
+import com.hbm.dim.duna.genlayer.GenLayerDunaBiomes;
+import com.hbm.dim.duna.genlayer.GenLayerDunaLowlands;
+import com.hbm.util.BobMathUtil;
 import com.hbm.util.ParticleUtil;
 
 import io.netty.buffer.ByteBuf;
@@ -25,6 +26,7 @@ import net.minecraft.world.gen.layer.GenLayerRiverMix;
 import net.minecraft.world.gen.layer.GenLayerSmooth;
 import net.minecraft.world.gen.layer.GenLayerVoronoiZoom;
 import net.minecraft.world.gen.layer.GenLayerZoom;
+import net.minecraftforge.client.event.EntityViewRenderEvent.FogDensity;
 
 public class WorldProviderDuna extends WorldProviderCelestial {
 
@@ -37,7 +39,7 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 	public String getDimensionName() {
 		return "Duna";
 	}
-	
+
 	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderDuna(this.worldObj, this.getSeed(), false);
@@ -46,25 +48,28 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 
 	private int dustStormTimer = 0;
 	private float dustStormIntensity = 1;
+	private float dustStormSmoothed = 0;
 
 	@Override
 	public void updateWeather() {
 		super.updateWeather();
 
+		dustStormSmoothed = (float)BobMathUtil.lerp(0.008, dustStormSmoothed, dustStormIntensity);
+
 		if(!worldObj.isRemote) {
 			if(dustStormTimer <= 0) {
-				if(dustStormIntensity >= 0.5F) {
+				if(dustStormIntensity >= 0.05F) {
 					dustStormIntensity = 0;
 					dustStormTimer = worldObj.rand.nextInt(168000) + 12000;
 				} else {
-					dustStormIntensity = worldObj.rand.nextFloat() * 0.5F + 0.5F;
+					dustStormIntensity = worldObj.rand.nextFloat() * 0.75F + 0.25F;
 					dustStormTimer = worldObj.rand.nextInt(12000) + 12000;
 				}
 			}
 
 			dustStormTimer--;
 		} else {
-			if(dustStormIntensity >= 0.5F) {
+			if(dustStormSmoothed >= 0.05F && worldObj.rand.nextFloat() < dustStormSmoothed) {
 				EntityLivingBase viewEntity = Minecraft.getMinecraft().renderViewEntity;
 				Vec3 vec = Vec3.createVectorHelper(20, 0, 50);
 				vec.rotateAroundZ((float)(worldObj.rand.nextDouble() * Math.PI * 10));
@@ -75,16 +80,16 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 	}
 
 	@Override
-	public float fogDensity() {
-		if(dustStormIntensity >= 0.5F)
-			return dustStormIntensity * dustStormIntensity * 0.05F;
+	public float fogDensity(FogDensity event) {
+		if(dustStormSmoothed >= 0.25F)
+			return dustStormSmoothed * dustStormSmoothed * 0.075F;
 
-		return super.fogDensity();
+		return super.fogDensity(event);
 	}
 
 	@Override
 	public boolean isDaytime() {
-		if(dustStormIntensity >= 0.5F) return false;
+		if(dustStormIntensity >= 0.2F) return false;
 		return super.isDaytime();
 	}
 
@@ -118,12 +123,18 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 	public void resetRainAndThunder() {
 		super.resetRainAndThunder();
 		dustStormIntensity = 0;
+		dustStormSmoothed = 0;
 		dustStormTimer = worldObj.rand.nextInt(168000) + 12000;
 	}
 
 	@Override
 	public Block getStone() {
 		return ModBlocks.duna_rock;
+	}
+
+	@Override
+	public boolean hasIce() {
+		return true;
 	}
 
 	@Override
@@ -144,7 +155,7 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 
 	private static BiomeGenLayers createBiomeGenerators(long seed) {
 		GenLayer biomes = new GenLayerDunaBiomes(seed);
-		
+
 		biomes = new GenLayerFuzzyZoom(2000L, biomes);
 		biomes = new GenLayerZoom(2001L, biomes);
 		biomes = new GenLayerDiversifyDuna(1000L, biomes);
@@ -159,10 +170,8 @@ public class WorldProviderDuna extends WorldProviderCelestial {
 		biomes = new GenLayerFuzzyZoom(1000L, biomes);
 		biomes = new GenLayerSmooth(705L, biomes);
 		biomes = new GenLayerFuzzyZoom(1001L, biomes);
-		biomes = new GenLayerSmooth(706L, biomes);
-		biomes = new GenLayerFuzzyZoom(1002L, biomes);
 		biomes = new GenLayerZoom(1006L, biomes);
-		
+
 		GenLayer genlayerVoronoiZoom = new GenLayerVoronoiZoom(10L, biomes);
 
 		GenLayer genlayerRiverZoom = new GenLayerZoom(1000L, biomes);

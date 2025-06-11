@@ -9,18 +9,17 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class BiomeGenLaythePolar extends BiomeGenBaseLaythe {
-	
-    public static final BiomeGenBase.Height height = new BiomeGenBase.Height(-0.1F, 0.05F);
 
 	public BiomeGenLaythePolar(int id) {
 		super(id);
 		this.setBiomeName("Laythe Poles");
 		this.waterColorMultiplier = 0xC1F4FF;
-        
-        this.setHeight(height);
-        
-        this.topBlock = Blocks.snow;
-        this.fillerBlock = Blocks.ice;
+		
+		this.setHeight(new BiomeGenBase.Height(-0.1F, 0.05F));
+		this.setTemperatureRainfall(0.2F, 0.2F);
+		
+		this.topBlock = Blocks.snow;
+		this.fillerBlock = Blocks.ice;
 	}
 
 	@Override

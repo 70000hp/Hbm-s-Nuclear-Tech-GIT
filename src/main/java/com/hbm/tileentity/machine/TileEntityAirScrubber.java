@@ -46,9 +46,9 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 				// Fetch a new pump to scrub CO2 from
 				if(worldObj.getTotalWorldTime() % 5 == 0 && (pump == null || pump.getFluidPressure() == 0 || !pump.registerScrubber(this))) {
 					pump = null;
-	
+
 					List<AtmosphereBlob> blobs = ChunkAtmosphereManager.proxy.getBlobs(worldObj, xCoord, yCoord, zCoord);
-	
+
 					for(AtmosphereBlob blob : blobs) {
 						if(blob != null) {
 							ThreeInts pos = blob.getRootPosition();
@@ -74,7 +74,7 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 			networkPackNT(20);
 		} else {
 			float maxSpeed = 30F;
-			
+
 			if(canOperate()) {
 				rotSpeed += 0.2;
 				if(rotSpeed > maxSpeed) rotSpeed = maxSpeed;
@@ -82,11 +82,11 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 				rotSpeed -= 0.1;
 				if(rotSpeed < 0) rotSpeed = 0;
 			}
-			
+
 			prevRot = rot;
-			
+
 			rot += rotSpeed;
-			
+
 			if(rot >= 360) {
 				rot -= 360;
 				prevRot -= 360;
@@ -98,11 +98,12 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 		return power > 200;
 	}
 
-	public void scrub(int amount) {
-		if(!canOperate()) return;
+	public int scrub(int amount) {
+		if(!canOperate()) return 0;
 		int add = Math.min(tank.getMaxFill() - tank.getFill(), amount);
 		tank.setFill(tank.getFill() + add);
 		power -= add * 10;
+		return add;
 	}
 
 	@Override
@@ -159,7 +160,7 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 	}
 
 	AxisAlignedBB bb = null;
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		if(bb == null) {
@@ -172,8 +173,8 @@ public class TileEntityAirScrubber extends TileEntityMachineBase implements IFlu
 				zCoord + 1
 			);
 		}
-		
+
 		return bb;
 	}
-	
+
 }

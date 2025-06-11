@@ -74,19 +74,37 @@ public class CommandStations extends CommandBase {
 			Destination destination = getStationDestination(sender, player.getHeldItem());
 			if(destination == null) return;
 
-			int x = destination.x * OrbitalStation.STATION_SIZE + (OrbitalStation.STATION_SIZE / 2);
-			int z = destination.z * OrbitalStation.STATION_SIZE + (OrbitalStation.STATION_SIZE / 2);
+			int dimensionId = destination.body.getDimensionId();
+
+			int x = destination.x;
+			int z = destination.z;
+
+			if(dimensionId == SpaceConfig.orbitDimension) {
+				x = x * OrbitalStation.STATION_SIZE + (OrbitalStation.STATION_SIZE / 2);
+				z = z * OrbitalStation.STATION_SIZE + (OrbitalStation.STATION_SIZE / 2);	
+			}
 
 			player.mountEntity(null);
 
-			if(player.dimension != SpaceConfig.orbitDimension) {
-				DebugTeleporter.teleport(player, SpaceConfig.orbitDimension, x + 0.5D, 130.0D, z + 0.5D, false);
+			if(player.dimension != dimensionId) {
+				if(dimensionId == SpaceConfig.orbitDimension) {
+					DebugTeleporter.teleport(player, dimensionId, x + 0.5D, 130.0D, z + 0.5D, false);
+				} else {
+					DebugTeleporter.teleport(player, dimensionId, x + 0.5D, 300.0D, z + 0.5D, true);
+				}
 			} else {
-				player.setPositionAndUpdate(x + 0.5D, 130.0D, z + 0.5D);
+				if(dimensionId == SpaceConfig.orbitDimension) {
+					player.setPositionAndUpdate(x + 0.5D, 130.0D, z + 0.5D);
+				} else {
+					int y = player.worldObj.getHeightValue(x, z);
+					player.setPositionAndUpdate(x + 0.5D, y + 1, z + 0.5D);
+				}
 			}
 
-			WorldServer targetWorld = DimensionManager.getWorld(SpaceConfig.orbitDimension);
-			OrbitalStation.spawn(targetWorld, x, z);
+			if(dimensionId == SpaceConfig.orbitDimension) {
+				WorldServer targetWorld = DimensionManager.getWorld(SpaceConfig.orbitDimension);
+				OrbitalStation.spawn(targetWorld, x, z);
+			}
 
 			showMessage(sender, "commands.station.teleported", false);
 			
@@ -164,11 +182,6 @@ public class CommandStations extends CommandBase {
 		}
 
 		Destination destination = ItemVOTVdrive.getDestination(stack);
-
-		if(destination.body != SolarSystem.Body.ORBIT) {
-			showMessage(sender, "commands.station.invalid_drive", true);
-			return null;
-		}
 
 		return destination;
 	}

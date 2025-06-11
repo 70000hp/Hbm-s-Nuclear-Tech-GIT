@@ -49,7 +49,8 @@ public class BlockStalagmite extends BlockEnumMulti {
 		return null;
 	}
 	
-	public static int getMetaFromResource(int meta) {
+	public static int getMetaFromResource(Block block, int meta) {
+		if(block == ModBlocks.tumor) return 2;
 		return meta;
 	}
 

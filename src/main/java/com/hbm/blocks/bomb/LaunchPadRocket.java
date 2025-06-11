@@ -12,7 +12,7 @@ import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.items.ModItems;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.bomb.TileEntityLaunchPadRocket;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,9 +33,9 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay, ITo
 	public TileEntity createNewTileEntity(World world, int meta) {
 		if(meta >= 12) return new TileEntityLaunchPadRocket();
 		if(meta >= 6) return new TileEntityProxyCombo().inventory().power().fluid();
-		return new TileEntityProxyCombo().inventory();
+		return null;
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		return this.standardOpenBehavior(world, x, y, z, player, 0);
@@ -60,10 +60,10 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay, ITo
 
 		// Main body
 		MultiblockHandlerXR.fillSpace(world, x, y, z, new int[] {2, 0, 6, 6, 4, 4}, this, dir);
-		
+
 		MultiblockHandlerXR.fillSpace(world, x - dir.offsetX * 2, y, z - dir.offsetZ * 2, new int[] {2, 0, 4, 0, 6, 6}, this, dir);
 		MultiblockHandlerXR.fillSpace(world, x + dir.offsetX * 2, y, z + dir.offsetZ * 2, new int[] {2, 0, 0, 4, 6, 6}, this, dir);
-		
+
 		// Inputs
 		BlockDummyable.safeRem = true;
 		for(int or = 1; or < 5; or++) {
@@ -77,17 +77,17 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay, ITo
 
 	@Override
 	public void printHook(Pre event, World world, int x, int y, int z) {
-		
+
 		int[] pos = this.findCore(world, x, y, z);
-		
+
 		if(pos == null)
 			return;
-		
+
 		TileEntity te = world.getTileEntity(pos[0], pos[1], pos[2]);
-		
+
 		if(!(te instanceof TileEntityLaunchPadRocket))
 			return;
-		
+
 		TileEntityLaunchPadRocket pad = (TileEntityLaunchPadRocket) te;
 
 		if(pad.rocket == null) return;
@@ -117,5 +117,5 @@ public class LaunchPadRocket extends BlockDummyable implements ILookOverlay, ITo
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean ext) {
 		addStandardInfo(stack, player, list, ext);
 	}
-	
+
 }

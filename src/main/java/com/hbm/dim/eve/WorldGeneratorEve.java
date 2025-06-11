@@ -3,13 +3,16 @@ package com.hbm.dim.eve;
 import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockOre;
 import com.hbm.config.SpaceConfig;
 import com.hbm.config.WorldConfig;
 import com.hbm.dim.CelestialBody;
-import com.hbm.dim.eve.GenLayerEve.WorldGenElectricVolcano;
-import com.hbm.dim.eve.GenLayerEve.WorldGenEveSpike;
+import com.hbm.dim.SolarSystem;
 import com.hbm.dim.eve.biome.BiomeGenBaseEve;
+import com.hbm.dim.eve.genlayer.WorldGenElectricVolcano;
+import com.hbm.dim.eve.genlayer.WorldGenEveSpike;
 import com.hbm.world.feature.OilBubble;
+import com.hbm.world.gen.NBTStructure;
 import com.hbm.world.generator.DungeonToolbox;
 
 import cpw.mods.fml.common.IWorldGenerator;
@@ -20,6 +23,14 @@ import net.minecraft.world.chunk.IChunkProvider;
 public class WorldGeneratorEve implements IWorldGenerator {
 
 	WorldGenElectricVolcano volcano = new WorldGenElectricVolcano(30, 22, ModBlocks.eve_silt, ModBlocks.eve_rock);
+
+	public WorldGeneratorEve() {
+		NBTStructure.registerNullWeight(SpaceConfig.eveDimension, 24);
+
+		BlockOre.addValidBody(ModBlocks.ore_niobium, SolarSystem.Body.EVE);
+		BlockOre.addValidBody(ModBlocks.ore_iodine, SolarSystem.Body.EVE);
+		BlockOre.addValidBody(ModBlocks.ore_gas, SolarSystem.Body.EVE);
+	}
 
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {

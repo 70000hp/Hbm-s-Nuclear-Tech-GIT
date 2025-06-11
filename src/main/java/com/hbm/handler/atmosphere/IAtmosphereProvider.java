@@ -8,10 +8,10 @@ import net.minecraft.world.World;
 public interface IAtmosphereProvider {
 
 	World getWorld();
-	
+
 	// the maximum distance an object can maintain a blob
 	int getMaxBlobRadius();
-	
+
 	// the position to use as root, if it can't be pathed to, the bubble is popped
 	ThreeInts getRootPosition();
 
@@ -20,6 +20,7 @@ public interface IAtmosphereProvider {
 	double getFluidPressure();
 
 	void consume(int amount);
+	void produce(int amount);
 
 	void onBlobCreated(AtmosphereBlob blob);
 

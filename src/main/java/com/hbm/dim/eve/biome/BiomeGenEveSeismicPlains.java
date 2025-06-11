@@ -78,7 +78,7 @@ public class BiomeGenEveSeismicPlains extends BiomeGenBaseEve {
 							} else if(l1 < 56 - l) {
 								block = null;
 								block1 = ModBlocks.eve_rock;
-								blocks[i2] = Blocks.gravel;
+								blocks[i2] = ModBlocks.basalt;
 							} else {
 								blocks[i2] = block1;
 							}

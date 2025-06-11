@@ -16,7 +16,7 @@ import com.hbm.packet.toclient.BufPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.tileentity.IBufPacketReceiver;
 import com.hbm.util.AstronomyUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.block.IToolable;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
@@ -59,24 +59,24 @@ public class BlockAtmosphereEditor extends BlockContainer implements IToolable, 
 		if(world.provider instanceof WorldProviderOrbit) return;
 
 		TileEntity te = world.getTileEntity(x, y, z);
-		
+
 		if(!(te instanceof TileEntityAtmosphereEditor))
 			return;
-		
+
 		TileEntityAtmosphereEditor editor = (TileEntityAtmosphereEditor) te;
 
 		CBT_Atmosphere atmosphere = CelestialBody.getTrait(world, CBT_Atmosphere.class);
 		double pressure = atmosphere != null ? atmosphere.getPressure(editor.fluid) : 0;
 		if(pressure < 0.0001) pressure = 0;
 		pressure = Math.round(pressure * 1_000.0) / 1_000.0;
-		
+
 		List<String> text = new ArrayList<String>();
 
 		text.add("State: " + (editor.isOn ? "RUNNING" : "OFF"));
 		text.add("Current gas: " + editor.fluid.getLocalizedName() + " - " + pressure);
 		text.add("Current mode: " + (editor.isEmitting ? "EMITTING" : "CAPTURING"));
 		text.add("Current throughput: " + Math.pow(10, editor.throughputFactor) / AstronomyUtil.MB_PER_ATM);
-		
+
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
 
@@ -86,7 +86,7 @@ public class BlockAtmosphereEditor extends BlockContainer implements IToolable, 
 
 		if(!(te instanceof TileEntityAtmosphereEditor))
 			return false;
-		
+
 		TileEntityAtmosphereEditor editor = (TileEntityAtmosphereEditor) te;
 
 		if(tool == ToolType.SCREWDRIVER) {
@@ -108,7 +108,7 @@ public class BlockAtmosphereEditor extends BlockContainer implements IToolable, 
 
 		return false;
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		if(world.isRemote)
@@ -116,16 +116,16 @@ public class BlockAtmosphereEditor extends BlockContainer implements IToolable, 
 
 		if(player.getHeldItem() != null && player.getHeldItem().getItem() instanceof IItemFluidIdentifier) {
 			TileEntity te = world.getTileEntity(x, y, z);
-			
+
 			if(!(te instanceof TileEntityAtmosphereEditor))
 				return false;
-			
+
 			TileEntityAtmosphereEditor editor = (TileEntityAtmosphereEditor) te;
 			FluidType type = ((IItemFluidIdentifier) player.getHeldItem().getItem()).getType(world, x, y, z, player.getHeldItem());
 			editor.fluid = type;
 			editor.markDirty();
 			player.addChatComponentMessage(new ChatComponentText("Changed type to ").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.YELLOW)).appendSibling(new ChatComponentTranslation(type.getConditionalName())).appendSibling(new ChatComponentText("!")));
-			
+
 			return true;
 		}
 
@@ -189,5 +189,5 @@ public class BlockAtmosphereEditor extends BlockContainer implements IToolable, 
 		}
 
 	}
-	
+
 }

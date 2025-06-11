@@ -1,6 +1,5 @@
 package com.hbm.render.entity.mob;
 
-import com.hbm.entity.mob.EntityScutterfish;
 import com.hbm.lib.RefStrings;
 
 import net.minecraft.client.model.ModelBase;
@@ -17,12 +16,7 @@ public class RenderScutter extends RenderLiving {
 	}
 
 	protected ResourceLocation getEntityTexture(Entity entity) {
-		return this.getEntityTexture((EntityScutterfish) entity);
-	}
-
-	protected ResourceLocation getEntityTexture(EntityScutterfish entity) {
 		return texture;
 	}
-
 
 }

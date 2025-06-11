@@ -17,15 +17,15 @@ import net.minecraft.world.biome.BiomeGenBase;
 public abstract class BiomeGenBaseDres extends BiomeGenBaseCelestial {
 
     public static final BiomeGenBase dresPlains = new BiomeGenDresPlains(SpaceConfig.dresBiome).setTemperatureRainfall(-1.0F, 0.0F);
-    public static final BiomeGenBase dresCanyon = new BiomeGenDresCanyon(SpaceConfig.dresBasins).setTemperatureRainfall(-1.0F, 0.0F);
-    
+    public static final BiomeGenBase dresCanyon = new BiomeGenDresCanyon(SpaceConfig.dresBasinBiome).setTemperatureRainfall(-1.0F, 0.0F);
+
     public BiomeGenBaseDres(int id) {
         super(id);
 		this.setDisableRain();
-        
+
         this.theBiomeDecorator = new BiomeDecoratorCelestial(ModBlocks.dres_rock);
         this.theBiomeDecorator.generateLakes = false;
-        
+
         this.topBlock = ModBlocks.sellafield_slaked;
         this.fillerBlock = ModBlocks.sellafield_slaked;
     }

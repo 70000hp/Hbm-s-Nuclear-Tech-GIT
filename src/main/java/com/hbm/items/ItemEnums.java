@@ -51,7 +51,10 @@ public class ItemEnums {
 	}
 
 	public static enum EnumChunkType {
-		RARE
+		RARE,
+		MALACHITE,
+		CRYOLITE,
+		PENTLANDITE
 	}
 
 	public static enum EnumAchievementType {
@@ -77,10 +80,14 @@ public class ItemEnums {
 	}
 
 	public static enum EnumSecretType {
-		CANISTER, CONTROLLER, SELENIUM_STEEL
+		CANISTER, CONTROLLER, SELENIUM_STEEL, ABERRATOR, FOLLY
 	}
 
 	public static enum EnumCasingType {
 		SMALL, LARGE, SMALL_STEEL, LARGE_STEEL, SHOTSHELL, BUCKSHOT, BUCKSHOT_ADVANCED
+	}
+
+	public static enum EnumIngotMetal {
+		INGOT, COUNTER, KEY, BEACON, CASING, CLOCKWORK, BAR, DETECTOR
 	}
 }

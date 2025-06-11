@@ -3,6 +3,8 @@ package com.hbm.handler.atmosphere;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -21,6 +23,7 @@ import com.hbm.util.AdjacencyGraph;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.BlockFence;
+import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -28,7 +31,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class AtmosphereBlob implements Runnable {
-	
+
 	/**
 	 * Somewhat based on the Advanced-Rocketry implementation, but extended to
 	 * define the gases and gas pressure inside the enclosed volume
@@ -42,19 +45,20 @@ public class AtmosphereBlob implements Runnable {
 
 
 	private static ThreadPoolExecutor pool = new ThreadPoolExecutor(2, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(32));
-	
+
 	private static HashMap<Block, Boolean> fullBounds = new HashMap<Block, Boolean>();
 
-	
+
 	private boolean executing;
 	private ThreeInts blockPos;
 
+	private LinkedHashMap<ThreeInts, Integer> plants = new LinkedHashMap<>();
 
 	public AtmosphereBlob(IAtmosphereProvider handler) {
 		this.handler = handler;
 		graph = new AdjacencyGraph<ThreeInts>();
 	}
-	
+
 	public boolean isPositionAllowed(World world, ThreeInts pos) {
 		return !isBlockSealed(world, pos);
 	}
@@ -114,7 +118,7 @@ public class AtmosphereBlob implements Runnable {
 
 		return isFull;
 	}
-	
+
 	public int getBlobMaxRadius() {
 		return handler.getMaxBlobRadius();
 	}
@@ -131,26 +135,30 @@ public class AtmosphereBlob implements Runnable {
 	public void consume(int amount) {
 		handler.consume(amount);
 	}
-	
+
+	public void produce(int amount) {
+		handler.produce(amount);
+	}
+
 	/**
 	 * Adds a block position to the blob
 	 */
 	public void addBlock(int x, int y , int z) {
 		addBlock(new ThreeInts(x, y, z));
 	}
-	
+
 	/**
 	 * Recursively checks for contiguous blocks and adds them to the graph
 	 */
 	public void addBlock(ThreeInts blockPos) {
-		if(!this.contains(blockPos) && 
+		if(!this.contains(blockPos) &&
 				(this.graph.size() == 0 || this.contains(blockPos.getPositionAtOffset(ForgeDirection.UP)) || this.contains(blockPos.getPositionAtOffset(ForgeDirection.DOWN)) ||
 						this.contains(blockPos.getPositionAtOffset(ForgeDirection.EAST)) || this.contains(blockPos.getPositionAtOffset(ForgeDirection.WEST)) ||
 						this.contains(blockPos.getPositionAtOffset(ForgeDirection.NORTH)) || this.contains(blockPos.getPositionAtOffset(ForgeDirection.SOUTH)))) {
 			if(!executing) {
 				this.blockPos = blockPos;
 				executing = true;
-				
+
 				if(GeneralConfig.enableThreadedAtmospheres) {
 					try {
 						pool.execute(this);
@@ -167,16 +175,19 @@ public class AtmosphereBlob implements Runnable {
 	private void addSingleBlock(ThreeInts blockPos) {
 		if(!graph.contains(blockPos)) {
 			graph.add(blockPos, getPositionsToAdd(blockPos));
+			if(handler.getWorld().getBlock(blockPos.x, blockPos.y, blockPos.z) instanceof IGrowable) {
+				addPlant(handler.getWorld(), blockPos.x, blockPos.y, blockPos.z);
+			}
 		}
 	}
-	
+
 	/**
 	 * @return the BlockPosition of the root of the blob
 	 */
 	public ThreeInts getRootPosition() {
 		return handler.getRootPosition();
 	}
-	
+
 	/**
 	 * Gets adjacent blocks if they exist in the blob
 	 * @param blockPos block to find things adjacent to
@@ -184,14 +195,14 @@ public class AtmosphereBlob implements Runnable {
 	 */
 	protected HashSet<ThreeInts> getPositionsToAdd(ThreeInts blockPos) {
 		HashSet<ThreeInts> set = new HashSet<>();
-		
+
 		for(ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-			
+
 			ThreeInts offset = blockPos.getPositionAtOffset(direction);
 			if(graph.contains(offset))
 				set.add(offset);
 		}
-		
+
 		return set;
 	}
 
@@ -201,14 +212,14 @@ public class AtmosphereBlob implements Runnable {
 	 */
 	public boolean contains(ThreeInts position) {
 		boolean contains;
-		
+
 		synchronized (graph) {
 			contains = graph.contains(position);
 		}
 
 		return contains;
 	}
-	
+
 	/**
 	 * Given a block position returns whether or not it exists in the graph
 	 * @param x
@@ -236,7 +247,7 @@ public class AtmosphereBlob implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Removes all nodes from the blob
 	 */
@@ -244,17 +255,17 @@ public class AtmosphereBlob implements Runnable {
 		World world = handler.getWorld();
 
 		runEffectOnWorldBlocks(world, getLocations());
-		
+
 		graph.clear();
 	}
-	
+
 	/**
 	 * @return a set containing all locations
 	 */
 	public Set<ThreeInts> getLocations() {
 		return graph.getKeys();
 	}
-	
+
 	/**
 	 * @return the number of elements in the blob
 	 */
@@ -332,6 +343,34 @@ public class AtmosphereBlob implements Runnable {
 			final Block block = world.getBlock(pos.x, pos.y, pos.z);
 			ChunkAtmosphereManager.proxy.runEffectsOnBlock(newAtmosphere, world, block, pos.x, pos.y, pos.z);
 		}
+	}
+
+	public void checkGrowth() {
+		World world = handler.getWorld();
+
+		Iterator<HashMap.Entry<ThreeInts, Integer>> iterator = plants.entrySet().iterator();
+		while(iterator.hasNext()) {
+			HashMap.Entry<ThreeInts, Integer> entry = iterator.next();
+			ThreeInts pos = entry.getKey();
+			int oldMeta = entry.getValue();
+			Block block = world.getBlock(pos.x, pos.y, pos.z);
+
+			if(!(block instanceof IGrowable)) {
+				iterator.remove();
+				continue;
+			}
+
+			int newMeta = world.getBlockMetadata(pos.x, pos.y, pos.z);
+
+			if(newMeta != oldMeta) {
+				entry.setValue(newMeta);
+				produce(Math.max(newMeta - oldMeta, 0) * ChunkAtmosphereHandler.CROP_GROWTH_CONVERSION);
+			}
+		}
+	}
+
+	public void addPlant(World world, int x, int y, int z) {
+		plants.put(new ThreeInts(x, y, z), world.getBlockMetadata(x, y, z));
 	}
 
 }

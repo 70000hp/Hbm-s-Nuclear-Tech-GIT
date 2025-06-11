@@ -13,31 +13,54 @@ import net.minecraftforge.client.IRenderHandler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.lwjgl.opengl.ContextCapabilities;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GLContext;
 
 import com.hbm.dim.SolarSystem.AstroMetric;
 import com.hbm.dim.trait.CBT_Atmosphere;
+import com.hbm.dim.trait.CBT_Dyson;
+import com.hbm.dim.trait.CBT_Impact;
+import com.hbm.dim.trait.CBT_Lights;
 import com.hbm.dim.trait.CelestialBodyTrait.CBT_Destroyed;
 import com.hbm.extprop.HbmLivingProps;
 import com.hbm.lib.RefStrings;
+import com.hbm.main.ModEventHandlerClient;
+import com.hbm.main.ModEventHandlerRenderer;
 import com.hbm.render.shader.Shader;
 import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.util.BobMathUtil;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
 public class SkyProviderCelestial extends IRenderHandler {
-	
+
 	private static final ResourceLocation planetTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/planet.png");
 	private static final ResourceLocation flareTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/sunspike.png");
 	private static final ResourceLocation nightTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/night.png");
 	private static final ResourceLocation digammaStar = new ResourceLocation(RefStrings.MODID, "textures/misc/space/star_digamma.png");
+	private static final ResourceLocation lodeStar = new ResourceLocation(RefStrings.MODID, "textures/misc/star_lode.png");
+
+	private static final ResourceLocation impactTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/impact.png");
+	private static final ResourceLocation shockwaveTexture = new ResourceLocation(RefStrings.MODID, "textures/particle/shockwave.png");
+	private static final ResourceLocation shockFlareTexture = new ResourceLocation(RefStrings.MODID, "textures/particle/flare.png");
+
 
 	private static final ResourceLocation noise = new ResourceLocation(RefStrings.MODID, "shaders/iChannel1.png");
 
 	protected static final Shader planetShader = new Shader(new ResourceLocation(RefStrings.MODID, "shaders/crescent.frag"));
+	protected static final Shader swarmShader = new Shader(new ResourceLocation(RefStrings.MODID, "shaders/swarm.vert"), new ResourceLocation(RefStrings.MODID, "shaders/swarm.frag"));
+
+	private static final ResourceLocation[] citylights = new ResourceLocation[] {
+		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_0.png"),
+		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_1.png"),
+		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_2.png"),
+	};
 
 	private static final String[] GL_SKY_LIST = new String[] { "glSkyList", "field_72771_w", "G" };
 	private static final String[] GL_SKY_LIST2 = new String[] { "glSkyList2", "field_72781_x", "H" };
@@ -46,16 +69,22 @@ public class SkyProviderCelestial extends IRenderHandler {
 	public static int glSkyList;
 	public static int glSkyList2;
 
+	private static boolean gl14;
+
 	public SkyProviderCelestial() {
-		if (!displayListsInitialized) {
+		if(!displayListsInitialized) {
 			initializeDisplayLists();
 		}
 	}
 
 	private void initializeDisplayLists() {
+        ContextCapabilities contextcapabilities = GLContext.getCapabilities();
+
 		Minecraft mc = Minecraft.getMinecraft();
 		glSkyList = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, GL_SKY_LIST);
 		glSkyList2 = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, GL_SKY_LIST2);
+
+		gl14 = contextcapabilities.OpenGL14;
 
 		displayListsInitialized = true;
 	}
@@ -64,23 +93,25 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 	@Override
 	public void render(float partialTicks, WorldClient world, Minecraft mc) {
-		float fogIntensity = 0;
+		// We can now guarantee that this only runs with celestial, but it doesn't hurt to be safe
+		if(!(world.provider instanceof WorldProviderCelestial)) return;
 
-		if(world.provider instanceof WorldProviderCelestial) {
-			// Without mixins, we have to resort to some very wacky ways of checking that the lightmap needs to be updated
-			// fortunately, thanks to torch flickering, we can just check to see if the brightest pixel has been modified
-			if(lastBrightestPixel != mc.entityRenderer.lightmapColors[255] + mc.entityRenderer.lightmapColors[250]) {
-				if(((WorldProviderCelestial)world.provider).updateLightmap(mc.entityRenderer.lightmapColors)) {
-					mc.entityRenderer.lightmapTexture.updateDynamicTexture();
-				}
+		WorldProviderCelestial celestialProvider = (WorldProviderCelestial) world.provider;
 
-				lastBrightestPixel = mc.entityRenderer.lightmapColors[255] + mc.entityRenderer.lightmapColors[250];
+		// Without mixins, we have to resort to some very wacky ways of checking that the lightmap needs to be updated
+		// fortunately, thanks to torch flickering, we can just check to see if the brightest pixel has been modified
+		if(lastBrightestPixel != mc.entityRenderer.lightmapColors[255] + mc.entityRenderer.lightmapColors[250]) {
+			if(celestialProvider.updateLightmap(mc.entityRenderer.lightmapColors)) {
+				mc.entityRenderer.lightmapTexture.updateDynamicTexture();
 			}
 
-			fogIntensity = ((WorldProviderCelestial) world.provider).fogDensity() * 30;
+			lastBrightestPixel = mc.entityRenderer.lightmapColors[255] + mc.entityRenderer.lightmapColors[250];
 		}
 
+		float fogIntensity = ModEventHandlerRenderer.lastFogDensity * 30;
+
 		CelestialBody body = CelestialBody.getBody(world);
+		CelestialBody sun = body.getStar();
 		CBT_Atmosphere atmosphere = body.getTrait(CBT_Atmosphere.class);
 
 		boolean hasAtmosphere = atmosphere != null;
@@ -131,8 +162,11 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		GL11.glPushMatrix();
 		{
+			if(mc.gameSettings.renderDistanceChunks > 16) {
+				GL11.glScalef(1.25F, 1, 1.25F);
+			}
 
-			GL11.glTranslatef(0.0F, mc.gameSettings.renderDistanceChunks - 12.0F, 0.0F);
+			GL11.glTranslatef(0.0F, mc.gameSettings.renderDistanceChunks - 8.0F, 0.0F);
 
 			GL11.glCallList(glSkyList);
 
@@ -156,7 +190,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		renderStars(partialTicks, world, mc, starBrightness, celestialAngle, body.axialTilt);
 
-		
+
 		GL11.glPushMatrix();
 		{
 
@@ -169,24 +203,15 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 			OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
 
-			double sunSize = SolarSystem.calculateSunSize(body);
+			// Scale sun size for rendering (texture is 4 times larger than actual, for glow)
+			double sunSize = SolarSystem.calculateSunSize(body) * SolarSystem.SUN_RENDER_SCALE;
 			double coronaSize = sunSize * (3 - MathHelper.clamp_float(pressure, 0.0F, 1.0F));
 
-			renderSun(partialTicks, world, mc, sunSize, coronaSize, visibility, pressure);
-			
+			renderSun(partialTicks, world, mc, sun, sunSize, coronaSize, visibility, pressure);
+
 			float blendAmount = hasAtmosphere ? MathHelper.clamp_float(1 - world.getSunBrightnessFactor(partialTicks), 0.25F, 1F) : 1F;
 
-			double longitude = 0;
-			CelestialBody tidalLockedBody = body.tidallyLockedTo != null ? CelestialBody.getBody(body.tidallyLockedTo) : null;
-
-			if(tidalLockedBody != null) {
-				longitude = SolarSystem.calculateSingleAngle(world, partialTicks, body, tidalLockedBody) + celestialAngle * 360.0 + 60.0;
-			}
-
-			// Get our orrery of bodies
-			List<AstroMetric> metrics = SolarSystem.calculateMetricsFromBody(world, partialTicks, longitude, body);
-			
-			renderCelestials(partialTicks, world, mc, metrics, celestialAngle, tidalLockedBody, planetTint, visibility, blendAmount, null, 24);
+			renderCelestials(partialTicks, world, mc, celestialProvider.metrics, celestialAngle, celestialProvider.tidalLockedBody, planetTint, visibility, blendAmount, null, 24);
 
 			GL11.glEnable(GL11.GL_BLEND);
 
@@ -196,7 +221,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 				if(world.provider.dimensionId == 0) {
 					renderSatellite(partialTicks, world, mc, celestialAngle, 1916169, new float[] { 1.0F, 0.534F, 0.385F });
 				}
-	
+
 				// Light up the sky
 				for(Map.Entry<Integer, Satellite> entry : SatelliteSavedData.getClientSats().entrySet()) {
 					renderSatellite(partialTicks, world, mc, celestialAngle, entry.getKey(), entry.getValue().getColor());
@@ -210,7 +235,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_FOG);
-			
+
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor3f(0.0F, 0.0F, 0.0F);
 
@@ -270,7 +295,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		}
 		GL11.glPopMatrix();
-		
+
 		double sc = 1 / (pos.yCoord / 1000);
 		double uvOffset = (pos.xCoord / 1024) % 1;
 		GL11.glPushMatrix();
@@ -284,11 +309,11 @@ public class SkyProviderCelestial extends IRenderHandler {
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 			float sunBrightness = world.getSunBrightness(partialTicks);
-	
+
 			GL11.glColor4f(sunBrightness, sunBrightness, sunBrightness, ((float)pos.yCoord - 200.0F) / 300.0F);
 			mc.renderEngine.bindTexture(body.texture);
 			GL11.glRotated(180, 1, 0, 0);
-			
+
 			tessellator.startDrawingQuads();
 			tessellator.addVertexWithUV(-115 * sc, 100.0D, -115 * sc, 0.0D + uvOffset, 0.0D);
 			tessellator.addVertexWithUV(115 * sc, 100.0D, -115 * sc, 1.0D + uvOffset, 0.0D);
@@ -310,10 +335,10 @@ public class SkyProviderCelestial extends IRenderHandler {
 		GL11.glDepthMask(true);
 
 	}
-	
+
 	protected void renderSunset(float partialTicks, WorldClient world, Minecraft mc) {
 		Tessellator tessellator = Tessellator.instance;
-		
+
 		float[] sunsetColor = world.provider.calcSunriseSunsetColors(world.getCelestialAngle(partialTicks), partialTicks);
 
 		if(sunsetColor != null) {
@@ -328,20 +353,20 @@ public class SkyProviderCelestial extends IRenderHandler {
 				GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(MathHelper.sin(world.getCelestialAngleRadians(partialTicks)) < 0.0F ? 180.0F : 0.0F, 0.0F, 0.0F, 1.0F);
 				GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
-	
+
 				tessellator.startDrawing(6);
 				tessellator.setColorRGBA_F(anaglyphColor[0], anaglyphColor[1], anaglyphColor[2], sunsetColor[3]);
 				tessellator.addVertex(0.0, 100.0, 0.0);
 				tessellator.setColorRGBA_F(sunsetColor[0], sunsetColor[1], sunsetColor[2], 0.0F);
 				byte segments = 16;
-	
+
 				for(int j = 0; j <= segments; ++j) {
 					float angle = (float)j * 3.1415927F * 2.0F / (float)segments;
 					float sinAngle = MathHelper.sin(angle);
 					float cosAngle = MathHelper.cos(angle);
 					tessellator.addVertex((double)(sinAngle * 120.0F), (double)(cosAngle * 120.0F), (double)(-cosAngle * 40.0F * sunsetColor[3]));
 				}
-	
+
 				tessellator.draw();
 
 			}
@@ -361,38 +386,38 @@ public class SkyProviderCelestial extends IRenderHandler {
 				GL11.glRotatef(axialTilt, 1.0F, 0.0F, 0.0F);
 
 				mc.renderEngine.bindTexture(nightTexture);
-	
+
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-	
+
 				float starBrightnessAlpha = starBrightness * 0.6f;
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, starBrightnessAlpha);
-				
+
 				GL11.glRotatef(-90.0F, 0.0F, 1.0F, 0.0F);
-	
+
 				GL11.glRotatef(celestialAngle * 360.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, starBrightnessAlpha);
-				
+
 				GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
 				GL11.glRotatef(-90.0F, 0.0F, 0.0F, 1.0F);
 				renderSkyboxSide(tessellator, 4);
-				
+
 				GL11.glPushMatrix();
 				GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
 				renderSkyboxSide(tessellator, 1);
 				GL11.glPopMatrix();
-				
+
 				GL11.glPushMatrix();
 				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
 				renderSkyboxSide(tessellator, 0);
 				GL11.glPopMatrix();
-				
+
 				GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
 				renderSkyboxSide(tessellator, 5);
-				
+
 				GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
 				renderSkyboxSide(tessellator, 2);
-				
+
 				GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
 				renderSkyboxSide(tessellator, 3);
 
@@ -403,16 +428,19 @@ public class SkyProviderCelestial extends IRenderHandler {
 		}
 	}
 
-	protected void renderSun(float partialTicks, WorldClient world, Minecraft mc, double sunSize, double coronaSize, float visibility, float pressure) {
+	protected void renderSun(float partialTicks, WorldClient world, Minecraft mc, CelestialBody sun, double sunSize, double coronaSize, float visibility, float pressure) {
 		Tessellator tessellator = Tessellator.instance;
 
-		if(SolarSystem.kerbol.shader != null && SolarSystem.kerbol.hasTrait(CBT_Destroyed.class)) {
+		CBT_Dyson dyson = sun.getTrait(CBT_Dyson.class);
+		int swarmCount = dyson != null ? dyson.size() : 0;
+
+		if(sun.shader != null && sun.hasTrait(CBT_Destroyed.class)) {
 			// BLACK HOLE SUN
 			// WON'T YOU COME
 			// AND WASH AWAY THE RAIN
 
-			Shader shader = SolarSystem.kerbol.shader;
-			double shaderSize = sunSize * SolarSystem.kerbol.shaderScale;
+			Shader shader = sun.shader;
+			double shaderSize = sunSize * sun.shaderScale;
 
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -422,17 +450,17 @@ public class SkyProviderCelestial extends IRenderHandler {
 			int textureUnit = 0;
 
 			mc.renderEngine.bindTexture(noise);
-	
+
 			shader.setTime(time);
 			shader.setTextureUnit(textureUnit);
-			
+
 			tessellator.startDrawingQuads();
 			tessellator.addVertexWithUV(-shaderSize, 100.0D, -shaderSize, 0.0D, 0.0D);
 			tessellator.addVertexWithUV(shaderSize, 100.0D, -shaderSize, 1.0D, 0.0D);
 			tessellator.addVertexWithUV(shaderSize, 100.0D, shaderSize, 1.0D, 1.0D);
 			tessellator.addVertexWithUV(-shaderSize, 100.0D, shaderSize, 0.0D, 1.0D);
 			tessellator.draw();
-	
+
 			shader.stop();
 
 			OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
@@ -448,11 +476,24 @@ public class SkyProviderCelestial extends IRenderHandler {
 			tessellator.addVertex(-sunSize, 99.9D, sunSize);
 			tessellator.draw();
 
-			// Draw the MIGHTY SUN
+			// Draw the sun to the depth buffer to block swarm members that are behind
+			GL11.glDepthMask(true);
+			GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
+
+			tessellator.startDrawingQuads();
+			tessellator.addVertexWithUV(-sunSize * 0.25D, 100.1D, -sunSize * 0.25D, 0.0D, 0.0D);
+			tessellator.addVertexWithUV(sunSize * 0.25D, 100.1D, -sunSize * 0.25D, 1.0D, 0.0D);
+			tessellator.addVertexWithUV(sunSize * 0.25D, 100.1D, sunSize * 0.25D, 1.0D, 1.0D);
+			tessellator.addVertexWithUV(-sunSize * 0.25D, 100.1D, sunSize * 0.25D, 0.0D, 1.0D);
+			tessellator.draw();
+
+			GL11.glDepthMask(false);
+
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, visibility);
 
-			mc.renderEngine.bindTexture(SolarSystem.kerbol.texture);
+			// Draw the MIGHTY SUN
+			mc.renderEngine.bindTexture(sun.texture);
 
 			tessellator.startDrawingQuads();
 			tessellator.addVertexWithUV(-sunSize, 100.0D, -sunSize, 0.0D, 0.0D);
@@ -467,12 +508,118 @@ public class SkyProviderCelestial extends IRenderHandler {
 			mc.renderEngine.bindTexture(flareTexture);
 
 			tessellator.startDrawingQuads();
-			tessellator.addVertexWithUV(-coronaSize, 100.0D, -coronaSize, 0.0D, 0.0D);
-			tessellator.addVertexWithUV(coronaSize, 100.0D, -coronaSize, 1.0D, 0.0D);
-			tessellator.addVertexWithUV(coronaSize, 100.0D, coronaSize, 1.0D, 1.0D);
-			tessellator.addVertexWithUV(-coronaSize, 100.0D, coronaSize, 0.0D, 1.0D);
+			tessellator.addVertexWithUV(-coronaSize, 99.9D, -coronaSize, 0.0D, 0.0D);
+			tessellator.addVertexWithUV(coronaSize, 99.9D, -coronaSize, 1.0D, 0.0D);
+			tessellator.addVertexWithUV(coronaSize, 99.9D, coronaSize, 1.0D, 1.0D);
+			tessellator.addVertexWithUV(-coronaSize, 99.9D, coronaSize, 0.0D, 1.0D);
 			tessellator.draw();
+
+			// Draw the swarm members with depth occlusion
+			// We do this last so we can render transparency against the sun
+			renderSwarm(partialTicks, world, mc, sunSize * 0.5, swarmCount);
+
+			// Clear and disable the depth buffer once again, buffer has to be writable to clear it
+			GL11.glDepthMask(true);
+			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+			GL11.glDepthMask(false);
 		}
+	}
+
+	private void renderSwarm(float partialTicks, WorldClient world, Minecraft mc, double swarmRadius, int swarmCount) {
+		Tessellator tessellator = Tessellator.instance;
+
+		// bloodseeking, parasitic, ecstatically tracing decay
+		// thriving in the glow that death emits, the warm perfume it radiates
+
+		swarmShader.use();
+
+		// swarm members render as pixels, which can vary based on screen resolution
+		// because of this, we make the pixels more transparent based on their apparent size, which varies by a fair few factors
+		// this isn't a foolproof solution, analyzing the projection matrices would be best, but it works for now.
+		float swarmScreenSize = (float)((mc.displayHeight / mc.gameSettings.fovSetting) * swarmRadius * 0.002);
+		float time = ((float)world.getWorldTime() + partialTicks) / 800.0F;
+		int textureUnit = 0;
+
+		swarmShader.setTime(time);
+		swarmShader.setTextureUnit(textureUnit);
+
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glColor4f(0.0F, 0.0F, 0.0F, MathHelper.clamp_float(swarmScreenSize, 0, 1));
+
+		GL11.glPushMatrix();
+		{
+
+			GL11.glTranslatef(0.0F, 100.0F, 0.0F);
+			GL11.glScaled(swarmRadius, swarmRadius, swarmRadius);
+
+			GL11.glPushMatrix();
+			{
+
+				GL11.glRotatef(80.0F, 1, 0, 0);
+
+				tessellator.startDrawing(GL11.GL_POINTS);
+				for(int i = 0; i < swarmCount; i += 3) {
+					swarmShader.setOffset(i);
+
+					float t = i + time;
+					double x = Math.cos(t);
+					double z = Math.sin(t);
+
+					tessellator.addVertex(x, 0, z);
+				}
+				tessellator.draw();
+
+			}
+			GL11.glPopMatrix();
+
+			GL11.glPushMatrix();
+			{
+
+				GL11.glRotatef(60.0F, 0, 1, 0);
+				GL11.glRotatef(80.0F, 1, 0, 0);
+
+				tessellator.startDrawing(GL11.GL_POINTS);
+				for(int i = 1; i < swarmCount; i += 3) {
+					swarmShader.setOffset(i);
+
+					float t = i + time;
+					double x = Math.cos(t);
+					double z = Math.sin(t);
+
+					tessellator.addVertex(x, 0, z);
+				}
+				tessellator.draw();
+
+			}
+			GL11.glPopMatrix();
+
+			GL11.glPushMatrix();
+			{
+
+				GL11.glRotatef(-60.0F, 0, 1, 0);
+				GL11.glRotatef(80.0F, 1, 0, 0);
+
+				tessellator.startDrawing(GL11.GL_POINTS);
+				for(int i = 2; i < swarmCount; i += 3) {
+					swarmShader.setOffset(i);
+
+					float t = i + time;
+					double x = Math.cos(t);
+					double z = Math.sin(t);
+
+					tessellator.addVertex(x, 0, z);
+				}
+				tessellator.draw();
+
+			}
+			GL11.glPopMatrix();
+
+		}
+		GL11.glPopMatrix();
+
+		swarmShader.stop();
+
+		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
 	}
 
 	protected void renderCelestials(float partialTicks, WorldClient world, Minecraft mc, List<AstroMetric> metrics, float celestialAngle, CelestialBody tidalLockedBody, Vec3 planetTint, float visibility, float blendAmount, CelestialBody orbiting, float maxSize) {
@@ -485,7 +632,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 			// Ignore self
 			if(metric.distance == 0)
 				continue;
-			
+
 			boolean orbitingThis = metric.body == orbiting;
 
 			double uvOffset = orbitingThis ? 1 - ((((double)world.getWorldTime() + partialTicks) / 1024) % 1) : 0;
@@ -513,6 +660,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 					GL11.glRotated(celestialAngle * -360.0 - 60.0, 1.0, 0.0, 0.0);
 				} else {
 					GL11.glRotated(metric.angle, 1.0, 0.0, 0.0);
+					GL11.glRotated(metric.inclination, 0.0, 0.0, 1.0);
 				}
 				GL11.glRotatef(axialTilt + 90.0F, 0.0F, 1.0F, 0.0F);
 
@@ -524,8 +672,9 @@ public class SkyProviderCelestial extends IRenderHandler {
 				tessellator.draw();
 
 				if(!renderAsPoint) {
+
 					GL11.glEnable(GL11.GL_BLEND);
-					
+
 					// Draw a shader on top to render celestial phase
 					OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
@@ -534,7 +683,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 					planetShader.use();
 					planetShader.setTime((float)-metric.phase);
 					planetShader.setOffset((float)uvOffset);
-					
+
 					tessellator.startDrawingQuads();
 					tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D, 0.0D);
 					tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D, 0.0D);
@@ -544,12 +693,150 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 					planetShader.stop();
 
+					CBT_Impact impact = metric.body.getTrait(CBT_Impact.class);
+					CBT_Lights light = metric.body.getTrait(CBT_Lights.class);
+
+					double impactTime = impact != null ? (world.getTotalWorldTime() - impact.time) + partialTicks : 0;
+					int lightIntensity = light != null ? light.getIntensity() : 0;
+
+					if(lightIntensity > 0 && impactTime < 40) {
+
+						// Draw ONLY to alpha
+						OpenGlHelper.glBlendFunc(GL11.GL_ZERO, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_SRC_ALPHA);
+						GL11.glColorMask(false, false, false, true);
+						if(gl14) GL14.glBlendEquation(GL14.GL_MIN);
+
+						// First draw the light alpha into the texture
+						GL11.glColor4d(1.0, 1.0, 1.0, 1.0);
+						mc.renderEngine.bindTexture(citylights[lightIntensity - 1]);
+
+						tessellator.startDrawingQuads();
+						tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, size, 1.0D + uvOffset, 1.0D);
+						tessellator.addVertexWithUV(-size, 100.0D, size, 0.0D + uvOffset, 1.0D);
+						tessellator.draw();
+
+						// Then mask out the continents
+						if(metric.body.cityMask != null) {
+							GL11.glColor4d(1.0, 1.0, 1.0, 1.0);
+							mc.renderEngine.bindTexture(metric.body.cityMask);
+
+							tessellator.startDrawingQuads();
+							tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D + uvOffset, 0.0D);
+							tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D + uvOffset, 0.0D);
+							tessellator.addVertexWithUV(size, 100.0D, size, 1.0D + uvOffset, 1.0D);
+							tessellator.addVertexWithUV(-size, 100.0D, size, 0.0D + uvOffset, 1.0D);
+							tessellator.draw();
+						}
+
+						// Mask out any significant blackout events
+						if(impact != null) {
+							int blackoutInterval = 8;
+							int maxBlackouts = 5;
+
+							int activeBlackouts = Math.min((int)(impactTime / blackoutInterval), maxBlackouts);
+							double blsize = size * 0.35;
+
+							long seedBase = (long)(impactTime / (blackoutInterval * (maxBlackouts + 1)));
+							Random rand = new Random(seedBase);
+
+							for (int i = 0; i < activeBlackouts; i++) {
+								double offsetX = (rand.nextDouble() * 2.0 - 1.0) * (size - blsize);
+								double offsetZ = (rand.nextDouble() * 2.0 - 1.0) * (size - blsize);
+
+								GL11.glColor4d(0.0, 0.0, 0.0, 0.0);
+
+								GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+								tessellator.startDrawingQuads();
+								tessellator.addVertexWithUV(-blsize + offsetX, 100.0D, -blsize + offsetZ, 0.0D + uvOffset, 0.0D);
+								tessellator.addVertexWithUV(blsize + offsetX, 100.0D, -blsize + offsetZ, 1.0D + uvOffset, 0.0D);
+								tessellator.addVertexWithUV(blsize + offsetX, 100.0D, blsize + offsetZ, 1.0D + uvOffset, 1.0D);
+								tessellator.addVertexWithUV(-blsize + offsetX, 100.0D, blsize + offsetZ, 0.0D + uvOffset, 1.0D);
+								tessellator.draw();
+
+								GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+							}
+						}
+
+						// Back to normal blending
+						OpenGlHelper.glBlendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+						GL11.glColorMask(true, true, true, true);
+						if(gl14) GL14.glBlendEquation(GL14.GL_FUNC_ADD);
+
+						// Now draw the actual lights
+						GL11.glColor4d(1.0, 1.0, 1.0, 0.5);
+						mc.renderEngine.bindTexture(citylights[lightIntensity - 1]);
+
+						//man i should REALLY consider a shader...
+
+						tessellator.startDrawingQuads();
+						tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, size, 1.0D + uvOffset, 1.0D);
+						tessellator.addVertexWithUV(-size, 100.0D, size, 0.0D + uvOffset, 1.0D);
+						tessellator.draw();
+					}
+
+					OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
+
+					if(impact != null) {
+						double lavaAlpha = Math.min(impactTime * 0.1, 1.0);
+
+						double impactSize = (impactTime * 0.1) * size * 0.035;
+						double impactAlpha = 1.0 - Math.min(1.0, impactTime * 0.0015);
+						double flareSize = size * 1.5;
+						double flareAlpha = 1.0 - Math.min(1.0, impactTime * 0.002);
+
+						GL11.glColor4d(1.0, 1.0, 1.0, lavaAlpha);
+						mc.renderEngine.bindTexture(impactTexture);
+
+						tessellator.startDrawingQuads();
+						tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D + uvOffset, 0.0D);
+						tessellator.addVertexWithUV(size, 100.0D, size, 1.0D + uvOffset, 1.0D);
+						tessellator.addVertexWithUV(-size, 100.0D, size, 0.0D + uvOffset, 1.0D);
+						tessellator.draw();
+
+						GL11.glPushMatrix();
+						{
+
+							GL11.glTranslated(-size * 0.5, 0, size * 0.4);
+
+							// impact shockwave, increases in size and fades out
+							GL11.glColor4d(1.0, 1.0, 1.0F, impactAlpha);
+							mc.renderEngine.bindTexture(shockwaveTexture);
+
+							tessellator.startDrawingQuads();
+							tessellator.addVertexWithUV(-impactSize, 100.0D, -impactSize, 0.0D, 0.0D);
+							tessellator.addVertexWithUV(impactSize, 100.0D, -impactSize, 1.0D, 0.0D);
+							tessellator.addVertexWithUV(impactSize, 100.0D, impactSize, 1.0D, 1.0D);
+							tessellator.addVertexWithUV(-impactSize, 100.0D, impactSize, 0.0D, 1.0D);
+							tessellator.draw();
+
+
+							// impact flare, remains static in size and fades out
+							GL11.glColor4d(1.0F, 1.0F, 1.0F, flareAlpha);
+							mc.renderEngine.bindTexture(shockFlareTexture);
+
+							tessellator.startDrawingQuads();
+							tessellator.addVertexWithUV(-flareSize, 100.0D, -flareSize, 0.0D, 0.0D);
+							tessellator.addVertexWithUV(flareSize, 100.0D, -flareSize, 1.0D, 0.0D);
+							tessellator.addVertexWithUV(flareSize, 100.0D, flareSize, 1.0D, 1.0D);
+							tessellator.addVertexWithUV(-flareSize, 100.0D, flareSize, 0.0D, 1.0D);
+							tessellator.draw();
+
+						}
+						GL11.glPopMatrix();
+					}
+
 
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
-					
+
 					// Draw another layer on top to blend with the atmosphere
 					GL11.glColor4d(planetTint.xCoord - blendDarken, planetTint.yCoord - blendDarken, planetTint.zCoord - blendDarken, (1 - blendAmount * visibility));
-					OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
 
 					tessellator.startDrawingQuads();
 					tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D, 0.0D);
@@ -572,6 +859,25 @@ public class SkyProviderCelestial extends IRenderHandler {
 		GL11.glPushMatrix();
 		{
 
+			float var12 = 1F + world.rand.nextFloat() * 0.5F;
+			double dist = 100D;
+
+			if(ModEventHandlerClient.renderLodeStar) {
+				GL11.glPushMatrix();
+				GL11.glRotatef(-75.0F, 1.0F, 0.0F, 0.0F);
+				GL11.glRotatef(10.0F, 0.0F, 1.0F, 0.0F);
+				FMLClientHandler.instance().getClient().renderEngine.bindTexture(lodeStar); // genu-ine bona-fide ass whooping
+
+				tessellator.startDrawingQuads();
+				tessellator.addVertexWithUV(-var12, dist, -var12, 0.0D, 0.0D);
+				tessellator.addVertexWithUV(var12, dist, -var12, 0.0D, 1.0D);
+				tessellator.addVertexWithUV(var12, dist, var12, 1.0D, 1.0D);
+				tessellator.addVertexWithUV(-var12, dist, var12, 1.0D, 0.0D);
+				tessellator.draw();
+
+				GL11.glPopMatrix();
+			}
+
 			OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
 
 			float brightness = (float) Math.sin(celestialAngle * Math.PI);
@@ -585,8 +891,8 @@ public class SkyProviderCelestial extends IRenderHandler {
 			mc.renderEngine.bindTexture(digammaStar);
 
 			float digamma = HbmLivingProps.getDigamma(Minecraft.getMinecraft().thePlayer);
-			float var12 = 1F * (1 + digamma * 0.25F);
-			double dist = 100D - digamma * 2.5;
+			var12 = 1F * (1 + digamma * 0.25F);
+			dist = 100D - digamma * 2.5;
 
 			tessellator.startDrawingQuads();
 			tessellator.addVertexWithUV(-var12, dist, -var12, 0.0D, 0.0D);
@@ -620,14 +926,14 @@ public class SkyProviderCelestial extends IRenderHandler {
 			GL11.glRotatef(-40.0F + (float)(seed % 800) * 0.1F - 5.0F, 1.0F, 0.0F, 0.0F);
 			GL11.glRotatef((float)(seed % 50) * 0.1F - 20.0F, 0.0F, 1.0F, 0.0F);
 			GL11.glRotatef((float)(seed % 80) * 0.1F - 2.5F, 0.0F, 0.0F, 1.0F);
-			GL11.glRotated((ticks / 600.0D) * 360.0D, 1.0F, 0.0F, 0.0F);
-			
+			GL11.glRotated((ticks / 600.0D) * -360.0D, 1.0F, 0.0F, 0.0F);
+
 			GL11.glColor4f(color[0], color[1], color[2], 1F);
-			
+
 			mc.renderEngine.bindTexture(planetTexture);
-			
+
 			float size = 0.5F;
-			
+
 			tessellator.startDrawingQuads();
 			tessellator.addVertexWithUV(-size, 100.0, -size, 0.0D, 0.0D);
 			tessellator.addVertexWithUV(size, 100.0, -size, 0.0D, 1.0D);
@@ -638,7 +944,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 		}
 		GL11.glPopMatrix();
 	}
-	
+
 	// is just drawing a big cube with UVs prepared to draw a gradient
 	private void renderSkyboxSide(Tessellator tessellator, int side) {
 		double u = side % 3 / 3.0D;

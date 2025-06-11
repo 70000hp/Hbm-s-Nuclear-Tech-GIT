@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityMachineRocketAssembly extends TileEntityMachineBase implements IGUIProvider, IControlReceiver {
-	
+
 	public RocketStruct rocket;
 
 	private int previousHeight = 0;
@@ -40,8 +40,12 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 
 	private boolean platformFailed = false;
 
+	public int currentStage;
+
+	public boolean isBreaking;
+
 	public TileEntityMachineRocketAssembly() {
-		super(1 + RocketStruct.MAX_STAGES * 3 + 1 + 2); // capsule + stages + result + drives
+		super(1 + RocketStruct.MAX_STAGES * 3 + 1 + RocketStruct.MAX_STAGES * 2); // capsule + stages + result + drives
 	}
 
 	@Override
@@ -52,8 +56,8 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	@Override
 	public void updateEntity() {
 		if(!worldObj.isRemote) {
-			ItemStack fromStack = slots[slots.length - 2];
-			ItemStack toStack = slots[slots.length - 1];
+			ItemStack fromStack = slots[slots.length - (RocketStruct.MAX_STAGES - currentStage) * 2];
+			ItemStack toStack = slots[slots.length - (RocketStruct.MAX_STAGES - currentStage) * 2 + 1];
 
 			// updates the orbital station information and syncs it to the client, if necessary
 			ItemVOTVdrive.getTarget(fromStack, worldObj);
@@ -115,7 +119,7 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 						if(nextStage != null && nextStage.thruster != null) targetHeight += nextStage.thruster.height;
 
 						int platform = Math.round(targetHeight);
-						
+
 						if(platform > 0) {
 							addPlatform(platform);
 							platforms.add(platform);
@@ -173,7 +177,7 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 				int meta = 0;
 
 				if((x == -4 || x == 4) && (z == -4 || z == 4)) continue;
-					
+
 				if(x < 0) {
 					meta = ForgeDirection.WEST.ordinal();
 				} else if(x > 0) {
@@ -203,6 +207,12 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	}
 
 	@Override
+	public int getSizeInventory() {
+		if(isBreaking) return super.getSizeInventory() - RocketStruct.MAX_STAGES * 2;
+		return super.getSizeInventory();
+	}
+
+	@Override
 	public void serialize(ByteBuf buf) {
 		rocket.writeToByteBuffer(buf);
 	}
@@ -228,17 +238,17 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	public void construct() {
 		if(!rocket.validate()) return;
 
-		slots[slots.length - 3] = ItemCustomRocket.build(rocket);
+		slots[slots.length - RocketStruct.MAX_STAGES * 2 - 1] = ItemCustomRocket.build(rocket);
 
-		for(int i = 0; i < slots.length - 3; i++) {
+		for(int i = 0; i < slots.length - RocketStruct.MAX_STAGES * 2 - 1; i++) {
 			slots[i] = null;
 		}
 	}
 
 	public boolean canDeconstruct() {
-		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - 3]);
+		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - RocketStruct.MAX_STAGES * 2 - 1]);
 		if(rocket == null) return false;
-		for(int i = 0; i < slots.length - 3; i++) {
+		for(int i = 0; i < slots.length - RocketStruct.MAX_STAGES * 2 - 1; i++) {
 			if(slots[i] != null) return false;
 		}
 
@@ -247,8 +257,8 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 
 	public void deconstruct() {
 		if(!canDeconstruct()) return;
-		int satFreq = ISatChip.getFreqS(slots[slots.length - 3]);
-		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - 3]);
+		int satFreq = ISatChip.getFreqS(slots[slots.length - RocketStruct.MAX_STAGES * 2 - 1]);
+		RocketStruct rocket = ItemCustomRocket.get(slots[slots.length - RocketStruct.MAX_STAGES * 2 - 1]);
 
 		slots[0] = new ItemStack(rocket.capsule.part);
 		if(slots[0].getItem() instanceof ISatChip) {
@@ -262,14 +272,14 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 			slots[o + 3] = new ItemStack(stage.thruster.part, stage.thrusterCount);
 		}
 
-		slots[slots.length - 3] = null;
+		slots[slots.length - RocketStruct.MAX_STAGES * 2 - 1] = null;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return TileEntity.INFINITE_EXTENT_AABB;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared() {
@@ -311,5 +321,5 @@ public class TileEntityMachineRocketAssembly extends TileEntityMachineBase imple
 	public int getInventoryStackLimit() {
 		return 8;
 	}
-	
+
 }

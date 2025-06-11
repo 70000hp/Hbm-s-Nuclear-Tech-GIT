@@ -1,7 +1,9 @@
 package com.hbm.items.tool;
 
+import com.hbm.dim.CelestialBody;
 import com.hbm.items.special.ItemBedrockOreBase;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
+import com.hbm.items.special.ItemBedrockOreNew.CelestialBedrockOre;
+import com.hbm.items.special.ItemBedrockOreNew.CelestialBedrockOreType;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.toclient.PlayerInformPacket;
 import com.hbm.util.ChatBuilder;
@@ -21,15 +23,17 @@ public class ItemOreDensityScanner extends Item {
 		if(!(entity instanceof EntityPlayerMP) || world.getTotalWorldTime() % 5 != 0) return;
 		
 		EntityPlayerMP player = (EntityPlayerMP) entity;
+
+		CelestialBody body = CelestialBody.getBody(world);
 		
-		for(BedrockOreType type : BedrockOreType.values()) {
-			double level = ItemBedrockOreBase.getOreLevel((int) Math.floor(player.posX), (int) Math.floor(player.posZ), type);
+		for(CelestialBedrockOreType type : CelestialBedrockOre.get(body.getEnum()).types) {
+			double level = ItemBedrockOreBase.getOreLevel(world, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), type);
 			PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(
 					ChatBuilder.startTranslation("item.bedrock_ore.type." + type.suffix + ".name")
 					.next(": " + ((int) (level * 100) / 100D) + " (")
 					.nextTranslation(translateDensity(level)).color(getColor(level))
 					.next(")").color(EnumChatFormatting.RESET).flush(),
-			777 + type.ordinal(), 4000), player);
+			777 + type.index, 4000), player);
 		}
 	}
 	

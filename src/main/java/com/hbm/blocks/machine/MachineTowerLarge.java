@@ -10,7 +10,7 @@ import com.hbm.dim.trait.CBT_Atmosphere;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityTowerLarge;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
@@ -27,13 +27,13 @@ public class MachineTowerLarge extends BlockDummyable implements ILookOverlay {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int meta) {
-		
+
 		if(meta >= 12)
 			return new TileEntityTowerLarge();
-		
+
 		if(meta >= 8)
 			return new TileEntityProxyCombo(false, false, true);
-		
+
 		return null;
 	}
 
@@ -50,10 +50,10 @@ public class MachineTowerLarge extends BlockDummyable implements ILookOverlay {
 	@Override
 	public void fillSpace(World world, int x, int y, int z, ForgeDirection dir, int o) {
 		super.fillSpace(world, x, y, z, dir, o);
-		
+
 		x = x + dir.offsetX * o;
 		z = z + dir.offsetZ * o;
-		
+
 		for(int i = 2; i <= 6; i++) {
 			ForgeDirection dr2 = ForgeDirection.getOrientation(i);
 			ForgeDirection rot = dr2.getRotation(ForgeDirection.UP);

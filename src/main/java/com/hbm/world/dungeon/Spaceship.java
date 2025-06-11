@@ -28,7 +28,7 @@ public class Spaceship extends WorldGenerator {
 	Block Block8 = ModBlocks.fusion_hatch;
 	Block Block9 = ModBlocks.reinforced_light;
 	Block Block10 = ModBlocks.reinforced_glass;
-	
+
 	protected Block[] GetValidSpawnBlocks() {
 		return new Block[] {
 			Blocks.grass,
@@ -40,6 +40,7 @@ public class Spaceship extends WorldGenerator {
 			ModBlocks.moon_rock,
 			ModBlocks.duna_sands,
 			ModBlocks.duna_rock,
+			ModBlocks.duna_cobble,
 			ModBlocks.ike_regolith,
 			ModBlocks.ike_stone,
 			ModBlocks.dres_rock,
@@ -91,7 +92,7 @@ public class Spaceship extends WorldGenerator {
 			return false;
 
 		y += 1;
-		
+
 		world.setBlock(x + 2, y + -3, z + 10, Blocks.air, 0, 3);
 		world.setBlock(x + 2, y + -3, z + 11, Blocks.air, 0, 3);
 		world.setBlock(x + 11, y + -3, z + 11, Blocks.air, 0, 3);

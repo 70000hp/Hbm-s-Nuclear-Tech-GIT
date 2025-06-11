@@ -2,6 +2,7 @@ package com.hbm.tileentity.machine;
 
 import java.util.HashMap;
 
+import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBrickFurnace;
 import com.hbm.inventory.OreDictManager.DictFrame;
 import com.hbm.inventory.container.ContainerFurnaceBrick;
@@ -26,23 +27,34 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.world.World;
 
 public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGUIProvider {
-	
+
 	private static final int[] slotsTop = new int[] { 0 };
 	private static final int[] slotsBottom = new int[] { 2, 1, 3 };
 	private static final int[] slotsSides = new int[] {1};
-	
+
 	public static HashMap<Item, Integer> burnSpeed = new HashMap();
-	
+
 	static {
 		burnSpeed.put(Items.clay_ball,								4);
 		burnSpeed.put(ModItems.ball_fireclay,						4);
 		burnSpeed.put(Item.getItemFromBlock(Blocks.netherrack),		4);
 		burnSpeed.put(Item.getItemFromBlock(Blocks.cobblestone),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.duna_cobble),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.dres_rock),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.ike_regolith), 2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.eve_rock),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.moho_regolith), 2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.moon_rock),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.minmus_regolith), 2);
 		burnSpeed.put(Item.getItemFromBlock(Blocks.sand),			2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.duna_sands),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.laythe_silt),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.eve_silt),	2);
+		burnSpeed.put(Item.getItemFromBlock(ModBlocks.moon_turf),	2);
 		burnSpeed.put(Item.getItemFromBlock(Blocks.log),			2);
 		burnSpeed.put(Item.getItemFromBlock(Blocks.log2),			2);
 	}
-	
+
 	public int burnTime;
 	public int maxBurnTime;
 	public int progress;
@@ -63,16 +75,16 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 	@Override
 
 	public void updateEntity() {
-		
+
 		if(!worldObj.isRemote) {
 			boolean wasBurning = this.burnTime > 0;
 			boolean canOperate = breatheAir(wasBurning && worldObj.getTotalWorldTime() % 5 == 0 ? 1 : 0);
 			boolean markDirty = false;
-	
+
 			if(this.burnTime > 0) {
 				this.burnTime--;
 			}
-	
+
 			if(this.burnTime != 0 || this.slots[1] != null && this.slots[0] != null) {
 				if(canOperate && this.burnTime == 0 && this.canSmelt()) {
 					this.maxBurnTime = this.burnTime = TileEntityFurnace.getItemBurnTime(this.slots[1]);
@@ -116,21 +128,21 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 				markDirty = true;
 				MachineBrickFurnace.updateBlockState(this.burnTime > 0, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 			}
-	
+
 			if(markDirty) {
 				this.markDirty();
 			}
-			
+
 			this.networkPackNT(15);
 		}
 	}
-	
+
 	public int getBurnSpeed() {
 		Integer speed = burnSpeed.get(slots[0].getItem());
 		if(speed != null) return speed;
 		return 1;
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		return slot >= 2 ? false : (slot == 1 ? TileEntityFurnace.getItemBurnTime(stack) > 0 : true);
@@ -148,16 +160,16 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 		buf.writeInt(maxBurnTime);
 		buf.writeInt(progress);
 	}
-	
+
 	@Override public void deserialize(ByteBuf buf) {
 		super.deserialize(buf);
 		this.burnTime = buf.readInt();
 		this.maxBurnTime = buf.readInt();
 		this.progress = buf.readInt();
 	}
-	
+
 	protected boolean processAsh(int level, EnumAshType type, int threshold) {
-		
+
 		if(level >= threshold) {
 			if(slots[3] == null) {
 				slots[3] = DictFrame.fromOne(ModItems.powder_ash, type);
@@ -167,7 +179,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -186,7 +198,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 			return result <= getInventoryStackLimit() && result <= this.slots[2].getMaxStackSize();
 		}
 	}
-	
+
 	public void smeltItem() {
 		if(this.canSmelt()) {
 			ItemStack itemstack = FurnaceRecipes.smelting().getSmeltingResult(this.slots[0]);

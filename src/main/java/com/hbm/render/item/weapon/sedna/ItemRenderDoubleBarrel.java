@@ -2,14 +2,23 @@ package com.hbm.render.item.weapon.sedna;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.items.ModItems;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
+import com.hbm.items.weapon.sedna.mods.WeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public class ItemRenderDoubleBarrel extends ItemRenderWeaponBase {
+	
+	protected ResourceLocation texture;
+	
+	public ItemRenderDoubleBarrel(ResourceLocation texture) {
+		this.texture = texture;
+	}
 
 	@Override
 	protected float getTurnMagnitude(ItemStack stack) { return ItemGunBaseNT.getIsAiming(stack) ? 2.5F : -0.5F; }
@@ -34,7 +43,7 @@ public class ItemRenderDoubleBarrel extends ItemRenderWeaponBase {
 	public void renderFirstPerson(ItemStack stack) {
 		
 		ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
-		Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.double_barrel_tex);
+		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
 		double scale = 0.375D;
 		GL11.glScaled(scale, scale, scale);
 
@@ -75,7 +84,7 @@ public class ItemRenderDoubleBarrel extends ItemRenderWeaponBase {
 		GL11.glTranslated(0, 0.4375, 0.875);
 		
 		ResourceManager.double_barrel.renderPart("BarrelShort");
-		ResourceManager.double_barrel.renderPart("Barrel");
+		if(!isSawedOff(stack)) ResourceManager.double_barrel.renderPart("Barrel");
 
 		GL11.glPushMatrix();
 		GL11.glTranslated(0.75, 0, -0.6875);
@@ -126,11 +135,26 @@ public class ItemRenderDoubleBarrel extends ItemRenderWeaponBase {
 	@Override
 	public void setupInv(ItemStack stack) {
 		super.setupInv(stack);
-		double scale = 1.375D;
+		if(isSawedOff(stack)) {
+			double scale = 2D;
+			GL11.glScaled(scale, scale, scale);
+			GL11.glRotated(25, 1, 0, 0);
+			GL11.glRotated(45, 0, 1, 0);
+			GL11.glTranslated(-2, 0.5, 0);
+		} else {
+			double scale = 1.375D;
+			GL11.glScaled(scale, scale, scale);
+			GL11.glRotated(25, 1, 0, 0);
+			GL11.glRotated(45, 0, 1, 0);
+			GL11.glTranslated(0, 0.5, 0);
+		}
+	}
+
+	@Override
+	public void setupModTable(ItemStack stack) {
+		double scale = -8.75D;
 		GL11.glScaled(scale, scale, scale);
-		GL11.glRotated(25, 1, 0, 0);
-		GL11.glRotated(45, 0, 1, 0);
-		GL11.glTranslated(0, 0.5, 0);
+		GL11.glRotated(90, 0, 1, 0);
 	}
 
 	@Override
@@ -138,8 +162,17 @@ public class ItemRenderDoubleBarrel extends ItemRenderWeaponBase {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		
 		GL11.glShadeModel(GL11.GL_SMOOTH);
-		Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.double_barrel_tex);
-		ResourceManager.double_barrel.renderAll();
+		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+		ResourceManager.double_barrel.renderPart("Stock");
+		ResourceManager.double_barrel.renderPart("BarrelShort");
+		if(!isSawedOff(stack)) ResourceManager.double_barrel.renderPart("Barrel");
+		ResourceManager.double_barrel.renderPart("Buckle");
+		ResourceManager.double_barrel.renderPart("Lever");
+		ResourceManager.double_barrel.renderPart("Shells");
 		GL11.glShadeModel(GL11.GL_FLAT);
+	}
+	
+	public boolean isSawedOff(ItemStack stack) {
+		return stack.getItem() == ModItems.gun_double_barrel_sacred_dragon || WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SAWED_OFF);
 	}
 }

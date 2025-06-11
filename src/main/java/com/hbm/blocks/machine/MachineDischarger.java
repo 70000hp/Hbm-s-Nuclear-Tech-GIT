@@ -14,7 +14,7 @@ import com.hbm.tileentity.IPersistentNBT;
 import com.hbm.tileentity.machine.TileEntityMachineDischarger;
 import com.hbm.tileentity.machine.storage.TileEntityMachineBattery;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -40,12 +40,12 @@ public class MachineDischarger extends BlockContainer{
 
     private final Random field_149933_a = new Random();
 	private static boolean keepInventory;
-	
+
 	@SideOnly(Side.CLIENT)
 	//private IIcon iconFront;
 	private IIcon iconTop;
 	private IIcon iconBottom;
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconRegister) {
@@ -53,7 +53,7 @@ public class MachineDischarger extends BlockContainer{
 		this.iconBottom = iconRegister.registerIcon(RefStrings.MODID + (":discharger_bottom"));
 		this.blockIcon = iconRegister.registerIcon(RefStrings.MODID + ":discharger_side");
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int metadata) {
@@ -63,13 +63,13 @@ public class MachineDischarger extends BlockContainer{
 	public MachineDischarger(Material p_i45386_1_) {
 		super(p_i45386_1_);
 	}
-	
+
 	@Override
 	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_)
     {
         return Item.getItemFromBlock(ModBlocks.machine_discharger);
     }
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		if(world.isRemote)
@@ -96,23 +96,23 @@ public class MachineDischarger extends BlockContainer{
 	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
 		return IPersistentNBT.getDrops(world, x, y, z, this);
 	}
-	
+
 	@Override
 	public void onBlockHarvested(World world, int x, int y, int z, int meta, EntityPlayer player) {
-		
+
 		if(!player.capabilities.isCreativeMode) {
 			harvesters.set(player);
 			this.dropBlockAsItem(world, x, y, z, meta, 0);
 			harvesters.set(null);
 		}
 	}
-	
+
 	@Override
 	public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
 		player.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
 		player.addExhaustion(0.025F);
 	}
-	
+
 	@Override
 	public void breakBlock(World p_149749_1_, int p_149749_2_, int p_149749_3_, int p_149749_4_, Block p_149749_5_, int p_149749_6_)
     {
@@ -164,7 +164,7 @@ public class MachineDischarger extends BlockContainer{
 
         super.breakBlock(p_149749_1_, p_149749_2_, p_149749_3_, p_149749_4_, p_149749_5_, p_149749_6_);
     }
-    
+
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
 		int i = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
@@ -185,7 +185,7 @@ public class MachineDischarger extends BlockContainer{
 		if(itemStack.hasDisplayName()) {
 			((TileEntityMachineBattery) world.getTileEntity(x, y, z)).setCustomName(itemStack.getDisplayName());
 		}
-		
+
 		IPersistentNBT.restoreData(world, x, y, z, itemStack);
 	}
 

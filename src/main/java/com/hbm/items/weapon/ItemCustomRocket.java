@@ -5,7 +5,7 @@ import java.util.List;
 import com.hbm.handler.RocketStruct;
 import com.hbm.items.ISatChip;
 import com.hbm.items.ModItems;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -28,7 +28,7 @@ public class ItemCustomRocket extends Item implements ISatChip {
 		ItemStack stack = build(rocket);
 
 		setFuel(stack, hasFuel);
-		
+
 		return stack;
 	}
 
@@ -49,7 +49,7 @@ public class ItemCustomRocket extends Item implements ISatChip {
 		if(stack.stackTagCompound == null) stack.stackTagCompound = new NBTTagCompound();
 		stack.stackTagCompound.setBoolean("hasFuel", hasFuel);
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {

@@ -4,9 +4,14 @@ import api.hbm.block.ICrucibleAcceptor;
 import com.hbm.handler.CompatHandler;
 import com.hbm.handler.CompatHandler.OCComponent;
 import com.hbm.inventory.fluid.FluidType;
+import com.hbm.inventory.fluid.tank.FluidTank;
 
 import api.hbm.energymk2.IEnergyReceiverMK2;
-import api.hbm.fluid.IFluidConnector;
+import api.hbm.fluidmk2.IFluidConnectorMK2;
+import api.hbm.fluidmk2.IFluidReceiverMK2;
+import api.hbm.redstoneoverradio.IRORInfo;
+import api.hbm.redstoneoverradio.IRORInteractive;
+import api.hbm.redstoneoverradio.IRORValueProvider;
 import api.hbm.tile.IHeatSource;
 import com.hbm.inventory.material.Mats;
 import cpw.mods.fml.common.Loader;
@@ -26,7 +31,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 		@Optional.Interface(iface = "com.hbm.handler.CompatHandler.OCComponent", modid = "opencomputers"),
 		@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
 })
-public class TileEntityProxyCombo extends TileEntityProxyBase implements IEnergyReceiverMK2, ISidedInventory, IFluidConnector, IHeatSource, ICrucibleAcceptor, SimpleComponent, OCComponent {
+public class TileEntityProxyCombo extends TileEntityProxyBase implements IEnergyReceiverMK2, ISidedInventory, IFluidReceiverMK2, IHeatSource, ICrucibleAcceptor, SimpleComponent, OCComponent, IRORValueProvider, IRORInteractive {
 
 	TileEntity tile;
 	boolean inventory;
@@ -140,6 +145,53 @@ public class TileEntityProxyCombo extends TileEntityProxyBase implements IEnergy
 			return ((IEnergyReceiverMK2)getTile()).canConnect(dir);
 		}
 
+		return true;
+	}
+
+	public static final FluidTank[] EMPTY_TANKS = new FluidTank[0];
+
+	@Override
+	public FluidTank[] getAllTanks() {
+		if(!fluid) return EMPTY_TANKS;
+
+		if(getTile() instanceof IFluidReceiverMK2) {
+			return ((IFluidReceiverMK2)getTile()).getAllTanks();
+		}
+
+		return EMPTY_TANKS;
+	}
+
+	@Override
+	public long transferFluid(FluidType type, int pressure, long amount) {
+		if(!fluid) return amount;
+
+		if(getTile() instanceof IFluidReceiverMK2) {
+			return ((IFluidReceiverMK2)getTile()).transferFluid(type, pressure, amount);
+		}
+
+		return amount;
+	}
+
+	@Override
+	public long getDemand(FluidType type, int pressure) {
+		if(!fluid) return 0;
+
+		if(getTile() instanceof IFluidReceiverMK2) {
+			return ((IFluidReceiverMK2)getTile()).getDemand(type, pressure);
+		}
+
+		return 0;
+	}
+
+	@Override
+	public boolean canConnect(FluidType type, ForgeDirection dir) {
+
+		if(!this.fluid)
+			return false;
+
+		if(getTile() instanceof IFluidConnectorMK2) {
+			return ((IFluidConnectorMK2) getTile()).canConnect(type, dir);
+		}
 		return true;
 	}
 
@@ -369,42 +421,6 @@ public class TileEntityProxyCombo extends TileEntityProxyBase implements IEnergy
 	}
 
 	@Override
-	public long transferFluid(FluidType type, int pressure, long fluid) {
-
-		if(!this.fluid)
-			return fluid;
-
-		if(getTile() instanceof IFluidConnector) {
-			return ((IFluidConnector)getTile()).transferFluid(type, pressure, fluid);
-		}
-		return fluid;
-	}
-
-	@Override
-	public long getDemand(FluidType type, int pressure) {
-
-		if(!this.fluid)
-			return 0;
-
-		if(getTile() instanceof IFluidConnector) {
-			return ((IFluidConnector)getTile()).getDemand(type, pressure);
-		}
-		return 0;
-	}
-
-	@Override
-	public boolean canConnect(FluidType type, ForgeDirection dir) {
-
-		if(!this.fluid)
-			return false;
-
-		if(getTile() instanceof IFluidConnector) {
-			return ((IFluidConnector)getTile()).canConnect(type, dir);
-		}
-		return true;
-	}
-
-	@Override
 	public int getHeatStored() {
 
 		if(!this.heat)
@@ -498,5 +514,23 @@ public class TileEntityProxyCombo extends TileEntityProxyBase implements IEnergy
 		if(this.getTile() instanceof OCComponent)
 			return ((OCComponent) this.getTile()).invoke(method, context, args);
 		return OCComponent.super.invoke(null, null, null);
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		if(getTile() instanceof IRORInfo) return ((IRORInfo) getTile()).getFunctionInfo();
+		return new String[0];
+	}
+
+	@Override
+	public String provideRORValue(String name) {
+		if(getTile() instanceof IRORValueProvider) return ((IRORValueProvider) getTile()).provideRORValue(name);
+		return null;
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+		if(getTile() instanceof IRORInteractive) return ((IRORInteractive) getTile()).runRORFunction(name, params);
+		return null;
 	}
 }

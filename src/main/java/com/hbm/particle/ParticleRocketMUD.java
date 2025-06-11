@@ -2,60 +2,17 @@ package com.hbm.particle;
 
 import java.util.Random;
 
-import com.hbm.main.ModEventHandlerClient;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.World;
 
 @SideOnly(Side.CLIENT)
-public class ParticleRocketMUD extends EntityFX {
-	
-	private int age;
-	private int maxAge;
+public class ParticleRocketMUD extends ParticleRocketFlame {
 
 	public ParticleRocketMUD(TextureManager p_i1213_1_, World p_i1218_1_, double p_i1218_2_, double p_i1218_4_, double p_i1218_6_) {
-		super(p_i1218_1_, p_i1218_2_, p_i1218_4_, p_i1218_6_);
-		particleIcon = ModEventHandlerClient.particleBase;
-		maxAge = 300 + rand.nextInt(50);
-		this.particleScale = 1F;
-	}
-	
-	public ParticleRocketMUD setScale(float scale) {
-		this.particleScale = scale;
-		return this;
-	}
-	
-	public ParticleRocketMUD setMaxAge(int maxAge) {
-		this.maxAge = maxAge;
-		return this;
-	}
-
-	@Override
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		
-		this.age++;
-
-		if(this.age == this.maxAge) {
-			this.setDead();
-		}
-
-		this.motionX *= 0.91D;
-		this.motionY *= 0.91D;
-		this.motionZ *= 0.91D;
-		
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-	}
-
-	@Override
-	public int getFXLayer() {
-		return 1;
+		super(p_i1213_1_, p_i1218_1_, p_i1218_2_, p_i1218_4_, p_i1218_6_);
 	}
 
 	@Override

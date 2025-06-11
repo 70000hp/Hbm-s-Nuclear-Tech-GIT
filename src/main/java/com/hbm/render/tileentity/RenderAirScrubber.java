@@ -25,18 +25,18 @@ public class RenderAirScrubber extends TileEntitySpecialRenderer implements IIte
 
 			GL11.glTranslated(x + 0.5D, y, z + 0.5D);
 			GL11.glEnable(GL11.GL_LIGHTING);
-	
+
 			GL11.glRotatef(180, 0F, 1F, 0F);
-	
+
 			switch(te.getBlockMetadata() - BlockDummyable.offset) {
 			case 2: GL11.glRotatef(0, 0F, 1F, 0F); break;
 			case 4: GL11.glRotatef(90, 0F, 1F, 0F); break;
 			case 3: GL11.glRotatef(180, 0F, 1F, 0F); break;
 			case 5: GL11.glRotatef(270, 0F, 1F, 0F); break;
 			}
-	
+
 			bindTexture(ResourceManager.air_scrubber_tex);
-	
+
 			GL11.glShadeModel(GL11.GL_SMOOTH);
 			ResourceManager.air_scrubber.renderPart("Base");
 
@@ -55,10 +55,11 @@ public class RenderAirScrubber extends TileEntitySpecialRenderer implements IIte
 	public IItemRenderer getRenderer() {
 		return new ItemRenderBase() {
 			public void renderInventory() {
-				GL11.glTranslated(0, -2, 0);
+				GL11.glTranslated(0, -4, 0);
 				GL11.glScaled(4, 4, 4);
 			}
 			public void renderCommon() {
+				GL11.glScaled(1.5, 1.5, 1.5);
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glShadeModel(GL11.GL_SMOOTH);
 				bindTexture(ResourceManager.air_scrubber_tex);

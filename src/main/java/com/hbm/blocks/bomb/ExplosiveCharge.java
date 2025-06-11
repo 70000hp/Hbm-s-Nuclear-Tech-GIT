@@ -40,10 +40,10 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 	public void registerBlockIcons(IIconRegister iconRegister) {
 		super.registerBlockIcons(iconRegister);
 		if(this == ModBlocks.det_nuke) {
-			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_nuke_top");	
+			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_nuke_top");
 		}
 		if(this == ModBlocks.det_salt) {
-			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_cobalt_top");	
+			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_cobalt_top");
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 
 	@Override
 	public BombReturnCode explode(World world, int x, int y, int z) {
-		
+
 		if(!world.isRemote) {
 			world.setBlock(x, y, z, Blocks.air);
 			if(this == ModBlocks.det_cord) {
@@ -78,24 +78,24 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 			}
 			if(this == ModBlocks.det_nuke) {
 				world.spawnEntityInWorld(EntityNukeExplosionMK5.statFac(world, BombConfig.missileRadius, x + 0.5, y + 0.5, z + 0.5));
-				EntityNukeTorex.statFac(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
+				EntityNukeTorex.statFacStandard(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
 			}
 			if(this == ModBlocks.det_salt) {
 				world.spawnEntityInWorld(EntityNukeExplosionMK5.statFacSalted(world, BombConfig.missileRadius, x + 0.5, y + 0.5, z + 0.5));
 
-				EntityNukeTorex.statFac(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
+				EntityNukeTorex.statFacStandard(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
 			}
 		}
 
 		return BombReturnCode.DETONATED;
 	}
-	
+
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
 		if(!world.isRemote) {
 			if(GeneralConfig.enableExtendedLogging) {
 				MainRegistry.logger.log(Level.INFO, "[BOMBPL]" + this.getLocalizedName() + " placed at " + x + " / " + y + " / " + z + "! " + "by "+ player.getCommandSenderName());
-			}	
+			}
 		}
 	}
 

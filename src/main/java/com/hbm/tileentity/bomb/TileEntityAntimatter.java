@@ -3,8 +3,6 @@ package com.hbm.tileentity.bomb;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.logic.EntityBalefire;
 import com.hbm.inventory.container.ContainerNukeAntimatter;
-import com.hbm.inventory.container.ContainerNukeAntimatter;
-import com.hbm.inventory.gui.GUINukeAntimatter;
 import com.hbm.inventory.gui.GUINukeAntimatter;
 import com.hbm.items.ModItems;
 import com.hbm.tileentity.IGUIProvider;
@@ -12,7 +10,7 @@ import com.hbm.tileentity.TileEntityMachineBase;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -55,20 +53,23 @@ public class TileEntityAntimatter extends TileEntityMachineBase implements IGUIP
 			if(timer <= 0) {
 				explode();
 			}
-			
-			NBTTagCompound data = new NBTTagCompound();
-			data.setInteger("timer", timer);
-			data.setBoolean("loaded", this.isLoaded());
-			data.setBoolean("started", started);
-			networkPack(data, 250);
+
+			networkPackNT(250);
 		}
 	}
-	
-	public void networkUnpack(NBTTagCompound data) {
-		
-		timer = data.getInteger("timer");
-		started = data.getBoolean("started");
-		loaded = data.getBoolean("loaded");
+
+	@Override
+	public void serialize(ByteBuf buf) {
+		buf.writeInt(timer);
+		buf.writeBoolean(isLoaded());
+		buf.writeBoolean(started);
+	}
+
+	@Override
+	public void deserialize(ByteBuf buf) {
+		timer = buf.readInt();
+		loaded = buf.readBoolean();
+		started = buf.readBoolean();
 	}
 	
 	public void handleButtonPacket(int value, int meta) {

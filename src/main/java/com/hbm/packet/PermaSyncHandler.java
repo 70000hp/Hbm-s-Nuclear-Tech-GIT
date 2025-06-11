@@ -32,12 +32,12 @@ import net.minecraft.world.World;
  * @author hbm
  */
 public class PermaSyncHandler {
-	
+
 	public static HashSet<Integer> boykissers = new HashSet<Integer>();
 	public static float[] pollution = new float[PollutionType.values().length];
 
 	public static void writePacket(ByteBuf buf, World world, EntityPlayerMP player) {
-		
+
 		/// TOM IMPACT DATA ///
 		TomSaveData data = TomSaveData.forWorld(world);
 		buf.writeFloat(data.fire);
@@ -45,7 +45,7 @@ public class PermaSyncHandler {
 		buf.writeBoolean(data.impact);
 		buf.writeLong(data.time);
 		/// TOM IMPACT DATA ///
-		
+
 		/// SHITTY MEMES ///
 		List<Integer> ids = new ArrayList<Integer>();
 		for(Object o : world.playerEntities) {
@@ -76,11 +76,11 @@ public class PermaSyncHandler {
 				if(traits != null) {
 					buf.writeBoolean(true); // Has traits marker (since we can have an empty list)
 					buf.writeInt(traits.size());
-		
+
 					for(int i = 0; i < CelestialBodyTrait.traitList.size(); i++) {
 						Class<? extends CelestialBodyTrait> traitClass = CelestialBodyTrait.traitList.get(i);
 						CelestialBodyTrait trait = traits.get(traitClass);
-			
+
 						if(trait != null) {
 							buf.writeInt(i); // ID of the trait, in order registered
 							trait.writeToBytes(buf);
@@ -122,7 +122,7 @@ public class PermaSyncHandler {
 		}
 		/// RIDING DESYNC FIX ///
 	}
-	
+
 	public static void readPacket(ByteBuf buf, World world, EntityPlayer player) {
 
 		/// TOM IMPACT DATA ///
@@ -148,32 +148,47 @@ public class PermaSyncHandler {
 		/// CBT ///
 		if(buf.readBoolean()) {
 			try {
-				HashMap<String, HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>> traitMap = new HashMap<String, HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>>();
-	
+				HashMap<String, HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>> traitMap = SolarSystemWorldSavedData.clientTraits;
+
+				if(traitMap == null) {
+					traitMap = new HashMap<String, HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>>();
+					SolarSystemWorldSavedData.updateClientTraits(traitMap);
+				}
+
 				for(CelestialBody body : CelestialBody.getAllBodies()) {
 					if(buf.readBoolean()) {
-						HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait> traits = new HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>();
-	
+						HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait> traits = traitMap.get(body.name);
+
+						if(traits == null) {
+							traits = new HashMap<Class<? extends CelestialBodyTrait>, CelestialBodyTrait>();
+							traitMap.put(body.name, traits);
+						}
+
+						List<Class<? extends CelestialBodyTrait>> sentTraits = new ArrayList<>();
+
 						int cbtSize = buf.readInt();
 						for(int i = 0; i < cbtSize; i++) {
-							CelestialBodyTrait trait = CelestialBodyTrait.traitList.get(buf.readInt()).newInstance();
+							Class<? extends CelestialBodyTrait> clazz = CelestialBodyTrait.traitList.get(buf.readInt());
+							sentTraits.add(clazz);
+
+							CelestialBodyTrait trait = traits.getOrDefault(clazz, clazz.newInstance());
 							trait.readFromBytes(buf);
-			
+
 							traits.put(trait.getClass(), trait);
 						}
-	
-						traitMap.put(body.name, traits);
+
+						traits.keySet().removeIf(traitClass -> !sentTraits.contains(traitClass));
+					} else {
+						traitMap.remove(body.name);
 					}
 				}
-	
-				SolarSystemWorldSavedData.updateClientTraits(traitMap);
 			} catch (Exception ex) {
 				// If any exception occurs, stop parsing any more bytes, they'll be unaligned
 				// We'll unset the client trait set to prevent any issues
-	
+
 				MainRegistry.logger.catching(ex);
 				SolarSystemWorldSavedData.updateClientTraits(null);
-	
+
 				return;
 			}
 		}

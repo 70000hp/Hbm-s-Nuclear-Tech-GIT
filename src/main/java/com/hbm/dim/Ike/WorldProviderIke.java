@@ -13,7 +13,7 @@ import net.minecraft.world.biome.*;
 import net.minecraft.world.chunk.IChunkProvider;
 
 public class WorldProviderIke extends WorldProviderCelestial {
-	
+
 	@Override
 	public void registerWorldChunkManager() {
 		this.worldChunkMgr = new WorldChunkManagerHell(new BiomeGenIke(SpaceConfig.ikeBiome), dimensionId);
@@ -23,7 +23,7 @@ public class WorldProviderIke extends WorldProviderCelestial {
 	public String getDimensionName() {
 		return "Ike";
 	}
-	
+
 	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderIke(this.worldObj, this.getSeed(), false);
@@ -35,9 +35,14 @@ public class WorldProviderIke extends WorldProviderCelestial {
 	}
 
 	@Override
+	public boolean hasIce() {
+		return true;
+	}
+
+	@Override
 	public boolean updateLightmap(int[] lightmap) {
+		float sun = getSunBrightness(1.0F) - 0.1F;
 		for(int i = 0; i < 256; i++) {
-			float sun = getSunBrightness(1.0F) - 0.1F;
 			float sky = lightBrightnessTable[i / 16];
 			float duna = Math.max(sky - sun, 0);
 

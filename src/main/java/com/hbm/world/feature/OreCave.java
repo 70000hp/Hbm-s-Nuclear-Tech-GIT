@@ -32,6 +32,9 @@ public class OreCave {
 	private Block fluid;
 	int dim = 0;
 	boolean allCelestials = false;
+	Block override;
+	boolean ignoreWater = false;
+	boolean spawnStalagmites = true;
 	
 	public OreCave(Block ore) {
 		this(ore, 0);
@@ -72,6 +75,21 @@ public class OreCave {
 		return this;
 	}
 
+	public OreCave setBlockOverride(Block override) {
+		this.override = override;
+		return this;
+	}
+
+	public OreCave setIgnoreWater(boolean ignoreWater) {
+		this.ignoreWater = ignoreWater;
+		return this;
+	}
+
+	public OreCave setStalagmites(boolean spawnStalagmites) {
+		this.spawnStalagmites = spawnStalagmites;
+		return this;
+	}
+
 	// If enabled, this cave will spawn on all celestial bodies
 	public OreCave setGlobal(boolean value) {
 		this.allCelestials = value;
@@ -87,7 +105,9 @@ public class OreCave {
 		if(world.provider == null) return;
 
 		Block replace = Blocks.stone;
-		if(world.provider instanceof WorldProviderCelestial) {
+		if(override != null) {
+			replace = override;
+		} else if(world.provider instanceof WorldProviderCelestial) {
 			replace = ((WorldProviderCelestial)world.provider).getStone();
 		}
 
@@ -130,7 +150,8 @@ public class OreCave {
 							
 							for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 								Block neighbor = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-								if(neighbor.getMaterial() == Material.air || neighbor instanceof BlockStalagmite) {
+								Material material = neighbor.getMaterial();
+								if(material == Material.air || (ignoreWater && material == Material.water) || neighbor instanceof BlockStalagmite) {
 									shouldGen = true;
 								}
 								
@@ -168,29 +189,16 @@ public class OreCave {
 								world.setBlock(x, y, z, ore.block, ore.meta, 2);
 							}
 							
-						} else {
-							if(ore.block != ModBlocks.tumor) {
-								if((genTarget.getMaterial() == Material.air || !genTarget.isNormalCube()) && event.rand.nextInt(5) == 0 && !genTarget.getMaterial().isLiquid()) {
-									
-									if(ModBlocks.stalactite.canPlaceBlockAt(world, x, y, z)) {
-										world.setBlock(x, y, z, ModBlocks.stalactite, BlockStalagmite.getMetaFromResource(ore.meta), 2);
-									} else {
-										if(ModBlocks.stalagmite.canPlaceBlockAt(world, x, y, z)) {
-											world.setBlock(x, y, z, ModBlocks.stalagmite, BlockStalagmite.getMetaFromResource(ore.meta), 2);
-										}
+						} else if(spawnStalagmites) {
+
+							if((genTarget.getMaterial() == Material.air || !genTarget.isNormalCube()) && event.rand.nextInt(5) == 0 && !genTarget.getMaterial().isLiquid()) {
+								if(ModBlocks.stalactite.canPlaceBlockAt(world, x, y, z)) {
+									world.setBlock(x, y, z, ModBlocks.stalactite, BlockStalagmite.getMetaFromResource(ore.block, ore.meta), 2);
+								} else {
+									if(ModBlocks.stalagmite.canPlaceBlockAt(world, x, y, z)) {
+										world.setBlock(x, y, z, ModBlocks.stalagmite, BlockStalagmite.getMetaFromResource(ore.block, ore.meta), 2);
 									}
-								}	
-							}else {
-								if((genTarget.getMaterial() == Material.air || !genTarget.isNormalCube()) && event.rand.nextInt(5) == 0 && !genTarget.getMaterial().isLiquid()) {
-									
-									if(ModBlocks.stalactite.canPlaceBlockAt(world, x, y, z)) {
-										world.setBlock(x, y, z, ModBlocks.stalactite, 2, 2);
-									} else {
-										if(ModBlocks.stalagmite.canPlaceBlockAt(world, x, y, z)) {
-											world.setBlock(x, y, z, ModBlocks.stalagmite, 2, 2);
-										}
-									}
-								}	
+								}
 							}
 						}
 					}

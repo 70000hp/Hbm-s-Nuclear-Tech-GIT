@@ -16,21 +16,23 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.IItemRenderer;
 
 public class RenderRocketAssembly extends TileEntitySpecialRenderer implements IItemRendererProvider {
-	
+
 	public RenderRocketAssembly() { }
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f) {
-		
+
 		if(!(tileentity instanceof TileEntityMachineRocketAssembly))
 			return;
-		
+
 		TileEntityMachineRocketAssembly te = (TileEntityMachineRocketAssembly)tileentity;
-		
+
 		GL11.glPushMatrix();
-		
+
 		GL11.glTranslated(x + 0.5, y - 2.0, z + 0.5D);
-		
+		GL11.glEnable(GL11.GL_LIGHTING);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+
 		switch(te.getBlockMetadata()) {
 		case 2: GL11.glRotatef(180, 0F, 1F, 0F); break;
 		case 4: GL11.glRotatef(270, 0F, 1F, 0F); break;
@@ -40,7 +42,7 @@ public class RenderRocketAssembly extends TileEntitySpecialRenderer implements I
 
 		bindTexture(ResourceManager.rocket_assembly_tex);
 		ResourceManager.rocket_assembly.renderPart("Base");
-		
+
 		if(te.rocket != null && te.rocket.extraIssues.size() == 0) {
 			GL11.glPushMatrix();
 			{
@@ -53,7 +55,7 @@ public class RenderRocketAssembly extends TileEntitySpecialRenderer implements I
 						GL11.glTranslated(0, -stage.thruster.height, 0);
 					}
 				}
-	
+
 				MissilePronter.prontRocket(te.rocket, Minecraft.getMinecraft().getTextureManager(), false);
 
 			}
@@ -79,7 +81,7 @@ public class RenderRocketAssembly extends TileEntitySpecialRenderer implements I
 				ResourceManager.rocket_assembly.renderPart("Level");
 			}
 		}
-		
+
 		GL11.glPopMatrix();
 	}
 

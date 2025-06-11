@@ -15,6 +15,8 @@ public class RadiationConfig {
 	public static boolean worldRadEffects = true;
 	public static boolean cleanupDeadDirt = false;
 
+	public static double celestialRadMultiplier = 0.25;
+
 	public static boolean enableContamination = true;
 	public static boolean enableChunkRads = true;
 	public static boolean enablePRISM = false;
@@ -49,6 +51,8 @@ public class RadiationConfig {
 		worldRad = CommonConfig.createConfigInt(config, CATEGORY_NUKE, "RADWORLD_01_amount", "How many block operations radiation can perform per tick", 10);
 		worldRadThreshold = CommonConfig.createConfigInt(config, CATEGORY_NUKE, "RADWORLD_02_minimum", "The least amount of RADs required for block modification to happen", 20);
 		cleanupDeadDirt = CommonConfig.createConfigBool(config, CATEGORY_NUKE, "RADWORLD_03_regrow", "Whether dead grass and mycelium should decay into dirt", false);
+
+		celestialRadMultiplier = CommonConfig.createConfigDouble(config, CATEGORY_NUKE, "CELESTIAL_00_radMultiplier", "Radiation multiplier on celestial bodies, 1 = 1 rad/s on the Mun", 0.25D);
 
 		enableContamination = CommonConfig.createConfigBool(config, CATEGORY_NUKE, "RADIATION_00_enableContamination", "Toggles player contamination (and negative effects from radiation poisoning)", true);
 		enableChunkRads = CommonConfig.createConfigBool(config, CATEGORY_NUKE, "RADIATION_01_enableChunkRads", "Toggles the world radiation system (chunk radiation only, some blocks use an AoE!)", true);

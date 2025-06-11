@@ -5,13 +5,12 @@ import java.util.Random;
 import com.hbm.dim.noise.DoublePerlinNoiseSampler;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.MapGenBase;
 
 public class MapGenTiltedSpires extends MapGenBase {
-	
+
 	private final int chanceHigh;
 	private final int chanceLow;
 	private final float threshold;
@@ -42,16 +41,15 @@ public class MapGenTiltedSpires extends MapGenBase {
 		this.range = range;
 	}
 
-	// Fix falling gravel lag
+	// setup seeded random
 	@Override
 	public void func_151539_a(IChunkProvider chunk, World world, int chunkX, int chunkZ, Block[] blocks) {
 		if (worldObj != world) {
+			this.rand.setSeed(world.getSeed() + 69);
 			this.perlin = DoublePerlinNoiseSampler.create(new Random(rand.nextLong()), -8, 1.0D, 2.0D);
 		}
 
-		BlockFalling.fallInstantly = true;
 		super.func_151539_a(chunk, world, chunkX, chunkZ, blocks);
-		BlockFalling.fallInstantly = false;
 	}
 
 	// This function is looped over from -this.range to +this.range on both XZ axes.

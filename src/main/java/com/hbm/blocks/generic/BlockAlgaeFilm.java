@@ -7,7 +7,7 @@ import com.hbm.blocks.ILookOverlay;
 import com.hbm.blocks.ITooltipProvider;
 import com.hbm.tileentity.machine.TileEntityAlgaeFilm;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.block.BlockContainer;
@@ -43,7 +43,7 @@ public class BlockAlgaeFilm extends BlockContainer implements ILookOverlay, IToo
 	public boolean renderAsNormalBlock() {
 		return false;
 	}
-	
+
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
 		int i = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
@@ -61,11 +61,11 @@ public class BlockAlgaeFilm extends BlockContainer implements ILookOverlay, IToo
 
 	@Override
 	public void printHook(Pre event, World world, int x, int y, int z) {
-						
+
 		TileEntity tile = world.getTileEntity(x, y, z);
-		
+
 		if(!(tile instanceof TileEntityAlgaeFilm)) return;
-		
+
 		TileEntityAlgaeFilm film = (TileEntityAlgaeFilm) tile;
 
 		List<String> text = new ArrayList<>();
@@ -76,7 +76,7 @@ public class BlockAlgaeFilm extends BlockContainer implements ILookOverlay, IToo
 
 		text.add(EnumChatFormatting.GREEN + "-> " + EnumChatFormatting.RESET + film.tanks[0].getTankType().getLocalizedName() + ": " + film.tanks[0].getFill() + "/" + film.tanks[0].getMaxFill() + "mB");
 		text.add(EnumChatFormatting.RED + "<- " + EnumChatFormatting.RESET + film.tanks[1].getTankType().getLocalizedName() + ": " + film.tanks[1].getFill() + "/" + film.tanks[1].getMaxFill() + "mB");
-	
+
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
 
@@ -85,5 +85,5 @@ public class BlockAlgaeFilm extends BlockContainer implements ILookOverlay, IToo
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean ext) {
 		addStandardInfo(stack, player, list, ext);
 	}
-	
+
 }

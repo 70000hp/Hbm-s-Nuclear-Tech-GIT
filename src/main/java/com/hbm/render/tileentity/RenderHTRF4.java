@@ -6,10 +6,7 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.item.ItemRenderBase;
-import com.hbm.tileentity.machine.TileEntityMachineHTRF4;
-import com.hbm.util.BobMathUtil;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -20,7 +17,7 @@ public class RenderHTRF4 extends TileEntitySpecialRenderer implements IItemRende
 	@Override
 	public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float interp) {
 		GL11.glPushMatrix();
-		GL11.glTranslated(x + 0.5D, y, z + 0.5D);
+		GL11.glTranslated(x + 0.5D, y - 2.0D, z + 0.5D);
 		GL11.glEnable(GL11.GL_LIGHTING);
 		
 		switch(tile.getBlockMetadata() - BlockDummyable.offset) {
@@ -56,6 +53,7 @@ public class RenderHTRF4 extends TileEntitySpecialRenderer implements IItemRende
 				bindTexture(ResourceManager.lpw2_tex);
 				ResourceManager.htrf4.renderAll();
 				GL11.glShadeModel(GL11.GL_FLAT);
-			}};
+			}
+		};
 	}
 }

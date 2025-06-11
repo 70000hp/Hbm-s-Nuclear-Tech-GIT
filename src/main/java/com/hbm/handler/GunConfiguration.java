@@ -17,8 +17,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+@Deprecated
 public class GunConfiguration implements Cloneable {
-	
+
 	/**
 	 * alt function restrictions:
 	 * alt can not be reloaded (reload type of 0, ammo cap of 0)
@@ -39,12 +40,12 @@ public class GunConfiguration implements Cloneable {
 	public int firingMode;
 	//weapon won't fire after weapon breaks (main only)
 	public int durability;
-	
+
 	public World dimWorld;
 	public int x;
 	public int y;
 	public int z;
-	
+
 	//animations!
 	public HashMap<AnimType, BusAnimation> animations = new HashMap<AnimType, BusAnimation>();
 	//lazy-ish loading for animations, required for loading animations from ResourceManager, since that occurs after we've initialised the guns
@@ -56,11 +57,7 @@ public class GunConfiguration implements Cloneable {
 	public boolean isCentered;
 	//texture overlay when sneaking
 	public ResourceLocation scopeTexture;
-	//whether the FOV multiplier should be absolute or multiplicative to other modifiers, multiplicative mode is experimental!
-	public boolean absoluteFOV = true;
-	//the target FOV/multiplied FOV modifier when sneaking
-	public float zoomFOV = 0.0F;
-	
+
 	//duration of every animation cycle, used also for how quickly a burst fire rifle can fire
 	public int firingDuration;
 	//sound path to the shooting sound
@@ -78,7 +75,7 @@ public class GunConfiguration implements Cloneable {
 	//whether the reload sound should be played at the beginning or at the end of the reload
 	public boolean reloadSoundEnd = true;
 	public String equipSound = "";
-	
+
 	//how much ammo the clip can hold, 0 if drawn from inventory
 	public int ammoCap;
 	//0 does not allow direct reload, 1 is full clip, 2 is single bullet
@@ -89,7 +86,7 @@ public class GunConfiguration implements Cloneable {
 	public boolean allowsInfinity;
 	//whether the ammo count should be displayed
 	public boolean showAmmo = true;
-	
+
 	//for electrically powered weapons:
 	//the Maximum capacity of the gun
 	public long maxCharge;
@@ -97,7 +94,7 @@ public class GunConfiguration implements Cloneable {
 	public long chargeRate;
 	//how much energy is discharged per shot
 	public long dischargePerShot;
-	
+
 	public String name = "";
 	public EnumGunManufacturer manufacturer = EnumGunManufacturer.NONE;
 	public List<String> comment = new ArrayList<String>();
@@ -107,7 +104,7 @@ public class GunConfiguration implements Cloneable {
 
 	//crosshair
 	public Crosshair crosshair;
-	
+
 	//casing eject behavior
 	public CasingEjector ejector = null;
 
@@ -132,17 +129,5 @@ public class GunConfiguration implements Cloneable {
 	public static final String RSOUND_GRENADE = "hbm:weapon.hkReload";
 	public static final String RSOUND_GRENADE_NEW = "hbm:weapon.glReload";
 	public static final String RSOUND_FATMAN = "hbm:weapon.fatmanReload";
-	
-	public GunConfiguration silenced() {
-		this.firingSound = "hbm:weapon.silencerShoot";
-		return this;
-	}
-	public static void spawnParticles(World world, double x, double y, double z, int count) {
-		
-		NBTTagCompound data = new NBTTagCompound();
-		data.setString("type", "smoke");
-		data.setString("mode", "cloud");
-		data.setInteger("count", count);
-		PacketDispatcher.wrapper.sendToAllAround(new AuxParticlePacketNT(data, x, y, z),  new TargetPoint(world.provider.dimensionId, x, y, z, 250));
-	}
+
 }

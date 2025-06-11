@@ -18,41 +18,39 @@ import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 public class ChunkProviderLaythe extends ChunkProviderCelestial {
 
 	private MapGenGreg caveGenV3 = new MapGenGreg();
-	private MapGenTiltedSpires spires = new MapGenTiltedSpires(2, 14, 0.8F);
-	private MapGenTiltedSpires snowires = new MapGenTiltedSpires(2, 14, 0.8F);
+	private MapGenTiltedSpires spires = new MapGenTiltedSpires(2, 14, 0.75F);
+	private MapGenTiltedSpires snowires = new MapGenTiltedSpires(2, 14, 0.75F);
 
 	private List<SpawnListEntry> spawnedOfFlesh = new ArrayList<SpawnListEntry>();
 
 	public ChunkProviderLaythe(World world, long seed, boolean hasMapFeatures) {
 		super(world, seed, hasMapFeatures);
 		
-		spires.rock = Blocks.stone;
-		spires.regolith = ModBlocks.laythe_silt;
-		spires.curve = true;
-		spires.maxPoint = 6.0F;
-		spires.maxTilt = 3.5F;
-
-		seaBlock = Blocks.water;
-
-		spawnedOfFlesh.add(new SpawnListEntry(EntityCreeperFlesh.class, 10, 4, 4));
-		
 		snowires.rock = Blocks.packed_ice;
 		snowires.regolith = Blocks.snow;
-		snowires.curve = true;
-		snowires.maxPoint = 6.0F;
-		snowires.maxTilt = 3.5F;
+		spires.rock = Blocks.stone;
+		spires.regolith = ModBlocks.laythe_silt;
 
+		spires.curve = snowires.curve = true;
+		spires.maxPoint = snowires.maxPoint = 6.0F;
+		spires.maxTilt = snowires.maxTilt = 3.5F;
+
+		seaBlock = Blocks.water;
+		// seaLevel = 96;
+
+		spawnedOfFlesh.add(new SpawnListEntry(EntityCreeperFlesh.class, 10, 4, 4));
 	}
 
 	@Override
 	public BlockMetaBuffer getChunkPrimer(int x, int z) {
 		BlockMetaBuffer buffer = super.getChunkPrimer(x, z);
 		
-		spires.func_151539_a(this, worldObj, x, z, buffer.blocks);
-		caveGenV3.func_151539_a(this, worldObj, x, z, buffer.blocks);
 		if(biomesForGeneration[0] == BiomeGenBaseLaythe.laythePolar) {
 			snowires.func_151539_a(this, worldObj, x, z, buffer.blocks);
+		} else {
+			spires.func_151539_a(this, worldObj, x, z, buffer.blocks);
 		}
+		caveGenV3.func_151539_a(this, worldObj, x, z, buffer.blocks);
 
 		return buffer;
 	}

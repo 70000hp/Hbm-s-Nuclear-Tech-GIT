@@ -1,5 +1,6 @@
 package com.hbm.tileentity.machine;
 
+import com.hbm.dim.CelestialBody;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.ContainerDriveProcessor;
 import com.hbm.inventory.gui.GUIMachineDriveProcessor;
@@ -16,7 +17,6 @@ import api.hbm.energymk2.IEnergyReceiverMK2;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -57,7 +57,7 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 			} else if(slots[0] == null || slots[0].getItem() != ModItems.full_drive) {
 				isProcessing = false;
 				status = "";
-			} else if(getProcessingTier() < ItemVOTVdrive.getProcessingTier(slots[0])) {
+			} else if(getProcessingTier() < ItemVOTVdrive.getProcessingTier(slots[0], CelestialBody.getBody(worldObj))) {
 				isProcessing = false;
 				status = EnumChatFormatting.RED + "Low tier ";
 			}
@@ -127,7 +127,7 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		
+
 		power = nbt.getLong("power");
 		isProcessing = nbt.getBoolean("isProcessing");
 		progress = nbt.getInteger("progress");
@@ -142,7 +142,7 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 
 	private int getProcessingTier() {
 		if(slots[2] == null || slots[2].getItem() != ModItems.circuit) return 0;
-		
+
 		EnumCircuitType num = EnumUtil.grabEnumSafely(EnumCircuitType.class, slots[2].getItemDamage());
 
 		switch(num) {
@@ -164,7 +164,7 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 		if(ItemVOTVdrive.getProcessed(slots[0])) return;
 
 		// Check that our installed upgrade is a high enough tier
-		if(getProcessingTier() >= ItemVOTVdrive.getProcessingTier(slots[0])) {
+		if(getProcessingTier() >= ItemVOTVdrive.getProcessingTier(slots[0], CelestialBody.getBody(worldObj))) {
 			isProcessing = true;
 		}
 	}
@@ -216,10 +216,10 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 	}
 
 	AxisAlignedBB bb = null;
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-		
+
 		if(bb == null) {
 			bb = AxisAlignedBB.getBoundingBox(
 				xCoord - 1,
@@ -230,12 +230,12 @@ public class TileEntityMachineDriveProcessor extends TileEntityMachineBase imple
 				zCoord + 2
 			);
 		}
-		
+
 		return bb;
 	}
 
 	@Override public long getPower() { return power; }
 	@Override public void setPower(long power) { this.power = power; }
 	@Override public long getMaxPower() { return maxPower; }
-	
+
 }

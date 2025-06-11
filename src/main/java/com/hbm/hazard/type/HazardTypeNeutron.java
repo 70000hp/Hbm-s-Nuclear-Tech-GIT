@@ -9,7 +9,7 @@ import com.hbm.items.ModItems;
 import com.hbm.util.ContaminationUtil;
 import com.hbm.util.ContaminationUtil.ContaminationType;
 import com.hbm.util.ContaminationUtil.HazardType;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -29,15 +29,15 @@ public class HazardTypeNeutron extends HazardTypeBase {
 		if(RadiationConfig.disableNeutron) return;
 
 		boolean reacher = false;
-		
+
 		if(target instanceof EntityPlayer && !GeneralConfig.enable528)
 			reacher = ((EntityPlayer) target).inventory.hasItem(ModItems.reacher);
-		
+
 		level *= stack.stackSize;
-		
+
 		if(level > 0) {
 			float rad = (level / 20F)*ContaminationUtil.calculateRadiationMod(target);
-			
+
 			if(GeneralConfig.enable528 && reacher) {
 				rad = (float) (rad / 49F);	//More realistic function for 528: x / distance^2
 			} else if(reacher) {
@@ -51,7 +51,7 @@ public class HazardTypeNeutron extends HazardTypeBase {
 				}
 				for(int i = 0; i < player.inventory.armorInventory.length; i++) {
 					apply(player.inventory.armorItemInSlot(i), rad);
-				}	
+				}
 			}
 
 			ContaminationUtil.contaminate(target, HazardType.NEUTRON, ContaminationType.CREATIVE, rad);
@@ -65,16 +65,16 @@ public class HazardTypeNeutron extends HazardTypeBase {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addHazardInformation(EntityPlayer player, List list, float level, ItemStack stack, List<HazardModifier> modifiers) {
-		
+
 		level = HazardModifier.evalAllModifiers(stack, player, level, modifiers);
-		
+
 		if(level < 1e-5 || RadiationConfig.disableNeutron)
 			return;
-		
+
 		list.add(EnumChatFormatting.BLUE + "[" + I18nUtil.resolveKey("trait.neutron") + "]");
 		String neut = "" + (Math.floor(level* 1000) / 1000);
 		list.add(EnumChatFormatting.LIGHT_PURPLE+ (neut + "RAD/s^2"));
-		
+
 		if(stack.stackSize > 1) {
 			list.add(EnumChatFormatting.LIGHT_PURPLE + "Stack: " + ((Math.floor(level * 1000 * stack.stackSize) / 1000) + "RAD/s^2"));
 		}
@@ -93,7 +93,7 @@ public class HazardTypeNeutron extends HazardTypeBase {
 	public static void decay(ItemStack stack, float factor) {
 		if(stack == null) return;
 		if(!stack.hasTagCompound()) return;
-		
+
 		float activation = stack.stackTagCompound.getFloat(NEUTRON_KEY);
 		stack.stackTagCompound.setFloat(NEUTRON_KEY, activation * factor);
 

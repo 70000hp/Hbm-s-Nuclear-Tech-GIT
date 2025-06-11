@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.CelestialBody;
 import com.hbm.handler.RocketStruct;
 import com.hbm.handler.atmosphere.IBlockSealable;
@@ -14,7 +15,7 @@ import com.hbm.items.weapon.ItemCustomRocket;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityOrbitalStation;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -50,7 +51,7 @@ public class BlockOrbitalStation extends BlockDummyable implements IBlockSealabl
 	public int getOffset() {
 		return 2;
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		int[] pos = this.findCore(world, x, y, z);
@@ -98,7 +99,7 @@ public class BlockOrbitalStation extends BlockDummyable implements IBlockSealabl
 					}
 				}
 			}
-			
+
 			return true;
 		}
 	}
@@ -140,18 +141,18 @@ public class BlockOrbitalStation extends BlockDummyable implements IBlockSealabl
 		}
 
 		int[] pos = this.findCore(world, x, y, z);
-		
+
 		if(pos == null)
 			return;
 
 		if(Math.abs(pos[0] - x) >= 2 || Math.abs(pos[2] - z) >= 2)
 			return;
-		
+
 		TileEntity te = world.getTileEntity(pos[0], pos[1], pos[2]);
-		
+
 		if(!(te instanceof TileEntityOrbitalStation))
 			return;
-		
+
 		TileEntityOrbitalStation station = (TileEntityOrbitalStation) te;
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
@@ -203,8 +204,20 @@ public class BlockOrbitalStation extends BlockDummyable implements IBlockSealabl
 
 		if(text.isEmpty())
 			return;
-		
+
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
-	
+
+	@Override
+    public boolean canPlaceBlockAt(World worldIn, int x, int y, int z) {
+		if(this == ModBlocks.orbital_station) return false; // block placing of extra main ports (use the dedicated sub-ports!)
+		return super.canPlaceBlockAt(worldIn, x, y, z);
+	}
+
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+		if(this == ModBlocks.orbital_station) return false; // block removal of main port
+		return super.removedByPlayer(world, player, x, y, z, willHarvest);
+	}
+
 }

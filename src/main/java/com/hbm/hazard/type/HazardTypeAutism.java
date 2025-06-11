@@ -5,7 +5,7 @@ import java.util.List;
 import com.hbm.config.RadiationConfig;
 import com.hbm.hazard.modifier.HazardModifier;
 import com.hbm.util.ArmorRegistry;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 import com.hbm.util.ArmorRegistry.HazardClass;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -20,7 +20,7 @@ public class HazardTypeAutism extends HazardTypeBase {
 
 	@Override
 	public void onUpdate(EntityLivingBase target, float level, ItemStack stack) {
-		
+
 		if(RadiationConfig.disableBlinding)
 			return;
 

@@ -13,7 +13,7 @@ import com.hbm.lib.RefStrings;
 import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.tileentity.machine.TileEntityMachineStardar;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,9 @@ public class GUIMachineStardar extends GuiInfoContainer {
 
 	public static ResourceLocation texture = new ResourceLocation( RefStrings.MODID + ":textures/gui/machine/gui_stardar.png");
 	private static final ResourceLocation nightTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/night.png");
+
 	private TileEntityMachineStardar star;
+	private CelestialBody currentBody;
 
 	private int mX, mY; // current mouse position
 	private int lX, lY; // mouse position last frame (for flinging)
@@ -63,12 +65,14 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	private final int[] groundColors;
 
 	public void init() {
-		for(CelestialBody rody : CelestialBody.getLandableBodies()) {
-			CelestialBody body = CelestialBody.getBody(star.getWorldObj());
-			if(rody != body) {
+		currentBody = CelestialBody.getBody(star.getWorldObj());
+		boolean inOrbit = CelestialBody.inOrbit(star.getWorldObj());
+
+		for(CelestialBody landable : CelestialBody.getLandableBodies()) {
+			if(landable != currentBody || inOrbit) {
 				int posX = rnd.nextInt(400) - 200;
 				int posY = rnd.nextInt(400) - 200;
-				pList.add(new POI(posX, posY, rody));
+				pList.add(new POI(posX, posY, landable));
 			}
 		}
 	}
@@ -89,7 +93,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
-        
+
 		this.drawCustomInfoStat(mouseX, mouseY, guiLeft + 129, guiTop + 143, 18, 18, mouseX, mouseY, new String[] {"Program new orbital station into drive"} );
 		this.drawCustomInfoStat(mouseX, mouseY, guiLeft + 149, guiTop + 143, 18, 18, mouseX, mouseY, new String[] {"Program current body into drive"} );
 	}
@@ -125,7 +129,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 		if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
 			starX--;
 		}
-		
+
 		if(star.heightmap == null) {
 			Minecraft.getMinecraft().getTextureManager().bindTexture(nightTexture);
 			drawTexturedModalRect(guiLeft, guiTop, (int) starX * -1, (int) starY * -1, 256, 256);
@@ -136,7 +140,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				int px = (int) (guiLeft + starX + peepee.offsetX);
 				int py = (int) (guiTop + starY + peepee.offsetY);
 
-				drawTexturedModalRect(px, py, xSize + peepee.getBody().processingLevel * 8, 0, 8, 8);
+				drawTexturedModalRect(px, py, xSize + peepee.body.getProcessingLevel(currentBody) * 8, 0, 8, 8);
 			}
 		} else {
 			if(star.updateHeightmap) {
@@ -147,10 +151,10 @@ public class GUIMachineStardar extends GuiInfoContainer {
 					int g = h;
 					int b = 0;
 					int a = 255;
-	
+
 					groundColors[i] = a << 24 | r << 16 | g << 8 | b;
 				}
-	
+
 				groundTexture.updateDynamicTexture();
 
 				star.updateHeightmap = false;
@@ -172,9 +176,9 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				for(POI poi : pList) {
 					int px = (int) (starX + poi.offsetX);
 					int py = (int) (starY + poi.offsetY);
-		
+
 					// Has a small buffer area around the POI to improve click targeting
-					drawCustomInfoStat(mx - guiLeft, my - guiTop, px - 2, py - 2, 12, 12, px + 8, py + 10, I18nUtil.resolveKey("body." + poi.body.name), "Processing Tier: " + poi.body.processingLevel);
+					drawCustomInfoStat(mx - guiLeft, my - guiTop, px - 2, py - 2, 12, 12, px + 8, py + 10, I18nUtil.resolveKey("body." + poi.body.name), "Processing Tier: " + poi.body.getProcessingLevel(currentBody));
 				}
 			} else {
 				pushScissor(9, 9, 158, 108);
@@ -188,7 +192,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				String info = landingInfo(hx, hz);
 				int altitude = altitude(hx, hz);
 				boolean canLand = info == null;
-				
+
 				int sx = mx - ((mx + (int)starX) % 2);
 				int sy = my - ((my + (int)starY) % 2);
 				drawTexturedModalRect(sx - 6 - guiLeft, sy - 6 - guiTop, xSize + (canLand ? 14 : 0), 28, 14, 14);
@@ -220,7 +224,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 			}
 		}
 	}
-	
+
 	private String landingInfo(int x, int z) {
 		if(star.heightmap == null) return "No heightmap";
 		if(x < 3 || x > 252 || z < 3 || z > 252) return "Outside bounds";
@@ -344,7 +348,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 						mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
 
 						NBTTagCompound data = new NBTTagCompound();
-						data.setInteger("pid", poi.getBody().dimensionId);
+						data.setInteger("pid", poi.body.dimensionId);
 
 						PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, star.xCoord, star.yCoord, star.zCoord));
 						break;
@@ -359,7 +363,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				boolean canLand = landingInfo(hx, hz) == null;
 				if(canLand) {
 					mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
-					
+
 					NBTTagCompound data = new NBTTagCompound();
 					data.setInteger("px", hx);
 					data.setInteger("pz", hz);
@@ -377,15 +381,11 @@ public class GUIMachineStardar extends GuiInfoContainer {
 
 		CelestialBody body;
 
-		public POI(int offsetx, int offsety, CelestialBody dbody) {
-			offsetX = offsetx;
-			offsetY = offsety;
+		public POI(int offsetX, int offsetY, CelestialBody body) {
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
 
-			body = dbody;
-		}
-
-		public CelestialBody getBody() {
-			return body;
+			this.body = body;
 		}
 
 	}

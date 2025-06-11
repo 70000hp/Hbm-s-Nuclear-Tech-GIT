@@ -4,8 +4,10 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.WorldChunkManagerCelestial;
 import com.hbm.dim.WorldProviderCelestial;
 import com.hbm.dim.WorldChunkManagerCelestial.BiomeGenLayers;
-import com.hbm.dim.eve.GenLayerEve.GenLayerEveBiomes;
-import com.hbm.dim.eve.GenLayerEve.GenLayerEveRiverMix;
+import com.hbm.dim.eve.genlayer.GenLayerEveBiomes;
+import com.hbm.dim.eve.genlayer.GenLayerEveRiverMix;
+import com.hbm.inventory.FluidStack;
+import com.hbm.inventory.fluid.Fluids;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -33,7 +35,7 @@ public class WorldProviderEve extends WorldProviderCelestial {
 	public String getDimensionName() {
 		return "Eve";
 	}
-	
+
 	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderEve(this.worldObj, this.getSeed(), false);
@@ -97,9 +99,9 @@ public class WorldProviderEve extends WorldProviderCelestial {
 		float alpha = (flashd <= 0) ? 0.0F : 1.0F - Math.min(1.0F, flashd / 100);
 
 		return Vec3.createVectorHelper(ohshit.xCoord + alpha , ohshit.yCoord + alpha, ohshit.zCoord + alpha);
-		
+
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getSunBrightness(float par1) {
@@ -112,6 +114,11 @@ public class WorldProviderEve extends WorldProviderCelestial {
 	@Override
 	public Block getStone() {
 		return ModBlocks.eve_rock;
+	}
+
+	@Override
+	public FluidStack getBedrockAcid() {
+		return new FluidStack(Fluids.KMnO4, 500);
 	}
 
 	private static BiomeGenLayers createBiomeGenerators(long seed) {
@@ -131,7 +138,7 @@ public class WorldProviderEve extends WorldProviderCelestial {
 		GenLayerSmooth genlayersmooth1 = new GenLayerSmooth(1000L, genlayerBiomes);
 		GenLayerEveRiverMix genlayerrivermix = new GenLayerEveRiverMix(100L, genlayersmooth1, genlayersmooth);
 		GenLayerVoronoiZoom genlayervoronoizoom = new GenLayerVoronoiZoom(10L, genlayerrivermix);
-		
+
 		return new BiomeGenLayers(genlayerrivermix, genlayervoronoizoom, seed);
 	}
 

@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.bomb.BlockDetonatable;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.entity.projectile.EntityBulletBeamBase;
 import com.hbm.interfaces.NotableComments;
+import com.hbm.inventory.OreDictManager.DictFrame;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
+import com.hbm.items.ItemEnums.EnumCasingType;
 import com.hbm.items.ModItems;
 import com.hbm.items.weapon.sedna.factory.ConfettiUtil;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
@@ -41,6 +44,8 @@ public class BulletConfig implements Cloneable {
 	public int id;
 	
 	public ComparableStack ammo;
+	public ItemStack casingItem;
+	public int casingAmount;
 	/** How much ammo is added to a standard mag when loading one item */
 	public int ammoReloadCount = 1;
 	public float velocity = 10F;
@@ -99,8 +104,11 @@ public class BulletConfig implements Cloneable {
 	public BulletConfig setChunkloading() {												this.pType = ProjectileType.BULLET_CHUNKLOADING; return this; }
 	public BulletConfig setItem(Item ammo) {											this.ammo = new ComparableStack(ammo); return this; }
 	public BulletConfig setItem(ItemStack ammo) {										this.ammo = new ComparableStack(ammo); return this; }
+	public BulletConfig setItem(ComparableStack ammo) {									this.ammo = ammo; return this; }
 	public BulletConfig setItem(EnumAmmo ammo) {										this.ammo = new ComparableStack(ModItems.ammo_standard, 1, ammo.ordinal()); return this; }
 	public BulletConfig setItem(EnumAmmoSecret ammo) {									this.ammo = new ComparableStack(ModItems.ammo_secret, 1, ammo.ordinal()); return this; }
+	public BulletConfig setCasing(ItemStack item, int amount) {							this.casingItem = item; this.casingAmount = amount; return this; }
+	public BulletConfig setCasing(EnumCasingType item, int amount) {					this.casingItem = DictFrame.fromOne(ModItems.casing, item); this.casingAmount = amount; return this; }
 	public BulletConfig setReloadCount(int ammoReloadCount) {							this.ammoReloadCount = ammoReloadCount; return this; }
 	public BulletConfig setVel(float velocity) {										this.velocity = velocity; return this; }
 	public BulletConfig setSpread(float spread) {										this.spread = spread; return this; }
@@ -115,7 +123,7 @@ public class BulletConfig implements Cloneable {
 	public BulletConfig setupDamageClass(DamageClass clazz) {							this.dmgClass = clazz; return this; }
 	public BulletConfig setRicochetAngle(float angle) {									this.ricochetAngle = angle; return this; }
 	public BulletConfig setRicochetCount(int count) {									this.maxRicochetCount = count; return this; }
-	public BulletConfig setDamageFalloutByPen(boolean falloff) {						this.damageFalloffByPen = falloff; return this; }
+	public BulletConfig setDamageFalloffByPen(boolean falloff) {						this.damageFalloffByPen = falloff; return this; }
 	public BulletConfig setGrav(double gravity) {										this.gravity = gravity; return this; }
 	public BulletConfig setLife(int expires) {											this.expires = expires; return this; }
 	public BulletConfig setImpactsEntities(boolean impact) {							this.impactsEntities = impact; return this; }
@@ -173,6 +181,10 @@ public class BulletConfig implements Cloneable {
 			}
 			if(b instanceof BlockDetonatable) {
 				((BlockDetonatable) b).onShot(bullet.worldObj, mop.blockX, mop.blockY, mop.blockZ);
+			}
+			if(b == ModBlocks.deco_crt) {
+				int meta = bullet.worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
+				bullet.worldObj.setBlockMetadataWithNotify(mop.blockX, mop.blockY, mop.blockZ, meta % 4 + 4, 3);
 			}
 
 			ForgeDirection dir = ForgeDirection.getOrientation(mop.sideHit);

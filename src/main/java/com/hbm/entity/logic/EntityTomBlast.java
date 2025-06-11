@@ -3,6 +3,8 @@ package com.hbm.entity.logic;
 import org.apache.logging.log4j.Level;
 
 import com.hbm.config.GeneralConfig;
+import com.hbm.dim.CelestialBody;
+import com.hbm.dim.trait.CBT_Impact;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionTom;
 import com.hbm.main.MainRegistry;
@@ -61,6 +63,11 @@ public class EntityTomBlast extends EntityExplosionChunkloading {
 				MainRegistry.logger.log(Level.INFO, "[NUKE] Initialized TOM explosion at " + posX + " / " + posY + " / " + posZ + " with strength " + destructionRange + "!");
 
 			exp = new ExplosionTom((int) this.posX, (int) this.posY, (int) this.posZ, this.worldObj, this.destructionRange);
+
+			if(!worldObj.isRemote) {
+				CelestialBody body = CelestialBody.getBody(worldObj);
+				body.modifyTraits(new CBT_Impact(worldObj.getTotalWorldTime()));
+			}
 
 			this.did = true;
 		}

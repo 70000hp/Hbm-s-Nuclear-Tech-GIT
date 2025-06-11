@@ -1,12 +1,24 @@
 package com.hbm.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.items.ModItems;
+import com.hbm.main.MainRegistry;
 import com.hbm.util.Tuple.Quartet;
+import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.entity.IResistanceProvider;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -39,6 +51,8 @@ public class DamageResistanceHandler {
 	public static final String CATEGORY_PROJECTILE = "PROJ";
 	public static final String CATEGORY_ENERGY = "EN";
 
+	public static final Gson gson = new Gson();
+	
 	public static HashMap<Item, ResistanceStats> itemStats = new HashMap();
 	public static HashMap<Quartet<Item, Item, Item, Item>, ResistanceStats> setStats = new HashMap();
 	public static HashMap<Class<? extends Entity>, ResistanceStats> entityStats = new HashMap();
@@ -46,13 +60,65 @@ public class DamageResistanceHandler {
 	public static HashMap<Item, List<Quartet<Item, Item, Item, Item>>> itemInfoSet = new HashMap();
 
 	public static void init() {
+		File folder = MainRegistry.configHbmDir;
+
+		File config = new File(folder.getAbsolutePath() + File.separatorChar + "hbmArmor.json");
+		File template = new File(folder.getAbsolutePath() + File.separatorChar + "_hbmArmor.json");
 		
+		clearSystem();
+		
+		if(!config.exists()) {
+			initDefaults();
+			writeDefault(template);
+		} else {
+			readConfig(config);
+		}
+	}
+	
+	private static void clearSystem() {
 		itemStats.clear();
 		setStats.clear();
 		entityStats.clear();
 		itemInfoSet.clear();
+	}
+	
+	private static void writeDefault(File file) {
 		
-		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.5F));
+		MainRegistry.logger.info("No armor file found, registering defaults for " + file.getName());
+
+		try {
+			JsonWriter writer = new JsonWriter(new FileWriter(file));
+			writer.setIndent("  ");
+			writer.beginObject();
+			writer.name("comment").value("Template file, remove the underscore ('_') from the name to enable the config.");
+			
+			serialize(writer);
+			
+			writer.endObject();
+			writer.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void readConfig(File file) {
+		
+		MainRegistry.logger.info("Reading armor file " + file.getName());
+
+		try {
+			JsonObject json = gson.fromJson(new FileReader(file), JsonObject.class);
+			deserialize(json);
+			
+		} catch(FileNotFoundException ex) {
+			clearSystem();
+			initDefaults();
+			ex.printStackTrace();
+		}
+	}
+	
+	public static void initDefaults() {
+		
+		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.25F));
 
 		itemStats.put(ModItems.jackt, new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F));
@@ -111,12 +177,12 @@ public class DamageResistanceHandler {
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
 				.setOther(0F, 0.15F));
 		registerSet(ModItems.rpa_helmet, ModItems.rpa_plate, ModItems.rpa_legs, ModItems.rpa_boots, new ResistanceStats()
-				.addCategory(CATEGORY_PROJECTILE, 20F, 0.65F)
-				.addCategory(CATEGORY_FIRE, 10F, 0.75F)
+				.addCategory(CATEGORY_PROJECTILE, 25F, 0.65F)
+				.addCategory(CATEGORY_FIRE, 10F, 0.9F)
 				.addCategory(CATEGORY_EXPLOSION, 15F, 0.25F)
-				.addExact(DamageClass.LASER.name(), 10F, 0.75F)
+				.addCategory(CATEGORY_ENERGY, 25F, 0.75F)
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
-				.setOther(10F, 0.15F));
+				.setOther(15F, 0.3F));
 		ResistanceStats bj = new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F)
 				.addCategory(CATEGORY_FIRE, 2.5F, 0.5F)
@@ -145,12 +211,20 @@ public class DamageResistanceHandler {
 				.setOther(2F, 0.25F));
 		registerSet(ModItems.fau_helmet, ModItems.fau_plate, ModItems.fau_legs, ModItems.fau_boots, new ResistanceStats()
 				.addCategory(CATEGORY_EXPLOSION, 50F, 0.95F)
+				.addCategory(CATEGORY_FIRE, 0F, 1F)
 				.addExact(DamageClass.LASER.name(), 25F, 0.95F)
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
 				.setOther(100F, 0.99F));
 		registerSet(ModItems.dns_helmet, ModItems.dns_plate, ModItems.dns_legs, ModItems.dns_boots, new ResistanceStats()
 				.addCategory(CATEGORY_EXPLOSION, 100F, 0.99F)
+				.addCategory(CATEGORY_FIRE, 0F, 1F)
 				.setOther(100F, 1F));
+		registerSet(ModItems.taurun_helmet, ModItems.taurun_plate, ModItems.taurun_legs, ModItems.taurun_boots, new ResistanceStats()
+				.addCategory(CATEGORY_PROJECTILE, 2F, 0.15F)
+				.addCategory(CATEGORY_FIRE, 0F, 0.25F)
+				.addCategory(CATEGORY_EXPLOSION, 0F, 0.25F)
+				.addExact(DamageSource.fall.damageType, 4F, 0.5F)
+				.setOther(2F, 0.1F));
 		registerSet(ModItems.trenchmaster_helmet, ModItems.trenchmaster_plate, ModItems.trenchmaster_legs, ModItems.trenchmaster_boots, new ResistanceStats()
 				.addCategory(CATEGORY_PROJECTILE, 5F, 0.5F)
 				.addCategory(CATEGORY_FIRE, 5F, 0.5F)
@@ -158,6 +232,9 @@ public class DamageResistanceHandler {
 				.addExact(DamageClass.LASER.name(), 15F, 0.9F)
 				.addExact(DamageSource.fall.damageType, 10F, 0.5F)
 				.setOther(5F, 0.25F));
+
+		registerSet(ModItems.euphemium_helmet, ModItems.euphemium_plate, ModItems.euphemium_legs, ModItems.euphemium_boots, new ResistanceStats()
+				.setOther(1_000_000F, 1F));
 		
 		registerSet(ModItems.hazmat_helmet, ModItems.hazmat_plate, ModItems.hazmat_legs, ModItems.hazmat_boots, new ResistanceStats());
 		registerSet(ModItems.hazmat_helmet_red, ModItems.hazmat_plate_red, ModItems.hazmat_legs_red, ModItems.hazmat_boots_red, new ResistanceStats());
@@ -171,10 +248,10 @@ public class DamageResistanceHandler {
 	public static void registerSet(Item helmet, Item plate, Item legs, Item boots, ResistanceStats stats) {
 		Quartet set = new Quartet(helmet, plate, legs, boots);
 		setStats.put(set, stats);
-		addToListInHashMap(helmet, itemInfoSet, set);
-		addToListInHashMap(plate, itemInfoSet, set);
-		addToListInHashMap(legs, itemInfoSet, set);
-		addToListInHashMap(boots, itemInfoSet, set);
+		if(helmet != null) addToListInHashMap(helmet, itemInfoSet, set);
+		if(plate != null) addToListInHashMap(plate, itemInfoSet, set);
+		if(legs != null) addToListInHashMap(legs, itemInfoSet, set);
+		if(boots != null) addToListInHashMap(boots, itemInfoSet, set);
 	}
 	
 	public static void addToListInHashMap(Object key, HashMap map, Object listElement) {
@@ -241,6 +318,81 @@ public class DamageResistanceHandler {
 		}
 	}
 	
+	public static void serialize(JsonWriter writer) throws IOException {
+		/// ITEMS ///
+		writer.name("itemStats").beginArray();
+		for(Entry<Item, ResistanceStats> entry : itemStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(Item.itemRegistry.getNameForObject(entry.getKey())).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
+
+		/// SETS ///
+		writer.name("setStats").beginArray();
+		for(Entry<Quartet<Item, Item, Item, Item>, ResistanceStats> entry : setStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(Item.itemRegistry.getNameForObject(entry.getKey().getW()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getX()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getY()))
+			.value(Item.itemRegistry.getNameForObject(entry.getKey().getZ())).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
+
+		/// ENTITIES ///
+		writer.name("entityStats").beginArray();
+		for(Entry<Class<? extends Entity>, ResistanceStats> entry : entityStats.entrySet()) {
+			writer.beginArray().setIndent("");
+			writer.value(entry.getKey().getName()).setIndent("  ");
+			writer.beginObject();
+			entry.getValue().serialize(writer);
+			writer.setIndent("");
+			writer.endObject().endArray().setIndent("  ");
+		}
+		writer.endArray();
+	}
+	
+	public static void deserialize(JsonObject json) {
+		/// ITEMS ///
+		JsonArray itemStatsArray = json.get("itemStats").getAsJsonArray();
+		for(JsonElement element : itemStatsArray) {
+			JsonArray statArray = element.getAsJsonArray();
+			Item item = (Item) Item.itemRegistry.getObject(statArray.get(0).getAsString());
+			JsonObject stats = statArray.get(1).getAsJsonObject();
+			itemStats.put(item, ResistanceStats.deserialize(stats));
+		}
+
+		/// SETS ///
+		JsonArray setStatsArray = json.get("setStats").getAsJsonArray();
+		for(JsonElement element : setStatsArray) {
+			JsonArray statArray = element.getAsJsonArray();
+			Item helmet =	statArray.get(0).isJsonNull() ? null : (Item) Item.itemRegistry.getObject(statArray.get(0).getAsString());
+			Item plate =	statArray.get(1).isJsonNull() ? null : (Item) Item.itemRegistry.getObject(statArray.get(1).getAsString());
+			Item legs =		statArray.get(2).isJsonNull() ? null : (Item) Item.itemRegistry.getObject(statArray.get(2).getAsString());
+			Item boots =	statArray.get(3).isJsonNull() ? null : (Item) Item.itemRegistry.getObject(statArray.get(3).getAsString());
+			JsonObject stats = statArray.get(4).getAsJsonObject();
+			registerSet(helmet, plate, legs, boots, ResistanceStats.deserialize(stats));
+		}
+
+		/// ENTITIES ///
+		JsonArray entityStatsArray = json.get("entityStats").getAsJsonArray();
+		for(JsonElement element : entityStatsArray) {
+			JsonArray statArray = element.getAsJsonArray();
+			try {
+				Class clazz = Class.forName(statArray.get(0).getAsString());
+				JsonObject stats = statArray.get(1).getAsJsonObject();
+				entityStats.put(clazz, ResistanceStats.deserialize(stats));
+			} catch(ClassNotFoundException e) { }
+		}
+	}
+	
 	public static enum DamageClass {
 		PHYSICAL,
 		FIRE,
@@ -264,13 +416,16 @@ public class DamageResistanceHandler {
 	
 	@SubscribeEvent
 	public void onEntityAttacked(LivingAttackEvent event) {
+		if(event.source.isDamageAbsolute()) return;
+		
 		EntityLivingBase e = event.entityLiving;
 		float amount = event.ammount;
 		
 		float[] vals = getDTDR(e, event.source, amount, currentPDT, currentPDR);
 		float dt = vals[0] - currentPDT;
+		float dr = vals[1] - currentPDR;
 		
-		if(dt > 0 && dt >= event.ammount) {
+		if((dt > 0 && dt >= event.ammount) || dr >= 1F) {
 			event.setCanceled(true);
 			EntityDamageUtil.damageArmorNT(e, amount);
 		}
@@ -381,6 +536,59 @@ public class DamageResistanceHandler {
 		public ResistanceStats addExact(String type, float threshold, float resistance) { exactResistances.put(type, new Resistance(threshold, resistance)); return this; }
 		public ResistanceStats addCategory(String type, float threshold, float resistance) { categoryResistances.put(type, new Resistance(threshold, resistance)); return this; }
 		public ResistanceStats setOther(float threshold, float resistance) { otherResistance = new Resistance(threshold, resistance); return this; }
+		
+		public void serialize(JsonWriter writer) throws IOException {
+			
+			if(!exactResistances.isEmpty()) {
+				writer.name("exact").beginArray();
+				for(Entry<String, Resistance> entry : exactResistances.entrySet()) {
+					writer.beginArray().setIndent("");
+					writer.value(entry.getKey()).value(entry.getValue().threshold).value(entry.getValue().resistance).endArray().setIndent("  ");
+				}
+				writer.endArray();
+			}
+
+			if(!categoryResistances.isEmpty()) {
+				writer.name("category").beginArray();
+				for(Entry<String, Resistance> entry : categoryResistances.entrySet()) {
+					writer.beginArray().setIndent("");
+					writer.value(entry.getKey()).value(entry.getValue().threshold).value(entry.getValue().resistance).endArray().setIndent("  ");
+				}
+				writer.endArray();
+			}
+			
+			if(otherResistance != null) {
+				writer.name("other").beginArray().setIndent("");
+				writer.value(otherResistance.threshold).value(otherResistance.resistance).endArray().setIndent("  ");
+			}
+		}
+		
+		public static ResistanceStats deserialize(JsonObject json) {
+			ResistanceStats stats = new ResistanceStats();
+			
+			if(json.has("exact")) {
+				JsonArray exact = json.get("exact").getAsJsonArray();
+				for(JsonElement element : exact) {
+					JsonArray array = element.getAsJsonArray();
+					stats.exactResistances.put(array.get(0).getAsString(), new Resistance(array.get(1).getAsFloat(), array.get(2).getAsFloat()));
+				}
+			}
+			
+			if(json.has("category")) {
+				JsonArray category = json.get("category").getAsJsonArray();
+				for(JsonElement element : category) {
+					JsonArray array = element.getAsJsonArray();
+					stats.categoryResistances.put(array.get(0).getAsString(), new Resistance(array.get(1).getAsFloat(), array.get(2).getAsFloat()));
+				}
+			}
+			
+			if(json.has("other")) {
+				JsonArray other = json.get("other").getAsJsonArray();
+				stats.otherResistance = new Resistance(other.get(0).getAsFloat(), other.get(1).getAsFloat());
+			}
+			
+			return stats;
+		}
 	}
 	
 	public static class Resistance {

@@ -16,9 +16,14 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	public Block lavaBlock;
 	public Block stoneBlock;
 
-	private final int carvingScale;
+	private final float carvingScale;
 	private final int depthThreshold;
 	private final float largeCaveSize;
+
+	public float smallCaveSize = 1.0F;
+
+	public BiomeGenBase ignoreBiome;
+	public BiomeGenBase onlyBiome;
 
 	PerlinFestival perlinNoise;
 
@@ -26,7 +31,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 		this(3, 30, 6.0F);
 	}
 
-	public ExperimentalCaveGenerator(int carvingScale, int depthThreshold, float largeCaveSize) {
+	public ExperimentalCaveGenerator(float carvingScale, int depthThreshold, float largeCaveSize) {
 		super();
 		this.carvingScale = carvingScale;
 		this.depthThreshold = depthThreshold;
@@ -37,7 +42,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	}
 
 	protected void generateLargeCave(long seed, int chunkX, int chunkZ, Block[] blocks, double x, double y, double z) {
-		this.generateCaveNode(seed, chunkX, chunkZ, blocks, x, y, z, 1.0F + this.rand.nextFloat() * largeCaveSize, 0.0F, 0.0F, -1, -1, 0.5D);
+		this.generateCaveNode(seed, chunkX, chunkZ, blocks, x, y, z, (1.0F + this.rand.nextFloat()) * largeCaveSize, 0.0F, 0.0F, -1, -1, 0.5D);
 	}
 
 	protected void generateCaveNode(long seed, int chunkX, int chunkZ, Block[] blocks, double x, double y, double z, float caveSize, float yaw, float pitch, int currentStep, int totalSteps, double caveSizeIncrease) {
@@ -248,7 +253,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 				float f2 = this.rand.nextFloat() * 2.0F + this.rand.nextFloat();
 
 				if (this.rand.nextInt(10) == 0) {
-					f2 *= this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
+					f2 *= smallCaveSize * this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
 				}
 
 				this.generateCaveNode(this.rand.nextLong(), p_151538_4_, p_151538_5_, p_151538_6_, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
@@ -257,18 +262,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	}
 
 	protected boolean isOceanBlock(Block[] data, int index, int x, int y, int z, int chunkX, int chunkZ) {
-		return data[index] == Blocks.flowing_water || data[index] == Blocks.water;
-	}
-
-	// Exception biomes to make sure we generate like vanilla
-	private boolean isExceptionBiome(BiomeGenBase biome) {
-		if (biome == BiomeGenBase.mushroomIsland)
-			return true;
-		if (biome == BiomeGenBase.beach)
-			return true;
-		if (biome == BiomeGenBase.desert)
-			return true;
-		return false;
+		return data[index] != null && data[index].getMaterial().isLiquid();
 	}
 
 	// Determine if the block at the specified location is the top block for the
@@ -276,7 +270,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	// Vanilla bugs to make sure that we generate the map the same way vanilla does.
 	private boolean isTopBlock(Block[] data, int index, int x, int y, int z, int chunkX, int chunkZ) {
 		BiomeGenBase biome = worldObj.getBiomeGenForCoords(x + chunkX * 16, z + chunkZ * 16);
-		return (isExceptionBiome(biome) ? data[index] == Blocks.grass : data[index] == biome.topBlock);
+		return data[index] == biome.topBlock;
 	}
 
 	/**
@@ -286,7 +280,7 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	 * If setting to air, it also checks to see if we've broken the surface and if
 	 * so
 	 * tries to make the floor the biome's top block
-	 * 
+	 *
 	 * @param data     Block data array
 	 * @param index    Pre-calculated index into block data
 	 * @param x        local X position
@@ -299,18 +293,19 @@ public class ExperimentalCaveGenerator extends MapGenBase {
 	 */
 	protected void digBlock(Block[] data, int index, int x, int y, int z, int chunkX, int chunkZ, boolean foundTop) {
 		BiomeGenBase biome = worldObj.getBiomeGenForCoords(x + chunkX * 16, z + chunkZ * 16);
-		Block top = (isExceptionBiome(biome) ? Blocks.grass : biome.topBlock);
-		Block filler = (isExceptionBiome(biome) ? Blocks.dirt : biome.fillerBlock);
+		if(biome == ignoreBiome) return;
+		if(onlyBiome != null && biome != onlyBiome) return;
+
 		Block block = data[index];
 
-		if (block != null && (block == stoneBlock || block == filler || block == top || block.getMaterial().isLiquid())) {
+		if (block != null && (block == stoneBlock || block == biome.fillerBlock || block == biome.topBlock || block.getMaterial().isLiquid())) {
 			if (y < 10) {
 				data[index] = lavaBlock;
 			} else {
 				data[index] = null;
 
-				if (foundTop && data[index - 1] == filler) {
-					data[index - 1] = top;
+				if (foundTop && data[index - 1] == biome.fillerBlock) {
+					data[index - 1] = biome.topBlock;
 				}
 			}
 		}

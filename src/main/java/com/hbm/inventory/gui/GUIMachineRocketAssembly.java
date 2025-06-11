@@ -13,7 +13,7 @@ import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.render.util.MissilePronter;
 import com.hbm.tileentity.machine.TileEntityMachineRocketAssembly;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -35,7 +35,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 	public GUIMachineRocketAssembly(InventoryPlayer invPlayer, TileEntityMachineRocketAssembly machine) {
 		super(new ContainerMachineRocketAssembly(invPlayer, machine));
 		this.machine = machine;
-		
+
 		this.xSize = 192;
 		this.ySize = 224;
 	}
@@ -60,7 +60,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 
 		double dt = (double)(System.nanoTime() - lastTime) / 1000000000;
 		lastTime = System.nanoTime();
-		
+
 		GL11.glPushMatrix();
 		{
 
@@ -68,7 +68,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 
 			GL11.glTranslatef(guiLeft + 116, guiTop + 103, 100);
 			GL11.glRotatef(System.currentTimeMillis() / 10 % 360, 0, -1, 0);
-			
+
 			double size = 86;
 			double height = machine.rocket.getHeight(stage);
 			double targetScale = size / Math.max(height, 6);
@@ -76,7 +76,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 
 			double targetOffset = machine.rocket.getOffset(stage);
 			currentOffset = currentOffset + (targetOffset - currentOffset) * dt * 4;
-			
+
 			GL11.glScaled(-currentScale, -currentScale, -currentScale);
 			GL11.glTranslated(0, -currentOffset, 0);
 
@@ -93,8 +93,8 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 			GL11.glTranslatef(0, 0, 150);
 			GL11.glScalef(0.5F, 0.5F, 0.5F);
 
-			ItemStack fromStack = machine.slots[machine.slots.length - 2];
-			ItemStack toStack = machine.slots[machine.slots.length - 1];
+			ItemStack fromStack = machine.slots[machine.slots.length - (RocketStruct.MAX_STAGES - currentLayer) * 2];
+			ItemStack toStack = machine.slots[machine.slots.length - (RocketStruct.MAX_STAGES - currentLayer) * 2 + 1];
 
 			Target from = ItemVOTVdrive.getTarget(fromStack, machine.getWorldObj());
 			Target to = ItemVOTVdrive.getTarget(toStack, machine.getWorldObj());
@@ -120,7 +120,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 		if(checkClick(mouseX, mouseY, 17, 34, 18, 8)) {
 			drawTexturedModalRect(17, 34, xSize, 36, 18, 8);
 		}
-		
+
 		if(checkClick(mouseX, mouseY, 17, 98, 18, 8)) {
 			drawTexturedModalRect(17, 98, xSize, 44, 18, 8);
 		}
@@ -137,7 +137,7 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 	@Override
 	protected void mouseClicked(int x, int y, int i) {
 		super.mouseClicked(x, y, i);
-		
+
 		// Stage up
 		if(checkClick(x, y, 17, 34, 18, 8)) {
 			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
@@ -171,5 +171,5 @@ public class GUIMachineRocketAssembly extends GuiInfoContainerLayered {
 			}
 		}
 	}
-		
+
 }

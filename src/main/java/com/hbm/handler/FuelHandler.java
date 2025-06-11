@@ -15,7 +15,7 @@ public class FuelHandler implements IFuelHandler {
 
 	@Override
 	public int getBurnTime(ItemStack fuel) {
-		
+
 		int single = 200;
 
 		if(fuel.getItem().equals(ModItems.solid_fuel))						return single * 16;
@@ -25,7 +25,7 @@ public class FuelHandler implements IFuelHandler {
 		if(fuel.getItem().equals(ModItems.solid_fuel_presto_bf))			return single * 400;
 		if(fuel.getItem().equals(ModItems.solid_fuel_presto_triplet_bf))	return single * 2000;
 		if(fuel.getItem().equals(ModItems.rocket_fuel))						return single * 32;
-		
+
 		if(fuel.getItem() == ModItems.biomass)								return single * 2;
 		if(fuel.getItem() == ModItems.biomass_compressed)					return single * 4;
 		if(fuel.getItem() == ModItems.powder_coal)							return single * 8;
@@ -42,7 +42,8 @@ public class FuelHandler implements IFuelHandler {
 		if(fuel.getItem() == ModItems.coal_infernal)						return 4800;
 		if(fuel.getItem() == ModItems.crystal_coal)							return 6400;
 		if(fuel.getItem() == ModItems.powder_sawdust)						return single / 2;
-		
+		if(fuel.getItem() == ModItems.saltleaf)								return single;
+
 		if(fuel.getItem() == ModItems.briquette) {
 			int meta = fuel.getItemDamage();
 			switch(meta) {
@@ -51,7 +52,7 @@ public class FuelHandler implements IFuelHandler {
 			case 2: return single * 2;
 			}
 		}
-		
+
 		if(fuel.getItem() == ModItems.powder_ash) {
 			int meta = fuel.getItemDamage();
 			switch(meta) {
@@ -62,23 +63,23 @@ public class FuelHandler implements IFuelHandler {
 			case 4: return single / 2;
 			}
 		}
-		
+
 		return 0;
 	}
-	
+
 	private static HashMap<ComparableStack, Integer> burnCache = new HashMap();
-	
+
 	public static int getBurnTimeFromCache(ItemStack stack) {
-		
+
 		ComparableStack comp = new ComparableStack(stack).makeSingular();
-		
+
 		if(burnCache.containsKey(comp)) {
 			return burnCache.get(comp);
 		}
-		
+
 		int burnTime = TileEntityFurnace.getItemBurnTime(stack);
 		burnCache.put(comp, burnTime);
-		
+
 		return burnTime;
 	}
 }

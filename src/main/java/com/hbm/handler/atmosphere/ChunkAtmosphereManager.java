@@ -2,12 +2,13 @@ package com.hbm.handler.atmosphere;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class ChunkAtmosphereManager {
-    
+
     public static ChunkAtmosphereHandler proxy = new ChunkAtmosphereHandler();
 
     @SubscribeEvent
@@ -18,6 +19,11 @@ public class ChunkAtmosphereManager {
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event) {
         proxy.receiveWorldUnload(event);
+    }
+
+    @SubscribeEvent
+    public void onWorldTick(TickEvent.WorldTickEvent event) {
+        proxy.receiveWorldTick(event);
     }
 
     @SubscribeEvent
@@ -39,5 +45,10 @@ public class ChunkAtmosphereManager {
     public void onServerTick(TickEvent.ServerTickEvent event) {
         proxy.receiveServerTick(event);
     }
+
+	@SubscribeEvent
+	public void onTreeGrow(SaplingGrowTreeEvent event) {
+		proxy.receiveTreeGrow(event);
+	}
 
 }

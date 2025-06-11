@@ -8,7 +8,7 @@ import com.hbm.blocks.ILookOverlay;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityMachineVacuumCircuit;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,7 +27,7 @@ public class MachineVacuumCircuit extends BlockDummyable implements ILookOverlay
 		if(meta >= 12) return new TileEntityMachineVacuumCircuit();
 		return new TileEntityProxyCombo().inventory().power().fluid();
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		return this.standardOpenBehavior(world, x, y, z, player, 0);
@@ -46,13 +46,13 @@ public class MachineVacuumCircuit extends BlockDummyable implements ILookOverlay
 	@Override
 	public void printHook(Pre event, World world, int x, int y, int z) {
 		int[] pos = this.findCore(world, x, y, z);
-		
+
 		if(pos == null) return;
-		
+
 		TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
-		
+
 		if(!(tile instanceof TileEntityMachineVacuumCircuit)) return;
-		
+
 		TileEntityMachineVacuumCircuit machine = (TileEntityMachineVacuumCircuit) tile;
 
 		List<String> text = new ArrayList<>();
@@ -62,7 +62,7 @@ public class MachineVacuumCircuit extends BlockDummyable implements ILookOverlay
 		}
 
 		if(text.isEmpty()) return;
-	
+
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
 

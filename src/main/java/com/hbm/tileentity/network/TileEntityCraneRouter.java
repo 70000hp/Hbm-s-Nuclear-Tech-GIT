@@ -7,8 +7,10 @@ import com.hbm.tileentity.IControlReceiverFilter;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 
+import com.hbm.util.BufferUtil;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -45,26 +47,28 @@ public class TileEntityCraneRouter extends TileEntityMachineBase implements IGUI
 		
 		if(!worldObj.isRemote) {
 
-			NBTTagCompound data = new NBTTagCompound();
-			for(int i = 0; i < patterns.length; i++) {
-				NBTTagCompound compound = new NBTTagCompound();
-				patterns[i].writeToNBT(compound);
-				data.setTag("pattern" + i, compound);
-			}
-			data.setIntArray("modes", this.modes);
-			this.networkPack(data, 15);
+			this.networkPackNT(15);
 		}
 	}
-	
+
 	@Override
-	public void networkUnpack(NBTTagCompound data) {
-		super.networkUnpack(data);
-		
-		for(int i = 0; i < patterns.length; i++) {
-			NBTTagCompound compound = data.getCompoundTag("pattern" + i);
-			patterns[i].readFromNBT(compound);
+	public void serialize(ByteBuf buf) {
+		super.serialize(buf);
+		for (ModulePatternMatcher pattern : patterns) {
+			pattern.serialize(buf);
 		}
-		this.modes = data.getIntArray("modes");
+
+		BufferUtil.writeIntArray(buf, this.modes);
+	}
+
+	@Override
+	public void deserialize(ByteBuf buf) {
+		super.deserialize(buf);
+		for (ModulePatternMatcher pattern : patterns) {
+			pattern.deserialize(buf);
+		}
+
+		this.modes = BufferUtil.readIntArray(buf);
 	}
 
 	@Override
@@ -77,6 +81,7 @@ public class TileEntityCraneRouter extends TileEntityMachineBase implements IGUI
 	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUICraneRouter(player.inventory, this);
 	}
+	
 	@Override
 	public void nextMode(int index) {
 		
@@ -121,10 +126,12 @@ public class TileEntityCraneRouter extends TileEntityMachineBase implements IGUI
 	public boolean hasPermission(EntityPlayer player) {
 		return Vec3.createVectorHelper(xCoord - player.posX, yCoord - player.posY, zCoord - player.posZ).lengthVector() < 20;
 	}
+	
 	@Override
 	public int[] getFilterSlots() {
 		return new int[]{0, slots.length};
 	}
+	
 	@Override
 	public void receiveControl(NBTTagCompound data) {
 		if(data.hasKey("toggle")) {

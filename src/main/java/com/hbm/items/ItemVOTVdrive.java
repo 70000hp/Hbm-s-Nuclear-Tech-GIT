@@ -9,7 +9,7 @@ import com.hbm.dim.orbit.OrbitalStation;
 import com.hbm.entity.missile.EntityRideableRocket;
 import com.hbm.entity.missile.EntityRideableRocket.RocketState;
 import com.hbm.lib.RefStrings;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -27,11 +27,10 @@ import net.minecraft.world.World;
 
 public class ItemVOTVdrive extends ItemEnumMulti {
 
-	private IIcon[] IIcons;
-	private IIcon baseIcon;
-	
+	private IIcon[] overlays;
+
 	public ItemVOTVdrive() {
-		super(SolarSystem.Body.class, false, true);
+		super(SolarSystem.Body.class, false, false);
 		this.setMaxStackSize(1);
 		this.canRepair = false;
 	}
@@ -40,20 +39,20 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
 		super.addInformation(stack, player, list, bool);
-		
+
 		Destination destination = getDestination(stack);
 
 		if(destination.body == SolarSystem.Body.ORBIT) {
 			String identifier = stack.stackTagCompound.getString("stationName");
-			
+
 			if(identifier.equals("")) identifier = "0x" + Integer.toHexString(new ChunkCoordIntPair(destination.x, destination.z).hashCode()).toUpperCase();
-			
+
 			list.add("Destination: ORBITAL STATION");
 			list.add("Station: " + identifier);
 			return;
 		}
 
-		int processingLevel = destination.body.getProcessingLevel();
+		int processingLevel = destination.body.getProcessingLevel(CelestialBody.getBody(player.worldObj));
 
 		list.add("Destination: " + EnumChatFormatting.AQUA + I18nUtil.resolveKey("body." + destination.body.name));
 
@@ -74,30 +73,32 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister iconRegister) {
-		IIcons = new IIcon[4]; // Four unique icons for each processing level
+		overlays = new IIcon[SolarSystem.Body.values().length];
 
-		for (int i = 0; i < IIcons.length; i++) { // Change the loop to start from 0
-			IIcons[i] = iconRegister.registerIcon(RefStrings.MODID + ":votv_f" + i);
+		for(int i = 0; i < overlays.length; i++) {
+			SolarSystem.Body body = SolarSystem.Body.values()[i];
+			String name = body != SolarSystem.Body.ORBIT ? body.name : "orbit";
+			overlays[i] = iconRegister.registerIcon(RefStrings.MODID + ":votv." + name);
 		}
 
-		baseIcon = iconRegister.registerIcon(RefStrings.MODID + ":votv_f0"); // Base icon for unprocessed drives
+		itemIcon = iconRegister.registerIcon(RefStrings.MODID + ":votv_f"); // Base icon for unprocessed drives
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public IIcon getIconFromDamage(int metadata) {
-		SolarSystem.Body destinationType = SolarSystem.Body.values()[metadata];
+	public boolean requiresMultipleRenderPasses() {
+		return true;
+	}
 
-		if(destinationType == SolarSystem.Body.ORBIT)
-			return baseIcon;
+	@Override
+	public int getRenderPasses(int metadata) {
+		return 2;
+	}
 
-		int processingLevel = destinationType.getProcessingLevel();
-		if (processingLevel >= 0 && processingLevel <= IIcons.length) {
-			return IIcons[processingLevel]; // Subtract 1 to match array indexing
-		}
-
-		// Default to the base icon for unprocessed drives
-		return baseIcon;
+	@SideOnly(Side.CLIENT)
+	public IIcon getIconFromDamageForRenderPass(int meta, int pass) {
+		if(pass == 0) return this.getIconFromDamage(meta);
+		return this.overlays[meta];
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -142,7 +143,7 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 
 				return new Target(body, true, hasStation);
 			}
-			
+
 			OrbitalStation station = OrbitalStation.getStation(destination.x, destination.z);
 			if(!station.hasStation) station.orbiting = CelestialBody.getBody(world);
 
@@ -165,22 +166,22 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 		stack.stackTagCompound.setInteger("z", z);
 	}
 
-	public static int getProcessingTier(ItemStack stack) {
+	public static int getProcessingTier(ItemStack stack, CelestialBody from) {
 		SolarSystem.Body body = SolarSystem.Body.values()[stack.getItemDamage()];
-		return body.getProcessingLevel();
+		return body.getProcessingLevel(from);
 	}
 
 	public static boolean getProcessed(ItemStack stack) {
 		if(!stack.hasTagCompound())
 			stack.stackTagCompound = new NBTTagCompound();
-		
+
 		return stack.stackTagCompound.getBoolean("Processed");
 	}
 
 	public static void setProcessed(ItemStack stack, boolean processed) {
 		if(!stack.hasTagCompound())
 			stack.stackTagCompound = new NBTTagCompound();
-		
+
 		stack.stackTagCompound.setBoolean("Processed", processed);
 	}
 
@@ -202,7 +203,7 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 	public static void markCopied(ItemStack stack) {
 		if(!stack.hasTagCompound())
 			stack.stackTagCompound = new NBTTagCompound();
-		
+
 		stack.stackTagCompound.setBoolean("copied", true);
 	}
 
@@ -235,10 +236,10 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 					} else {
 						newStack.stackSize = 0;
 					}
-		
+
 					rocket.navDrive = stack.copy();
 					rocket.navDrive.stackSize = 1;
-		
+
 					if(!world.isRemote) {
 						rocket.setState(RocketState.AWAITING);
 					}
@@ -247,11 +248,11 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 				}
 			}
 		}
-	
+
 		return newStack;
 	}
 
-	
+
 	@Override
 	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float fx, float fy, float fz) {
 		Destination destination = getDestination(stack);
@@ -282,7 +283,7 @@ public class ItemVOTVdrive extends ItemEnumMulti {
 			this.x = x;
 			this.z = z;
 		}
-		
+
 		public ChunkCoordIntPair getChunk() {
 			return new ChunkCoordIntPair(x >> 4, z >> 4);
 		}

@@ -3,14 +3,15 @@ package com.hbm.tileentity.machine;
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemKey;
 import com.hbm.main.MainRegistry;
+import com.hbm.tileentity.TileEntityLoadedBase;
 import com.hbm.util.ArmorUtil;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
-public abstract class TileEntityLockableBase extends TileEntity {
+public abstract class TileEntityLockableBase extends TileEntityLoadedBase {
 
 	protected int lock;
 	private boolean isLocked = false;
@@ -25,11 +26,12 @@ public abstract class TileEntityLockableBase extends TileEntity {
 			MainRegistry.logger.error("A block has been set to locked state before setting pins, this should not happen and may cause errors! " + this.toString());
 		}
 		isLocked = true;
+		markDirty();
 	}
 
-	public void setPins(int pins) { lock = pins; }
+	public void setPins(int pins) { lock = pins; markDirty(); }
 	public int getPins() { return lock; }
-	public void setMod(double mod) { lockMod = mod; }
+	public void setMod(double mod) { lockMod = mod; markDirty(); }
 	public double getMod() { return lockMod; }
 
 	@Override
@@ -48,6 +50,24 @@ public abstract class TileEntityLockableBase extends TileEntity {
 		nbt.setInteger("lock", lock);
 		nbt.setBoolean("isLocked", isLocked);
 		nbt.setDouble("lockMod", lockMod);
+	}
+
+	@Override
+	public void serialize(ByteBuf buf) {
+		super.serialize(buf);
+
+		buf.writeInt(lock);
+		buf.writeBoolean(isLocked);
+		buf.writeDouble(lockMod);
+	}
+
+	@Override
+	public void deserialize(ByteBuf buf) {
+		super.deserialize(buf);
+
+		lock = buf.readInt();
+		isLocked = buf.readBoolean();
+		lockMod = buf.readDouble();
 	}
 
 	public boolean canAccess(EntityPlayer player) {

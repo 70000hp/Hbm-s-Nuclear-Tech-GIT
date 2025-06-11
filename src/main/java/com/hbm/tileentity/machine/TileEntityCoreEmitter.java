@@ -3,6 +3,7 @@ package com.hbm.tileentity.machine;
 import api.hbm.block.ILaserable;
 import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.fluid.IFluidStandardReceiver;
+import api.hbm.redstoneoverradio.IRORInteractive;
 import api.hbm.tile.IInfoProviderEC;
 
 import com.hbm.handler.CompatHandler;
@@ -18,6 +19,7 @@ import com.hbm.util.CompatEnergyControl;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
@@ -37,7 +39,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.util.List;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityCoreEmitter extends TileEntityMachineBase implements IEnergyReceiverMK2, ILaserable, IFluidStandardReceiver, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
+public class TileEntityCoreEmitter extends TileEntityMachineBase implements IEnergyReceiverMK2, ILaserable, IFluidStandardReceiver, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent, IRORInteractive {
 	
 	public long power;
 	public static final long maxPower = 1000000000L;
@@ -157,26 +159,32 @@ public class TileEntityCoreEmitter extends TileEntityMachineBase implements IEne
 			
 			this.markDirty();
 
-			NBTTagCompound data = new NBTTagCompound();
-			data.setLong("power", power);
-			data.setInteger("watts", watts);
-			data.setLong("prev", prev);
-			data.setInteger("beam", beam);
-			data.setBoolean("isOn", isOn);
-			tank.writeToNBT(data, "tank");
-			this.networkPack(data, 250);
+			this.networkPackNT(250);
 		}
 	}
-	
-	public void networkUnpack(NBTTagCompound data) {
-		super.networkUnpack(data);
 
-		power = data.getLong("power");
-		watts = data.getInteger("watts");
-		prev = data.getLong("prev");
-		beam = data.getInteger("beam");
-		isOn = data.getBoolean("isOn");
-		tank.readFromNBT(data, "tank");
+	@Override
+	public void serialize(ByteBuf buf) {
+		super.serialize(buf);
+
+		buf.writeLong(power);
+		buf.writeInt(watts);
+		buf.writeLong(prev);
+		buf.writeInt(beam);
+		buf.writeBoolean(isOn);
+		tank.serialize(buf);
+	}
+
+	@Override
+	public void deserialize(ByteBuf buf) {
+		super.deserialize(buf);
+
+		this.power = buf.readLong();
+		this.watts = buf.readInt();
+		this.prev = buf.readLong();
+		this.beam = buf.readInt();
+		this.isOn = buf.readBoolean();
+		tank.deserialize(buf);
 	}
 	
 	public long getPowerScaled(long i) {
@@ -328,5 +336,47 @@ public class TileEntityCoreEmitter extends TileEntityMachineBase implements IEne
 	public void provideExtraInfo(NBTTagCompound data) {
 		data.setDouble(CompatEnergyControl.D_CONSUMPTION_MB, joules > 0 || prev > 0 ? 20 : 0);
 		data.setDouble(CompatEnergyControl.D_CONSUMPTION_HE, maxPower * watts / 2000);
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_FUNCTION + "setpower" + NAME_SEPARATOR + "percent",
+				PREFIX_FUNCTION + "toggle",
+				PREFIX_FUNCTION + "switch" + NAME_SEPARATOR + "on/off",
+		};
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+		
+		if((PREFIX_FUNCTION + "setpower").equals(name) && params.length > 0) {
+			int watts = IRORInteractive.parseInt(params[0], 0, 100);
+			this.watts = watts;
+			this.markChanged();
+			return null;
+		}
+		
+		if((PREFIX_FUNCTION + "toggle").equals(name)) {
+			this.isOn = !this.isOn;
+			this.markChanged();
+			return null;
+		}
+			
+		
+		if((PREFIX_FUNCTION + "switch").equals(name) && params.length > 0) {
+			if("on".equals(params[0])) {
+				this.isOn = true;
+				this.markChanged();
+				return null;
+			}
+			if("off".equals(params[0])) {
+				this.isOn = false;
+				this.markChanged();
+				return null;
+			}
+		}
+		
+		return null;
 	}
 }

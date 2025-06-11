@@ -1,15 +1,12 @@
 package com.hbm.blocks.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.inventory.container.ContainerCounterTorch;
 import com.hbm.inventory.gui.GUICounterTorch;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.network.TileEntityRadioTorchCounter;
 import com.hbm.util.Compat;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -24,8 +21,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.Pre;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RadioTorchCounter extends RadioTorchBase {
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		if(!world.isRemote && !player.isSneaking()) {
@@ -62,18 +62,18 @@ public class RadioTorchCounter extends RadioTorchBase {
 	@Override
 	public void printHook(Pre event, World world, int x, int y, int z) {
 		TileEntity te = world.getTileEntity(x, y, z);
-		
+
 		if(te instanceof TileEntityRadioTorchCounter) {
 			TileEntityRadioTorchCounter radio = (TileEntityRadioTorchCounter) te;
 			List<String> text = new ArrayList();
-			
+
 			for(int i = 0; i < 3; i++) {
 				if(!radio.channel[i].isEmpty()) {
 					text.add(EnumChatFormatting.AQUA + "Freq " + (i + 1) + ": " + radio.channel[i]);
 					text.add(EnumChatFormatting.RED + "Signal " + (i + 1) + ": " + radio.lastCount[i]);
 				}
 			}
-			
+
 			ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 		}
 	}

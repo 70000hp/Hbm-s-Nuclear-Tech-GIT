@@ -16,7 +16,6 @@ public class BlockWaterPlant extends Block {
 	protected BlockWaterPlant() {
 		super(Material.water);
 	}
-
 	
 	@Override
 	public int getRenderType() {
@@ -27,22 +26,30 @@ public class BlockWaterPlant extends Block {
 	public boolean isOpaqueCube() {
 		return false;
 	}
-    @Override
-    public boolean renderAsNormalBlock() {
-        return false;
-    }
-    
+
+	@Override
+	public boolean renderAsNormalBlock() {
+		return false;
+	}
+	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
 		return null;
 	}
-    @Override
-    public Item getItemDropped(int parMetadata, Random parRand, int parFortune)  
-    {
-       return (ModItems.saltleaf);
-    }
-    @Override
-    public int quantityDropped(int meta, int fortune, java.util.Random random) {
-        return random.nextInt(4); 
-    }
+
+	@Override
+	public Item getItemDropped(int parMetadata, Random parRand, int parFortune)   {
+	   return (ModItems.saltleaf);
+	}
+
+	@Override
+	public int quantityDropped(int meta, int fortune, java.util.Random random) {
+		return random.nextInt(4); 
+	}
+	
+	@Override
+	public boolean canPlaceBlockAt(World world, int x, int y, int z) {
+		return super.canPlaceBlockAt(world, x, y, z) && this.canBlockStay(world, x, y, z) && world.getBlock(x, y + 1, z).getMaterial().isLiquid();
+	}
+	
 }

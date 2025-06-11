@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 public class BlockStepEffect extends Block {
 
     // Fucking BlockOre replacement because who needs good naming
-    
+
 	public BlockStepEffect(Material mat) {
         super(mat);
     }
@@ -32,17 +32,17 @@ public class BlockStepEffect extends Block {
         super(mat);
 		this.setTickRandomly(tick);
     }
-	
+
 	public boolean allowFortune = true;
-	
+
 	public BlockStepEffect noFortune() {
 		this.allowFortune = false;
 		return this;
 	}
-	
+
 	@Override
 	public int quantityDroppedWithBonus(int fortune, Random rand) {
-		
+
 		if(fortune > 0 && Item.getItemFromBlock(this) != this.getItemDropped(0, rand, fortune) && allowFortune) {
 			int mult = rand.nextInt(fortune + 2) - 1;
 
@@ -72,9 +72,6 @@ public class BlockStepEffect extends Block {
 		}
 		if(this == ModBlocks.ore_nether_fire) {
 			return rand.nextInt(10) == 0 ? ModItems.ingot_phosphorus : ModItems.powder_fire;
-		}
-		if(this == ModBlocks.block_meteor) {
-			return rand.nextInt(10) == 0 ? ModItems.plate_dalekanium : Item.getItemFromBlock(ModBlocks.block_meteor);
 		}
 		if(this == ModBlocks.block_meteor_cobble) {
 			return ModItems.fragment_meteorite;

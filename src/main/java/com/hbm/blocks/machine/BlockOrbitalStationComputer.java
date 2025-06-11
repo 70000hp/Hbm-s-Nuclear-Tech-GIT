@@ -15,7 +15,7 @@ import com.hbm.items.ItemVOTVdrive.Destination;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityOrbitalStationComputer;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.tile.IPropulsion;
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
@@ -59,7 +59,7 @@ public class BlockOrbitalStationComputer extends BlockDummyable implements ILook
 			return true;
 		} else {
 			int[] pos = this.findCore(world, x, y, z);
-	
+
 			if(pos == null)
 				return false;
 
@@ -80,7 +80,7 @@ public class BlockOrbitalStationComputer extends BlockDummyable implements ILook
 					return false;
 
 				Destination destination = ItemVOTVdrive.getDestination(heldStack);
-		
+
 				if(destination.body == SolarSystem.Body.ORBIT)
 					return false;
 
@@ -100,7 +100,7 @@ public class BlockOrbitalStationComputer extends BlockDummyable implements ILook
 				FMLNetworkHandler.openGui(player, MainRegistry.instance, 0, world, pos[0], pos[1], pos[2]);
 			}
 
-			
+
 			return true;
 		}
 	}
@@ -155,8 +155,8 @@ public class BlockOrbitalStationComputer extends BlockDummyable implements ILook
 		} else {
 			text.add(I18nUtil.resolveKey("station.insertDrive"));
 		}
-	
+
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
-	
+
 }

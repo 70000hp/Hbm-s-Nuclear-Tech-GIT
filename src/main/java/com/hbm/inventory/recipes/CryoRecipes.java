@@ -17,87 +17,89 @@ import com.hbm.util.Tuple.Quartet;
 import net.minecraft.item.ItemStack;
 
 public class CryoRecipes extends SerializableRecipe {
-	
-	private static HashMap<FluidType, Quartet<FluidStack, FluidStack, FluidStack, FluidStack>> recipes = new HashMap();
+
+	private static HashMap<FluidType, Quartet<FluidStack, FluidStack, FluidStack, FluidStack>> recipes = new HashMap<>();
 
 	@Override
 	public void registerDefaults() {
 		recipes.put(Fluids.AIR, new Quartet<>(
-				new FluidStack(Fluids.NITROGEN, 50),
-				new FluidStack(Fluids.OXYGEN, 15),
-				new FluidStack(Fluids.KRYPTON, 10),
-				new FluidStack(Fluids.CARBONDIOXIDE, 5)
-				));
-		
-		recipes.put(Fluids.TEKTOAIR, new Quartet<>(
-				new FluidStack(Fluids.CHLORINE, 45),
-				new FluidStack(Fluids.AROMATICS, 25),
-				new FluidStack(Fluids.GAS, 15),
-				new FluidStack(Fluids.PETROLEUM, 5)
-				));
+			new FluidStack(Fluids.NITROGEN, 60),
+			new FluidStack(Fluids.OXYGEN, 25),
+			new FluidStack(Fluids.KRYPTON, 10),
+			new FluidStack(Fluids.CARBONDIOXIDE, 5)
+		));
+
+		recipes.put(Fluids.TEKTOAIR, new Quartet<>( //rebalance this because i want it to give better gases...
+			new FluidStack(Fluids.CHLORINE, 55),
+			new FluidStack(Fluids.AROMATICS, 25),
+			new FluidStack(Fluids.GAS, 15),
+			new FluidStack(Fluids.PETROLEUM, 5)
+		));
+
 		recipes.put(Fluids.JOOLGAS, new Quartet<>(
-				new FluidStack(Fluids.HELIUM3, 25),
-				new FluidStack(Fluids.HYDROGEN, 25),
-				new FluidStack(Fluids.CHLORINE, 20),
-				new FluidStack(Fluids.NEON, 12)
-				));
+			new FluidStack(Fluids.HELIUM3, 40),
+			new FluidStack(Fluids.HYDROGEN, 30),
+			new FluidStack(Fluids.CHLORINE, 20),
+			new FluidStack(Fluids.NEON, 10)
+		));
+
 		recipes.put(Fluids.NGAS, new Quartet<>(
-				new FluidStack(Fluids.GAS, 35),
-				new FluidStack(Fluids.AMMONIA, 24),
-				new FluidStack(Fluids.UNSATURATEDS, 15),
-				new FluidStack(Fluids.XENON, 14)
-				));
+			new FluidStack(Fluids.GAS, 45),
+			new FluidStack(Fluids.AMMONIA, 25),
+			new FluidStack(Fluids.UNSATURATEDS, 15),
+			new FluidStack(Fluids.XENON, 15)
+		));
+
 		recipes.put(Fluids.UGAS, new Quartet<>(
-				new FluidStack(Fluids.OXYGEN, 35),
-				new FluidStack(Fluids.NITROGEN, 25),
-				new FluidStack(Fluids.METHANOL, 15),
-				new FluidStack(Fluids.AROMATICS, 10)
-				));
+			new FluidStack(Fluids.OXYGEN, 45),
+			new FluidStack(Fluids.NITROGEN, 25),
+			new FluidStack(Fluids.METHANOL, 15),
+			new FluidStack(Fluids.AROMATICS, 15)
+		));
+
 		recipes.put(Fluids.SARNUSGAS, new Quartet<>(
-				new FluidStack(Fluids.HYDROGEN, 45),
-				new FluidStack(Fluids.HELIUM3, 25),
-				new FluidStack(Fluids.GAS, 15),
-				new FluidStack(Fluids.NITROGEN, 5)
-				));
+			new FluidStack(Fluids.HYDROGEN, 45),
+			new FluidStack(Fluids.HELIUM3, 35),
+			new FluidStack(Fluids.GAS, 15),
+			new FluidStack(Fluids.NITROGEN, 5)
+		));
+
 		recipes.put(Fluids.EVEAIR, new Quartet<>(
-				new FluidStack(Fluids.KMnO4, 30),
-				new FluidStack(Fluids.MERCURY, 25),
-				new FluidStack(Fluids.XENON, 15),
-				new FluidStack(Fluids.AMMONIA, 5)
-				));
-		recipes.put(Fluids.MORKINE, new Quartet<>(
-				new FluidStack(Fluids.UNSATURATEDS, 40), //PURE acetylene
-				new FluidStack(Fluids.AROMATICS, 25),
-				new FluidStack(Fluids.METHYLENE, 14),
-				new FluidStack(Fluids.HYDROGEN, 10)
-				));
+			new FluidStack(Fluids.KMnO4, 40),
+			new FluidStack(Fluids.MERCURY, 35),
+			new FluidStack(Fluids.XENON, 15),
+			new FluidStack(Fluids.AMMONIA, 10)
+		));
+
+
 		recipes.put(Fluids.DUNAAIR, new Quartet<>(
-				new FluidStack(Fluids.CARBONDIOXIDE, 80),
-				new FluidStack(Fluids.NITROGEN, 10), 
-				new FluidStack(Fluids.ARGON, 8),
-				new FluidStack(Fluids.OXYGEN, 2)
-				));
-		
+			new FluidStack(Fluids.CARBONDIOXIDE, 70),
+			new FluidStack(Fluids.NITROGEN, 15),
+			new FluidStack(Fluids.ARGON, 10),
+			new FluidStack(Fluids.OXYGEN, 5)
+		));
+
 	} // this is such a sexy machine might use your code for atmospheric distillator
-	
+
 	public static Quartet<FluidStack, FluidStack, FluidStack, FluidStack> getOutput(FluidType type) {
 		return recipes.get(type);
 	}
-	
+
 	public static HashMap<Object, Object> getCryoRecipes() {
 
 		HashMap<Object, Object> map = new HashMap<Object, Object>();
-		
+
 		for(Entry<FluidType, Quartet<FluidStack, FluidStack, FluidStack, FluidStack>> recipe : recipes.entrySet()) {
 			map.put(ItemFluidIcon.make(recipe.getKey(), 1000),
-					new ItemStack[] {
-							ItemFluidIcon.make(recipe.getValue().getW().type,	recipe.getValue().getW().fill * 10),
-							ItemFluidIcon.make(recipe.getValue().getX().type,	recipe.getValue().getX().fill * 10),
-							ItemFluidIcon.make(recipe.getValue().getY().type,	recipe.getValue().getY().fill * 10),
-							ItemFluidIcon.make(recipe.getValue().getZ().type,	recipe.getValue().getZ().fill * 10)});
-
+				new ItemStack[] {
+					ItemFluidIcon.make(recipe.getValue().getW().type,	recipe.getValue().getW().fill * 10),
+					ItemFluidIcon.make(recipe.getValue().getX().type,	recipe.getValue().getX().fill * 10),
+					ItemFluidIcon.make(recipe.getValue().getY().type,	recipe.getValue().getY().fill * 10),
+					ItemFluidIcon.make(recipe.getValue().getZ().type,	recipe.getValue().getZ().fill * 10),
+				}
+			);
 		}
-		
+
 		return map;
 	}
 
@@ -116,25 +118,24 @@ public class CryoRecipes extends SerializableRecipe {
 		JsonObject obj = (JsonObject) recipe;
 
 		FluidType input = Fluids.fromName(obj.get("input").getAsString());
-		FluidStack output1 = this.readFluidStack(obj.get("output1").getAsJsonArray());
-		FluidStack output2 = this.readFluidStack(obj.get("output2").getAsJsonArray());
-		FluidStack output3 = this.readFluidStack(obj.get("output3").getAsJsonArray());
-		FluidStack output4 = this.readFluidStack(obj.get("output4").getAsJsonArray());
+		FluidStack output1 = readFluidStack(obj.get("output1").getAsJsonArray());
+		FluidStack output2 = readFluidStack(obj.get("output2").getAsJsonArray());
+		FluidStack output3 = readFluidStack(obj.get("output3").getAsJsonArray());
+		FluidStack output4 = readFluidStack(obj.get("output4").getAsJsonArray());
 
-		
-		recipes.put(input, new Quartet(output1, output2, output3, output4));
+		recipes.put(input, new Quartet<>(output1, output2, output3, output4));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void writeRecipe(Object recipe, JsonWriter writer) throws IOException {
 		Entry<FluidType, Quartet<FluidStack, FluidStack, FluidStack, FluidStack>> rec = (Entry<FluidType, Quartet<FluidStack, FluidStack, FluidStack, FluidStack>>) recipe;
-		
-		writer.name("input").value(rec.getKey().getName());
-		writer.name("output1"); this.writeFluidStack(rec.getValue().getW(), writer);
-		writer.name("output2"); this.writeFluidStack(rec.getValue().getZ(), writer);
-		writer.name("output3"); this.writeFluidStack(rec.getValue().getY(), writer);
-		writer.name("output4"); this.writeFluidStack(rec.getValue().getX(), writer);
 
+		writer.name("input").value(rec.getKey().getName());
+		writer.name("output1"); writeFluidStack(rec.getValue().getW(), writer);
+		writer.name("output2"); writeFluidStack(rec.getValue().getZ(), writer);
+		writer.name("output3"); writeFluidStack(rec.getValue().getY(), writer);
+		writer.name("output4"); writeFluidStack(rec.getValue().getX(), writer);
 	}
 
 	@Override

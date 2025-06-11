@@ -3,8 +3,6 @@
 uniform float iTime;
 uniform sampler2D iChannel1;
 
-varying vec3 vPosition;
-
 const float pi = 3.1415927;
 
 //From Dave (https://www.shadertoy.com/view/XlfGWN)

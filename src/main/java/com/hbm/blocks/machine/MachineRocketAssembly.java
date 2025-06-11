@@ -7,7 +7,6 @@ import com.hbm.blocks.ITooltipProvider;
 import com.hbm.handler.MultiblockHandlerXR;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityMachineRocketAssembly;
-import com.hbm.util.ItemStackUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -43,13 +42,14 @@ public class MachineRocketAssembly extends BlockDummyable implements ITooltipPro
 	public boolean renderAsNormalBlock() {
 		return false;
 	}
-	
+
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-		ItemStackUtil.spillItems(world, x, y, z, block, world.rand);
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te instanceof TileEntityMachineRocketAssembly) ((TileEntityMachineRocketAssembly) te).isBreaking = true;
 		super.breakBlock(world, x, y, z, block, meta);
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		return standardOpenBehavior(world, x, y, z, player, 0);

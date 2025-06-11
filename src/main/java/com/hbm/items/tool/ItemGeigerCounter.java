@@ -17,19 +17,21 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class ItemGeigerCounter extends Item {
-	
+
 	Random rand = new Random();
 
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int i, boolean bool) {
-		
+
 		if(!(entity instanceof EntityLivingBase) || world.isRemote)
 			return;
-		
+
 		float x = HbmLivingProps.getRadBuf((EntityLivingBase)entity);
-		
+
 		if(world.getTotalWorldTime() % 5 == 0) {
 			if(x > 1E-5) {
+				if(world.rand.nextFloat() > x) return;
+
 				List<Integer> list = new ArrayList<Integer>();
 
 				if(x < 1) list.add(0);
@@ -40,9 +42,9 @@ public class ItemGeigerCounter extends Item {
 				if(x > 15 && x < 25) list.add(4);
 				if(x > 20 && x < 30) list.add(5);
 				if(x > 25) list.add(6);
-			
+
 				int r = list.get(rand.nextInt(list.size()));
-				
+
 				if(r > 0)
 					world.playSoundAtEntity(entity, "hbm:item.geiger" + r, 1.0F, 1.0F);
 			} else if(rand.nextInt(50) == 0) {
@@ -50,18 +52,18 @@ public class ItemGeigerCounter extends Item {
 			}
 		}
 	}
-	
+
 	static void setFloat(ItemStack stack, float i, String name) {
 		if(!stack.hasTagCompound())
 			stack.stackTagCompound = new NBTTagCompound();
-		
+
 		stack.stackTagCompound.setFloat(name, i);
 	}
-	
+
 	public static float getFloat(ItemStack stack, String name) {
 		if(stack.hasTagCompound())
 			return stack.stackTagCompound.getFloat(name);
-		
+
 		return 0;
 	}
 
@@ -72,12 +74,12 @@ public class ItemGeigerCounter extends Item {
 
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-		
+
 		if(!world.isRemote) {
 			world.playSoundAtEntity(player, "hbm:item.techBoop", 1.0F, 1.0F);
 			ContaminationUtil.printGeigerData(player);
 		}
-		
+
 		return stack;
 	}
 }

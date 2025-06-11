@@ -10,7 +10,7 @@ import com.hbm.dim.trait.CBT_Atmosphere;
 import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityRadiator;
 import com.hbm.util.BobMathUtil;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
@@ -37,10 +37,10 @@ public class MachineRadiator extends BlockDummyable implements ILookOverlay {
 		super.fillSpace(world, x, y, z, dir, o);
 
 		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
-		
+
 		x = x + dir.offsetX * o;
 		z = z + dir.offsetZ * o;
-		
+
 		makeExtra(world, x + rot.offsetX, y + 1, z + rot.offsetZ);
 		makeExtra(world, x + rot.offsetX, y - 1, z + rot.offsetZ);
 		makeExtra(world, x - rot.offsetX, y + 1, z - rot.offsetZ);
@@ -90,5 +90,5 @@ public class MachineRadiator extends BlockDummyable implements ILookOverlay {
 
 		ILookOverlay.printGeneric(event, I18nUtil.resolveKey(getUnlocalizedName() + ".name"), 0xffff00, 0x404000, text);
 	}
-	
+
 }

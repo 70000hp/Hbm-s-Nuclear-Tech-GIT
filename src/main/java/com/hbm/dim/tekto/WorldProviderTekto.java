@@ -4,18 +4,13 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.dim.WorldChunkManagerCelestial;
 import com.hbm.dim.WorldProviderCelestial;
 import com.hbm.dim.WorldChunkManagerCelestial.BiomeGenLayers;
-import com.hbm.dim.eve.GenLayerEve.GenLayerEveBiomes;
-import com.hbm.dim.eve.GenLayerEve.GenLayerEveRiverMix;
 import com.hbm.dim.tekto.GenLayerTekto.GenLayerTektoRiverMix;
 import com.hbm.dim.tekto.GenLayerTekto.GenlayerTektoBiomes;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.layer.GenLayer;
@@ -35,7 +30,7 @@ public class WorldProviderTekto extends WorldProviderCelestial {
 	public String getDimensionName() {
 		return "Tekto";
 	}
-	
+
 	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderTekto(this.worldObj, this.getSeed(), false);
@@ -54,9 +49,9 @@ public class WorldProviderTekto extends WorldProviderCelestial {
 		Vec3 ohshit = super.getSkyColor(camera, partialTicks);
 
 		return Vec3.createVectorHelper(ohshit.xCoord , ohshit.yCoord, ohshit.zCoord);
-		
+
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getSunBrightness(float par1) {
@@ -87,7 +82,7 @@ public class WorldProviderTekto extends WorldProviderCelestial {
 		GenLayerSmooth genlayersmooth1 = new GenLayerSmooth(1000L, genlayerBiomes);
 		GenLayerTektoRiverMix genlayerrivermix = new GenLayerTektoRiverMix(100L, genlayersmooth1, genlayersmooth);
 		GenLayerVoronoiZoom genlayervoronoizoom = new GenLayerVoronoiZoom(10L, genlayerrivermix);
-		
+
 		return new BiomeGenLayers(genlayerrivermix, genlayervoronoizoom, seed);
 	}
 

@@ -26,8 +26,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+@Deprecated
 public class ChemplantRecipes extends SerializableRecipe {
-	
+
 	/**
 	 * Nice order: The order in which the ChemRecipe are added to the recipes list
 	 * Meta order: Fixed using the id param, saved in indexMapping
@@ -35,11 +36,11 @@ public class ChemplantRecipes extends SerializableRecipe {
 
 	public static HashMap<Integer, ChemRecipe> indexMapping = new HashMap<>();
 	public static List<ChemRecipe> recipes = new ArrayList<>();
-	
+
 	@Override
 	public void registerDefaults() {
-		
-		//6-30, formerly oil cracking, coal liquefaction and solidifciation
+
+		//6-30, formerly oil cracking, coal liquefaction and solidification
 		registerOtherOil();
 
 		 recipes.add(new ChemRecipe(1004, "URANIUM_BROMIDE", 50)
@@ -49,20 +50,6 @@ public class ChemplantRecipes extends SerializableRecipe {
 					new OreDictStack(ASBESTOS.ingot(), 1))
 				.inputFluids(new FluidStack(Fluids.HYDROGEN, 4000))
 				.outputFluids(new FluidStack(Fluids.URANIUM_BROMIDE, 4000)));
-		recipes.add(new ChemRecipe(1005, "PLUTONIUM_BROMIDE", 50)
-		        .inputItems(
-			        new OreDictStack(PU239.billet(), 1),
-			        new ComparableStack(ModItems.powder_bromine),
-			        new OreDictStack(ASBESTOS.ingot(), 1))
-		        .inputFluids(new FluidStack(Fluids.HYDROGEN, 4000))
-		        .outputFluids(new FluidStack(Fluids.PLUTONIUM_BROMIDE, 4000)));
-		recipes.add(new ChemRecipe(1006, "SCHRABIDIUM_BROMIDE", 50)
-		        .inputItems(
-			        new OreDictStack(SA326.billet(), 1),
-			        new ComparableStack(ModItems.powder_bromine),
-			        new OreDictStack(ASBESTOS.ingot(), 1))
-		        .inputFluids(new FluidStack(Fluids.HYDROGEN, 4000))
-		        .outputFluids(new FluidStack(Fluids.SCHRABIDIUM_BROMIDE, 4000)));
 		recipes.add(new ChemRecipe(1007, "THORIUM_BROMIDE", 50)
 		        .inputItems(
 			        new OreDictStack(TH232.billet(), 1),
@@ -70,7 +57,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 			        new OreDictStack(ASBESTOS.ingot(), 1))
 		        .inputFluids(new FluidStack(Fluids.HYDROGEN, 4000))
 		        .outputFluids(new FluidStack(Fluids.THORIUM_BROMIDE, 4000)));
-		
+
 		recipes.add(new ChemRecipe(36, "COOLANT", 50)
 				.inputItems(new OreDictStack(KNO.dust()))
 				.inputFluids(new FluidStack(Fluids.WATER, 1800))
@@ -127,7 +114,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 						new FluidStack(Fluids.XYLENE, 500),
 						new FluidStack(Fluids.OXYGEN, 100))
 				.outputItems(new ItemStack(ModItems.ingot_pet)));*/
-		
+
 		//Laminate Glass going here
 		recipes.add(new ChemRecipe(97, "LAMINATE", 100)
 				.inputFluids(
@@ -355,7 +342,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 						new ComparableStack(ModItems.nugget_bismuth, 4))
 				.inputFluids(new FluidStack(Fluids.PEROXIDE, 1000, 5))
 				.outputFluids(new FluidStack(Fluids.DEATH, 1000, 0)));
-		//one bucket of ethanol equals 275_000 TU using the diesel baseline0
+		//one bucket of ethanol equals 275_000 TU using the diesel baseline
 		//the coal baseline is 400_000 per piece
 		//if we assume a burntime of 1.5 ops (300 ticks) for sugar at 100 TU/t that would equal a total of 30_000 TU
 		recipes.add(new ChemRecipe(75, "ETHANOL", 50)
@@ -420,32 +407,6 @@ public class ChemplantRecipes extends SerializableRecipe {
 				.inputItems(
 						new ComparableStack(ModBlocks.sand_dirty, 20))
 				.outputItems(new ItemStack(ModItems.ingot_iridium, 1)));
-		recipes.add(new ChemRecipe(108, "ELBOMB", 300)
-				.inputFluids(new FluidStack(Fluids.ELBOWGREASE, 100))
-				.inputItems(
-						new ComparableStack(ModItems.ingot_lead, 1),
-						new OreDictStack(ANY_SMOKELESS.dust(), 1))
-				.outputItems(new ItemStack(ModItems.assembly_smg, 32))); //9mm
-		recipes.add(new ChemRecipe(109, "ELBOOB", 350)
-				.inputFluids(new FluidStack(Fluids.ELBOWGREASE, 100))
-				.inputItems(
-						new ComparableStack(ModItems.ingot_copper, 1),
-						new OreDictStack(ANY_SMOKELESS.dust(), 1))
-				.outputItems(new ItemStack(ModItems.assembly_762, 32))); //762
-		recipes.add(new ChemRecipe(110, "ELGORE", 250)
-				.inputFluids(new FluidStack(Fluids.ELBOWGREASE, 100))
-				.inputItems(
-						new ComparableStack(ModItems.ingot_copper, 1),
-						new ComparableStack(ModItems.ingot_lead, 1),
-						new OreDictStack(ANY_SMOKELESS.dust(), 1))
-				.outputItems(new ItemStack(ModItems.assembly_556, 32))); //556
-		recipes.add(new ChemRecipe(111, "FIVEFIVE", 300)
-				.inputFluids(new FluidStack(Fluids.ELBOWGREASE, 100))
-				.inputItems(
-						new ComparableStack(ModItems.ingot_copper, 1),
-						new ComparableStack(ModItems.ingot_steel, 1),
-						new OreDictStack(ANY_SMOKELESS.dust(), 1))
-				.outputItems(new ItemStack(ModItems.assembly_lacunae, 32))); //5mm
 		recipes.add(new ChemRecipe(112, "NMASSIII", 300)
 				.inputFluids(new FluidStack(Fluids.DEATH, 7000), (new FluidStack(Fluids.ELBOWGREASE, 6000)))
 				.inputItems(
@@ -480,6 +441,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 		recipes.add(new ChemRecipe(118, "CC_CENTRIFUGE", 200)
 				.inputFluids(new FluidStack(Fluids.CHLOROCALCITE_CLEANED, 500), new FluidStack(Fluids.SULFURIC_ACID, 8_000))
 				.outputFluids(new FluidStack(Fluids.POTASSIUM_CHLORIDE, 250), new FluidStack(Fluids.CALCIUM_CHLORIDE, 250)));
+
 		recipes.add(new ChemRecipe(119, "THORIUM_SALT", 60)
 				.inputFluids(new FluidStack(Fluids.THORIUM_SALT_DEPLETED, 16_000))
 				.inputItems(new OreDictStack(TH232.nugget(), 2))
@@ -487,21 +449,21 @@ public class ChemplantRecipes extends SerializableRecipe {
 				.outputItems(
 						new ItemStack(ModItems.nugget_u233, 1),
 						new ItemStack(ModItems.nuclear_waste_tiny, 1)));
-		
+
 		recipes.add(new ChemRecipe(120, "MASS_CAKE", 30)
 				.inputFluids(new FluidStack(Fluids.CMILK, 4000), new FluidStack(Fluids.CREAM, 1000)) // why not regular milk? well its because the refined products allow for higher mass cakes while still needing less milk
 				.inputItems(
 						new ComparableStack(Items.sugar, 8),				// if there is a hole in my logic i will shoot myself
-						new ComparableStack(Items.egg, 4))				//ex: since a cake needs 3 buckets of milk, c-milk is more dense, leading to it being only 4 buckets of condensed milk, thats 1 bucket per cake. 
+						new ComparableStack(Items.egg, 4))				//ex: since a cake needs 3 buckets of milk, c-milk is more dense, leading to it being only 4 buckets of condensed milk, thats 1 bucket per cake.
 				.outputItems(
 						new ItemStack(Items.cake, 4)));
-		
+
 		recipes.add(new ChemRecipe(121, "BUTTER", 50)
-				.inputFluids(new FluidStack(Fluids.EMILK, 1000)) 
+				.inputFluids(new FluidStack(Fluids.EMILK, 1000))
 				.outputItems(
 						new ItemStack(ModItems.butter)));
 		recipes.add(new ChemRecipe(122, "STRAWICE", 50)
-				.inputFluids(new FluidStack(Fluids.CREAM, 1000)) 
+				.inputFluids(new FluidStack(Fluids.CREAM, 1000))
 				.inputItems(
 						new ComparableStack(ModItems.butter, 2),
 						new ComparableStack(Blocks.packed_ice, 1),
@@ -519,10 +481,21 @@ public class ChemplantRecipes extends SerializableRecipe {
 		recipes.add(new ChemRecipe(1002, "CHLOROMETHANE", 50)
 				.inputFluids(new FluidStack(Fluids.GAS, 750), new FluidStack(Fluids.CHLORINE, 250))
 				.outputFluids(new FluidStack(Fluids.CHLOROMETHANE, 1000)));
+
+		// WARNING: NILERED CHEMISTRY ZONE //
+		recipes.add(new ChemRecipe(1003, "HYDRAPISS", 300)
+				.inputFluids(new FluidStack(Fluids.NITRIC_ACID, 2000))
+				.inputItems(new ComparableStack(ModItems.rag_piss)) // urea...
+				.outputFluids(new FluidStack(Fluids.HYDRAZINE, 800)));
+
+		recipes.add(new ChemRecipe(123, "RUSTY_DECO_STEEL", 100)
+			.inputItems(new ComparableStack(ModBlocks.deco_steel, 8))
+			.inputFluids(new FluidStack(Fluids.WATER, 1000))
+			.outputItems(new ItemStack(ModBlocks.deco_rusty_steel, 8)));
 	}
 
 	public static void registerOtherOil() {
-		recipes.add(new ChemRecipe(31, "BP_BIOGAS", 60)
+		recipes.add(new ChemRecipe(31, "BP_BIOGAS", 60, 1)
 				.inputItems(new ComparableStack(ModItems.biomass, 16)) //if we assume 1B BF = 500k and translate that to 2B BG = 500k, then each biomass is worth ~31k or roughly 1.5 furnace operations
 				.outputFluids(new FluidStack(2000, Fluids.BIOGAS)));
 		recipes.add(new ChemRecipe(32, "BP_BIOFUEL", 60)
@@ -540,8 +513,8 @@ public class ChemplantRecipes extends SerializableRecipe {
 				.inputFluids(new FluidStack(1000, Fluids.BITUMEN))
 				.outputItems(new ItemStack(ModBlocks.asphalt, 16)));
 	}
-	
-	public static class ChemRecipe {
+
+	@Deprecated public static class ChemRecipe {
 
 		public int listing;
 		private int id;
@@ -552,18 +525,18 @@ public class ChemplantRecipes extends SerializableRecipe {
 		public FluidStack[] outputFluids;
 		private int duration;
 		public int oxygenConsumption = 0; // How much oxygen the recipe consumes from the atmosphere per tick while processing
-		
+
 		public ChemRecipe(int index, String name, int duration) {
 			this.id = index;
 			this.name = name;
 			this.duration = duration;
 			this.listing = recipes.size();
-			
+
 			this.inputs = new AStack[4];
 			this.outputs = new ItemStack[4];
 			this.inputFluids = new FluidStack[2];
 			this.outputFluids = new FluidStack[2];
-			
+
 			if(!indexMapping.containsKey(id)) {
 				indexMapping.put(id, this);
 			} else {
@@ -575,31 +548,31 @@ public class ChemplantRecipes extends SerializableRecipe {
 			this(index, name, duration);
 			this.oxygenConsumption = oxygenConsumption;
 		}
-		
+
 		public ChemRecipe inputItems(AStack... in) {
 			for(int i = 0; i < in.length; i++) this.inputs[i] = in[i];
 			return this;
 		}
-		
+
 		public ChemRecipe inputFluids(FluidStack... in) {
 			for(int i = 0; i < in.length; i++) this.inputFluids[i] = in[i];
 			return this;
 		}
-		
+
 		public ChemRecipe outputItems(ItemStack... out) {
 			for(int i = 0; i < out.length; i++) this.outputs[i] = out[i];
 			return this;
 		}
-		
+
 		public ChemRecipe outputFluids(FluidStack... out) {
 			for(int i = 0; i < out.length; i++) this.outputFluids[i] = out[i];
 			return this;
 		}
-		
+
 		public int getId() {
 			return this.id;
 		}
-		
+
 		public int getDuration() {
 			return this.duration;
 		}
@@ -621,7 +594,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 		int id = obj.get("id").getAsInt();
 		String name = obj.get("name").getAsString();
 		int duration = obj.get("duration").getAsInt();
-		
+
 		recipes.add(new ChemRecipe(id, name, duration)
 				.inputFluids(	readFluidArray(		(JsonArray) obj.get("fluidInput")))
 				.inputItems(	readAStackArray(		(JsonArray) obj.get("itemInput")))
@@ -657,7 +630,7 @@ public class ChemplantRecipes extends SerializableRecipe {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public String getComment() {
 		return "Rules: All in- and output arrays need to be present, even if empty. IDs need to be unique, but not sequential. It's safe if you add your own"
 				+ " recipes starting with ID 1000. Template order depends on the order of the recipes in this JSON file. The 'name' field is responsible for"

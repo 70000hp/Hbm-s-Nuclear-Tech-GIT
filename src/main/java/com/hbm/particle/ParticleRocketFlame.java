@@ -14,8 +14,10 @@ import net.minecraft.world.World;
 @SideOnly(Side.CLIENT)
 public class ParticleRocketFlame extends EntityFX {
 	
-	private int age;
-	private int maxAge;
+	protected int age;
+	protected int maxAge;
+
+	protected double pressure = 1;
 
 	public ParticleRocketFlame(TextureManager p_i1213_1_, World p_i1218_1_, double p_i1218_2_, double p_i1218_4_, double p_i1218_6_) {
 		super(p_i1218_1_, p_i1218_2_, p_i1218_4_, p_i1218_6_);
@@ -31,6 +33,25 @@ public class ParticleRocketFlame extends EntityFX {
 	
 	public ParticleRocketFlame setMaxAge(int maxAge) {
 		this.maxAge = maxAge;
+		return this;
+	}
+
+	public ParticleRocketFlame setAtmosphericPressure(double pressure) {
+		this.pressure = pressure;
+
+		if(pressure < 0.08) {
+			double factor = (0.08 - pressure) * 100;
+			this.motionX += (rand.nextDouble() - 0.5) * factor;
+			this.motionY += (rand.nextDouble() - 0.5) * factor;
+			this.motionZ += (rand.nextDouble() - 0.5) * factor;
+		}
+
+		if(pressure < 0.05) {
+			this.maxAge /= 4;
+		} else if (pressure < 0.2) {
+			this.maxAge /= 2;
+		}
+
 		return this;
 	}
 

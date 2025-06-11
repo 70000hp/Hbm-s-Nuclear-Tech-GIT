@@ -79,7 +79,7 @@ public class ItemRenderMissilePart implements IItemRenderer {
 			}
 			
 			if(part.type == PartType.FUSELAGE) {
-				GL11.glTranslated(0, height / 4 * scale, 0);
+				GL11.glTranslated(0, (height / 4 - 0.5) * scale, 0);
 			}
 			
 			GL11.glTranslated(3.5, 14, 0);

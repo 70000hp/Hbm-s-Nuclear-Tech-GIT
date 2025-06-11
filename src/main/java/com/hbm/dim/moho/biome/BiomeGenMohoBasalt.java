@@ -77,7 +77,7 @@ public class BiomeGenMohoBasalt extends BiomeGenBaseMoho {
 							} else if(by < 56 - l) {
 								block = null;
 								block1 = ModBlocks.moho_stone;
-								blocks[i] = Blocks.gravel;
+								blocks[i] = ModBlocks.basalt;
 							} else {
 								blocks[i] = block1;
 							}

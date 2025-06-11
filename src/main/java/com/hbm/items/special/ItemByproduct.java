@@ -36,7 +36,8 @@ public class ItemByproduct extends ItemEnumMulti {
 		B_RADIUM(0xE9FAF6),
 		B_TECHNETIUM(0xCADFDF),
 		B_POLONIUM(0xCADFDF),
-		B_URANIUM(0x868D82);
+		B_URANIUM(0x868D82),
+		B_STRONTIUM(0xF1E8bA);
 		
 		public int color;
 		

@@ -21,10 +21,12 @@ import net.minecraft.world.World;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.config.GeneralConfig;
+import com.hbm.entity.effect.EntityMist;
 import com.hbm.explosion.ExplosionChaos;
 import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.interfaces.IBomb;
+import com.hbm.inventory.fluid.Fluids;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.bomb.TileEntityBombMulti;
 
@@ -124,17 +126,17 @@ public class BombMulti extends BlockContainer implements IBomb {
 	public BombReturnCode igniteTestBomb(World world, int x, int y, int z) {
 		TileEntityBombMulti entity = (TileEntityBombMulti) world.getTileEntity(x, y, z);
 		if(!world.isRemote) {
-			
+
 			if(entity.isLoaded()) {
-				
+
 				float explosionValue = 0.0F;
 				int clusterCount = 0;
 				int fireRadius = 0;
 				int poisonRadius = 0;
 				int gasCloud = 0;
-				
+
 				explosionValue = this.explosionBaseValue;
-				
+
 				switch(entity.return2type()) {
 				case 1: explosionValue += 1.0F; break;
 				case 2: explosionValue += 4.0F; break;
@@ -172,9 +174,13 @@ public class BombMulti extends BlockContainer implements IBomb {
 				}
 
 				if(gasCloud > 0) {
-					ExplosionChaos.spawnChlorine(world, x, y, z, gasCloud, gasCloud / 50, 0);
+					EntityMist mist = new EntityMist(world);
+					mist.setType(Fluids.CHLORINE);
+					mist.setPosition(x + 0.5, y + 0.5, z + 0.5);
+					mist.setArea(gasCloud * 15F / 50F, gasCloud * 7.5F / 50F);
+					world.spawnEntityInWorld(mist);
 				}
-				
+
 				return BombReturnCode.DETONATED;
 			}
 		}
@@ -218,7 +224,7 @@ public class BombMulti extends BlockContainer implements IBomb {
 		}
 	}
 }
-	
+
 
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess p_149719_1_, int p_149719_2_, int p_149719_3_, int p_149719_4_) {
@@ -235,17 +241,17 @@ public class BombMulti extends BlockContainer implements IBomb {
 
 	@Override
 	public BombReturnCode explode(World world, int x, int y, int z) {
-		
+
 		if(!world.isRemote) {
 			TileEntityBombMulti entity = (TileEntityBombMulti) world.getTileEntity(x, y, z);
-			
+
 			if(entity.isLoaded()) {
 				return igniteTestBomb(world, x, y, z);
 			}
-			
+
 			return BombReturnCode.ERROR_MISSING_COMPONENT;
 		}
-		
+
 		return BombReturnCode.UNDEFINED;
 	}
 
