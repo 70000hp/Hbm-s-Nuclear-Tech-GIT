@@ -1,17 +1,13 @@
-## Added
-* Sandbags
-  * Connect to other sandbags or solid blocks
-  * Pretts
-* Wooden barrier
-  * Pretty
-  * Automatically walls off connected solid blocks in addition to the direction it was placed in
-
 ## Changed
-* Increased bayonet damage from 5 to 7.5 hearts
-* Two numeric redstone over radio signals sent over the same channel will now be added together instead of one signal replacing the other
-  * This means that reading the fill state of multiple batteries over the same channel should result the combined fill state of all batteries
-* Halved base spread of the .22 SMG
-* Certain secret guns now have a proper way of being obtained
+* The DNT suit now has a damage threshold of 1,000
+* Compressed biomass now has a nice cube shape
+* The new chemical plant's indicator lights are now functional
+* The new chemical plant can now use upgrades
 
 ## Fixed
-* Fixed RoR controller having the wrong recipe
+* Chemical plant ports. For real this time.
+* Fixed cable and pipe gauges returning the incomplete delta second value for OC and ROR readers
+* Fixed new chemical plant not saving power values to disk
+* Fixed laser rifle scope texture being missing
+* Potentially fixed shift clicking issue with the new chemical plant
+* Fixed blowtorch having a minimum gas requirement of 1,000mB despite only using 250mB
