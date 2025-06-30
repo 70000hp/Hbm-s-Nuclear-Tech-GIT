@@ -2,14 +2,17 @@ package com.hbm.render.item.weapon.sedna;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.interfaces.NotableComments;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 import com.hbm.util.BobMathUtil;
+import com.hbm.util.Vec3NT;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
+@NotableComments
 public class ItemRenderSexy extends ItemRenderWeaponBase {
 
 	@Override
@@ -18,7 +21,7 @@ public class ItemRenderSexy extends ItemRenderWeaponBase {
 	@Override
 	public float getViewFOV(ItemStack stack, float fov) {
 		float aimingProgress = ItemGunBaseNT.prevAimingProgress + (ItemGunBaseNT.aimingProgress - ItemGunBaseNT.prevAimingProgress) * interp;
-		return  fov * (1 - aimingProgress * 0.66F);
+		return  fov * (1 - aimingProgress * 0.33F);
 	}
 
 	@Override
@@ -26,10 +29,6 @@ public class ItemRenderSexy extends ItemRenderWeaponBase {
 		GL11.glTranslated(0, 0, 0.875);
 		
 		float offset = 0.8F;
-
-		/*standardAimingTransform(stack,
-				-1.25F * offset, -0.75F * offset, 3.25F * offset,
-			0, -5.25 / 8D, 1);*/
 		
 		standardAimingTransform(stack,
 				-1F * offset, -0.75F * offset, 3F * offset,
@@ -39,84 +38,152 @@ public class ItemRenderSexy extends ItemRenderWeaponBase {
 	@Override
 	public void renderFirstPerson(ItemStack stack) {
 		ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
-		Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.sexy_tex);
 		double scale = 0.375D;
 		GL11.glScaled(scale, scale, scale);
 
+		// i'm not going overboard with the animation
+		boolean doesCycle = HbmAnimations.getRelevantAnim(0) != null && HbmAnimations.getRelevantAnim(0).animation.getBus("CYCLE") != null;
+		boolean reloading = HbmAnimations.getRelevantAnim(0) != null && HbmAnimations.getRelevantAnim(0).animation.getBus("BELT") != null;
+		boolean useShellCount = HbmAnimations.getRelevantAnim(0) != null && HbmAnimations.getRelevantAnim(0).animation.getBus("SHELLS") != null;
+		boolean girldinner = HbmAnimations.getRelevantAnim(0) != null && HbmAnimations.getRelevantAnim(0).animation.getBus("BOTTLE") != null;
 		double[] equip = HbmAnimations.getRelevantTransformation("EQUIP");
+		double[] lower = HbmAnimations.getRelevantTransformation("LOWER");
 		double[] recoil = HbmAnimations.getRelevantTransformation("RECOIL");
+		double[] cycle = HbmAnimations.getRelevantTransformation("CYCLE");
+		double[] barrel = HbmAnimations.getRelevantTransformation("BARREL");
+		double[] hood = HbmAnimations.getRelevantTransformation("HOOD");
+		double[] lever = HbmAnimations.getRelevantTransformation("LEVER");
+		double[] belt = HbmAnimations.getRelevantTransformation("BELT");
+		double[] mag = HbmAnimations.getRelevantTransformation("MAG");
+		double[] magRot = HbmAnimations.getRelevantTransformation("MAGROT");
+		double[] shellCount = HbmAnimations.getRelevantTransformation("SHELLS");
+		double[] bottle = HbmAnimations.getRelevantTransformation("BOTTLE");
+		double[] sippy = HbmAnimations.getRelevantTransformation("SIP");
+		
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+		
+		if(girldinner) {
+			GL11.glPushMatrix();
+			GL11.glTranslated(bottle[0], bottle[1], bottle[2]);
+			GL11.glTranslated(0, 2, 0);
+			GL11.glRotated(sippy[0], 1, 0, 0);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(-15, 1, 0, 0);
+			GL11.glTranslated(0, -2, 0);
+			GL11.glScaled(1.5, 1.5, 1.5);
+			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.whiskey_tex);
+			ResourceManager.whiskey.renderAll();
+			GL11.glPopMatrix();
+		}
+		
+		Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.sexy_tex);
 		
 		GL11.glTranslated(0, -1, -8);
 		GL11.glRotated(equip[0], 1, 0, 0);
 		GL11.glTranslated(0, 1, 8);
 		
-		GL11.glTranslated(0, 0, recoil[2]);
+		GL11.glTranslated(0, 0, -6);
+		GL11.glRotated(lower[0], 1, 0, 0);
+		GL11.glTranslated(0, 0, 6);
 		
-		GL11.glShadeModel(GL11.GL_SMOOTH);
+		GL11.glTranslated(0, 0, recoil[2]);
 		
 		ResourceManager.sexy.renderPart("Gun");
 		
 		GL11.glPushMatrix();
-		//GL11.glTranslated(0, 0, -1);
+		GL11.glTranslated(0, 0, barrel[2]);
 		ResourceManager.sexy.renderPart("Barrel");
 		GL11.glPopMatrix();
 
 		GL11.glPushMatrix();
-		GL11.glTranslated(0, 0, 0.375);
-		//GL11.glScaled(1, 1, 0.75);
 		GL11.glTranslated(0, 0, -0.375);
+		GL11.glScaled(1, 1, 1 + 0.457247371D * barrel[2]);
+		GL11.glTranslated(0, 0, 0.375);
 		ResourceManager.sexy.renderPart("RecoilSpring");
 		GL11.glPopMatrix();
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(0, 0.4375, -2.875);
-		//GL11.glRotated(60, 1, 0, 0);
+		GL11.glRotated(hood[0], 1, 0, 0);
 		GL11.glTranslated(0, -0.4375, 2.875);
 		ResourceManager.sexy.renderPart("Hood");
 		GL11.glPopMatrix();
 		
 		GL11.glPushMatrix();
 		GL11.glTranslated(0, 0.46875, -6.875);
-		//GL11.glRotated(60, 1, 0, 0);
+		GL11.glRotated(lever[2] * 60, 1, 0, 0);
 		GL11.glTranslated(0, -0.46875, 6.875);
 		ResourceManager.sexy.renderPart("Lever");
 		GL11.glPopMatrix();
 
 		GL11.glPushMatrix();
 		GL11.glTranslated(0, 0, -6.75);
-		//GL11.glScaled(1, 1, 0.75);
+		GL11.glScaled(1, 1, 1 - lever[2] * 0.25);
 		GL11.glTranslated(0, 0, 6.75);
 		ResourceManager.sexy.renderPart("LockSpring");
 		GL11.glPopMatrix();
 		
+		GL11.glPushMatrix();
+		GL11.glTranslated(mag[0], mag[1], mag[2]);
+		GL11.glTranslated(0, -1, 0);
+		GL11.glRotated(magRot[2], 0, 0, 1);
+		GL11.glTranslated(0, 1, 0);
 		ResourceManager.sexy.renderPart("Magazine");
-
-		/*renderShell(0, -0.375, 90, false);
-		renderShell(0.3125, -0.0625, 30, false);
-		renderShell(0.75, -0.125, -30, false);
-		renderShell(1.0625, -0.4375, -60, false);
-		renderShell(1.0625, -0.875, -90, false);
-		renderShell(1.0625, -1.3125, -90, false);*/
 		
 		double p = 0.0625D;
+		double x = p * 17;
+		double y = p * -26;
+		double angle = 0;
+		Vec3NT vec = new Vec3NT(0, 0.4375, 0); // reusable, just like how toilet paper was reusable during corona
+
+		// basically what all this does is take an array of angles and just strings together shells with the appropriate
+		// position and angle calculated out of the next angle, taking all previous transformations into account.
+		// has a second array which is the "open" position that the animation can smoothly interpolate through
+		double[] anglesLoaded = new double[]   {0,   0,  20,  20,  50, 60, 70};
+		double[] anglesUnloaded = new double[] {0, -10, -50, -60, -60,  0,  0};
+		double reloadProgress = !reloading ? 1D : belt[0];
+		double cycleProgress = !doesCycle ? 1 : cycle[0];
 		
-		renderShell(p *  0, p *  -6,  90, true);
-		renderShell(p *  5, p *   1,  30, true);
-		renderShell(p * 12, p *  -1, -30, true);
-		renderShell(p * 17, p *  -6, -60, true);
-		renderShell(p * 17, p * -13, -90, true);
-		renderShell(p * 17, p * -20, -90, true);
+		double[][] shells = new double[anglesLoaded.length][3];
+		
+		// generate belt, interp used for the reload animation
+		for(int i = 0; i < anglesLoaded.length; i++) {
+			shells[i][0] = x;
+			shells[i][1] = y;
+			shells[i][2] = angle - 90;
+			double delta = BobMathUtil.interp(anglesUnloaded[i], anglesLoaded[i], reloadProgress);
+			angle += delta;
+			vec.rotateAroundZDeg(-delta);
+			x += vec.xCoord;
+			y += vec.yCoord;
+		}
+		
+		int shellAmount = useShellCount ? (int) shellCount[0] : gun.getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, null);
+		
+		// draw belt, interp used for cycling (shells will transform towards the position/rotation of the next shell)
+		for(int i = 0; i < shells.length - 1; i++) {
+			double[] prevShell = shells[i];
+			double[] nextShell = shells[i + 1];
+			renderShell(prevShell[0], nextShell[0], prevShell[1], nextShell[1], prevShell[2], nextShell[2], shells.length - i < shellAmount + 2, cycleProgress);
+		}
+		GL11.glPopMatrix();
 		
 		GL11.glShadeModel(GL11.GL_FLAT);
+
+		GL11.glPushMatrix();
+		GL11.glTranslated(0, 0, 8);
+		GL11.glRotated(90, 0, 1, 0);
+		GL11.glRotated(90 * gun.shotRand, 1, 0, 0);
+		this.renderMuzzleFlash(gun.lastShot[0], 150, 7.5);
+		GL11.glPopMatrix();
 	}
 
 	@Override
 	public void setupThirdPerson(ItemStack stack) {
 		super.setupThirdPerson(stack);
-		double scale = 1.25D;
+		double scale = 1.75D;
 		GL11.glScaled(scale, scale, scale);
-		GL11.glTranslated(0, 0, 4);
-
+		GL11.glTranslated(1, 1, 6);
 	}
 
 	@Override
