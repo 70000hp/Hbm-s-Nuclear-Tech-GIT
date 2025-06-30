@@ -44,6 +44,8 @@ dependencies {
 	implementation 'codechicken:NotEnoughItems:1.7.10-1.0.3.74:dev'
 	compileOnly 'codechicken:NotEnoughItems:1.7.10-1.0.3.74:src'
 
+	compileOnly "com.github.GTNewHorizons:Applied-Energistics-2-Unofficial:rv3-beta-485-GTNH:dev"
+
 	compileOnly "inventorytweaks:InventoryTweaks:1.59-dev:deobf"
 
 	implementation "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:api"
