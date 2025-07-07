@@ -1030,14 +1030,21 @@ public class ModEventHandlerClient {
 
 	public static boolean renderLodeStar = false;
 	public static long lastStarCheck = 0L;
+	public static long lastLoadScreenReplacement = 0L;
+	public static int loadingScreenReplacementRetry = 0;
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onClientTickLast(ClientTickEvent event) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		if(!(mc.loadingScreen instanceof LoadingScreenRendererNT)) {
+		long millis = Clock.get_ms();
+		if(millis == 0) millis = System.currentTimeMillis();
+		
+		if(GeneralConfig.enableLoadScreenReplacement && loadingScreenReplacementRetry < 25 && !(mc.loadingScreen instanceof LoadingScreenRendererNT) && millis > lastLoadScreenReplacement + 5_000) {
 			mc.loadingScreen = new LoadingScreenRendererNT(mc);
+			lastLoadScreenReplacement = millis;
+			loadingScreenReplacementRetry++; // this might not do anything, but at least it should prevent a metric fuckton of framebuffers from being created
 		}
 
 		if(event.phase == Phase.START && GeneralConfig.enableSkyboxes) {
@@ -1067,7 +1074,6 @@ public class ModEventHandlerClient {
 			}
 
 			EntityPlayer player = mc.thePlayer;
-			long millis = Clock.get_ms();
 
 			if(lastStarCheck + 200 < millis) {
 				renderLodeStar = false;
