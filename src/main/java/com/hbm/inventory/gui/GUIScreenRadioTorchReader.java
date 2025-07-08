@@ -12,7 +12,7 @@ import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.tileentity.network.TileEntityRadioTorchReader;
 import com.hbm.util.Compat;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.redstoneoverradio.IRORValueProvider;
 import net.minecraft.client.Minecraft;
@@ -28,9 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class GUIScreenRadioTorchReader extends GuiScreen {
 	
 	protected static final ResourceLocation texture = new ResourceLocation(RefStrings.MODID + ":textures/gui/machine/gui_rtty_reader.png");
-	
 	public TileEntityRadioTorchReader rtty;
-	
 	protected int xSize = 256;
 	protected int ySize = 204;
 	protected int guiLeft;
