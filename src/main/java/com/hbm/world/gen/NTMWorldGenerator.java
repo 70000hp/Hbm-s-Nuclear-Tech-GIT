@@ -18,13 +18,16 @@ import com.hbm.world.gen.component.Component.GreenOoze;
 import com.hbm.world.gen.component.Component.MeteorBricks;
 import com.hbm.world.gen.component.Component.SupplyCrates;
 
+import com.hbm.world.gen.deposits.MapGenSaltLake;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.structure.StructureComponent.BlockSelector;
+import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.InitMapGenEvent.EventType;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
@@ -163,6 +166,23 @@ public class NTMWorldGenerator implements IWorldGenerator {
 		final long i = rand.nextLong() / 2L * 2L + 1L;
 		final long j = rand.nextLong() / 2L * 2L + 1L;
 		rand.setSeed((long)chunkX * i + (long)chunkZ * j ^ world.getSeed());
+	}
+
+	private MapGenSaltLake saltlake;
+	/*
+	 * Pre-decoration Event
+	 * Used to generate world features like strata and crater lakes, used for MapGen world features
+	 *
+	 */
+	@SubscribeEvent
+	public void generateTerrainFeature (ChunkProviderEvent.ReplaceBiomeBlocks event){
+		if(saltlake == null){
+			saltlake = new MapGenSaltLake(10);
+			saltlake.regolith = Blocks.clay;
+			saltlake.rock = ModBlocks.block_niter;
+			saltlake.setSize(10,30);
+		}
+		saltlake.func_151539_a(event.chunkProvider, event.world, event.chunkX, event.chunkZ, event.blockArray);
 	}
 
 	/*
