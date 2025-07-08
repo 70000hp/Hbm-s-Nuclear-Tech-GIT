@@ -1,18 +1,14 @@
 package com.hbm.entity.mob.raider;
 
-import com.hbm.entity.mob.ai.EntityAIFireGun;
-import com.hbm.entity.mob.ai.EntityAINearestAttackableTargetNT;
 import com.hbm.entity.mob.glyphid.GlyphidStats;
-import com.hbm.entity.mob.minerva.MinervaAIManager;
-import com.hbm.entity.mob.minerva.commands.AIGroup;
-import com.hbm.entity.mob.minerva.commands.AICommand;
-import com.hbm.entity.mob.minerva.commands.IMinervaUser;
+import com.hbm.entity.mob.minerva.AIGroup;
+import com.hbm.entity.mob.minerva.AICommand;
+import com.hbm.entity.mob.minerva.IMinervaUser;
 import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
 import java.util.Collection;
@@ -23,17 +19,16 @@ public class EntityRaider extends EntityMob implements IMinervaUser {
 	public int homeX;
 	public int homeY;
 	public int homeZ;
+	public boolean hasHome;
 
 	public boolean hasGroup;
 	AIGroup group;
 
 	Queue<AICommand> taskQueue;
-	MinervaAIManager manager;
 
 	public EntityRaider(World world){
 		super(world);
 		this.setSize(0.6F, 1.8F);
-		manager = new MinervaAIManager(this);
 	}
 
 	@Override
@@ -48,6 +43,11 @@ public class EntityRaider extends EntityMob implements IMinervaUser {
 	public void onUpdate() {
 		super.onUpdate();
 
+	}
+
+	@Override
+	public EntityLivingBase getUser() {
+		return this;
 	}
 
 	@Override
@@ -72,10 +72,21 @@ public class EntityRaider extends EntityMob implements IMinervaUser {
 	}
 
 	@Override
-	public MinervaAIManager getManager() {
-		return manager;
+	public EntityLivingBase getEnemy() {
+		return getAttackTarget();
 	}
 
-	public class RaiderTargetSelector implements IEntitySelector
+	@Override
+	public void setEnemy(EntityLivingBase enemy) {
+		setTarget(enemy);
+	}
+
+	public class RaiderTargetSelector implements IEntitySelector{
+
+		@Override
+		public boolean isEntityApplicable(Entity p_82704_1_) {
+			return false;
+		}
+	}
 
 }

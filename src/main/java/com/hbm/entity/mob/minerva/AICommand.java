@@ -1,4 +1,4 @@
-package com.hbm.entity.mob.minerva.commands;
+package com.hbm.entity.mob.minerva;
 
 import com.hbm.util.fauxpointtwelve.BlockPos;
 
