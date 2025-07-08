@@ -27,13 +27,7 @@ public class EntityAINearestAttackableTargetNT extends EntityAITarget {
 		this.searchRange = range;
 		setMutexBits(1);
 
-		this.targetEntitySelector = new IEntitySelector() {
-
-			@Override
-			public boolean isEntityApplicable(Entity entity) {
-				return selector != null && !selector.isEntityApplicable(entity) ? false : !(entity instanceof EntityLivingBase) ? false : EntityAINearestAttackableTargetNT.this.isSuitableTarget((EntityLivingBase) entity, false);
-			}
-		};
+		this.targetEntitySelector = entity -> selector != null && !selector.isEntityApplicable(entity) ? false : !(entity instanceof EntityLivingBase) ? false : EntityAINearestAttackableTargetNT.this.isSuitableTarget((EntityLivingBase) entity, false);
 	}
 
 	@Override
@@ -50,7 +44,7 @@ public class EntityAINearestAttackableTargetNT extends EntityAITarget {
 		double range = getTargetDistance();
 		List targets = this.taskOwner.worldObj.selectEntitiesWithinAABB(this.targetClass, this.taskOwner.boundingBox.expand(range, range, range), this.targetEntitySelector);
 		Collections.sort(targets, this.theNearestAttackableTargetSorter);
-		
+
 		if(targets.isEmpty()) {
 			return false;
 		}

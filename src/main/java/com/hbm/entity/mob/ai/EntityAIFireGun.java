@@ -1,5 +1,6 @@
 package com.hbm.entity.mob.ai;
 
+import com.hbm.entity.pathfinder.PathFinderUtils;
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
 import com.hbm.items.weapon.sedna.GunConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
@@ -33,7 +34,7 @@ public class EntityAIFireGun extends EntityAIBase {
 		FIRING,
 		RELOADING,
 	}
-	
+
 	public EntityAIFireGun(EntityLiving host) {
 		this.host = host;
 	}
@@ -63,7 +64,7 @@ public class EntityAIFireGun extends EntityAIBase {
 		if(distanceToTargetSquared < maxRange * maxRange && attackTimer > 20) {
 			host.getNavigator().clearPathEntity();
 		} else {
-			host.getNavigator().tryMoveToEntityLiving(target, attackMoveSpeed);
+			host.getNavigator().setPath(PathFinderUtils.getPathEntityToEntityPartial(host.worldObj, host, host.getAttackTarget(), 16F, true, true, true, true), 1);
 		}
 
 		host.getLookHelper().setLookPositionWithEntity(target, 30.0F, 30.0F);
@@ -132,5 +133,5 @@ public class EntityAIFireGun extends EntityAIBase {
 
 		return (ItemGunBaseNT) stack.getItem();
 	}
-	
+
 }

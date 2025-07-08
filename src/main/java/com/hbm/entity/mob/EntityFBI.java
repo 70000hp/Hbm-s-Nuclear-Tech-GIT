@@ -7,6 +7,7 @@ import java.util.Set;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.config.MobConfig;
 import com.hbm.entity.mob.ai.EntityAIBreaking;
+import com.hbm.entity.mob.glyphid.GlyphidStats;
 import com.hbm.entity.pathfinder.PathFinderUtils;
 import com.hbm.items.ModItems;
 
@@ -56,7 +57,7 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, false));
         this.setSize(0.6F, 1.8F);
-        
+
         this.isImmuneToFire = true;
 	}
 
@@ -65,9 +66,9 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
         this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setBaseValue(0.5D);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3D);
     }
-    
+
     public boolean attackEntityFrom(DamageSource source, float amount) {
-    	
+
     	if(source instanceof EntityDamageSourceIndirect && ((EntityDamageSourceIndirect)source).getEntity() instanceof EntityFBI) {
     		return false;
     	}
@@ -78,35 +79,35 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
 	    	if("thermal".equals(source.damageType))
 	    		return false;
     	}
-    	
+
     	return super.attackEntityFrom(source, amount);
     }
 
     protected void entityInit() {
         super.entityInit();
     }
-    
+
     protected boolean canDespawn() {
         return false;
     }
-	
+
     protected void addRandomArmor() {
         //super.addRandomArmor();
-        
+
         int equip = rand.nextInt(2);
-        
+
         switch(equip) {
         case 0: this.setCurrentItemOrArmor(0, new ItemStack(ModItems.gun_heavy_revolver)); break;
         case 1: this.setCurrentItemOrArmor(0, new ItemStack(ModItems.gun_spas12)); break;
         }
-        
+
         if(rand.nextInt(5) == 0) {
         	this.setCurrentItemOrArmor(4, new ItemStack(ModItems.security_helmet));
         	this.setCurrentItemOrArmor(3, new ItemStack(ModItems.security_plate));
         	this.setCurrentItemOrArmor(2, new ItemStack(ModItems.security_legs));
         	this.setCurrentItemOrArmor(1, new ItemStack(ModItems.security_boots));
         }
-        
+
         if(this.worldObj != null && this.worldObj.provider.dimensionId != 0) {
         	this.setCurrentItemOrArmor(4, new ItemStack(Blocks.glass));
         	this.setCurrentItemOrArmor(3, new ItemStack(ModItems.paa_plate));
@@ -114,7 +115,7 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
         	this.setCurrentItemOrArmor(1, new ItemStack(ModItems.paa_boots));
         }
     }
-    
+
     protected boolean isAIEnabled() {
         return true;
     }
@@ -132,7 +133,7 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
 			this.getNavigator().setPath(PathFinderUtils.getPathEntityToEntityPartial(worldObj, this, this.getAttackTarget(), 16F, true, false, false, true), 1);
 		}
 	}
-    
+
     //combat vest = full diamond set
     public int getTotalArmorValue() {
     	return 20;
@@ -141,9 +142,9 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
 	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase entity, float f) {
 	}
-	
+
 	private static final Set<Block> canDestroy = new HashSet();
-	
+
 	static {
 		canDestroy.add(Blocks.wooden_door);
 		canDestroy.add(Blocks.iron_door);
@@ -174,35 +175,35 @@ public class EntityFBI extends EntityMob implements IRangedAttackMob {
     {
     	if(this.getEquipmentInSlot(4) == null)
            	this.setCurrentItemOrArmor(4, new ItemStack(ModItems.gas_mask_m65));
-    	
+
     	return false;
     }
-	
+
     public void onLivingUpdate() {
     	super.onLivingUpdate();
-    	
+
     	if(worldObj.isRemote || this.getHealth() <= 0)
     		return;
-    	
+
     	if(this.ticksExisted % MobConfig.raidAttackDelay == 0) {
     		Vec3 vec = Vec3.createVectorHelper(MobConfig.raidAttackReach, 0, 0);
     		vec.rotateAroundY((float)(Math.PI * 2) * rand.nextFloat());
-    		
+
             Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY + 0.5 + rand.nextFloat(), this.posZ);
             Vec3 vec31 = Vec3.createVectorHelper(vec3.xCoord + vec.xCoord, vec3.yCoord + vec.yCoord, vec3.zCoord + vec.zCoord);
             MovingObjectPosition mop = this.worldObj.func_147447_a(vec3, vec31, false, true, false);
-            
+
             if(mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
-            	
+
             	if(canDestroy.contains(worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ)))
             		worldObj.func_147480_a(mop.blockX, mop.blockY, mop.blockZ, false);
             }
     	}
-    	
+
     	double range = 1.5;
-    	
+
     	List<EntityItem> items = worldObj.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX, posY, posZ).expand(range, range, range));
-    	
+
     	for(EntityItem item : items)
     		item.setFire(10);
     }
