@@ -14,7 +14,7 @@ import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
-import com.hbm.module.ModuleMachineChemplant;
+import com.hbm.module.machine.ModuleMachineChemplant;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
@@ -314,6 +314,9 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		for(int i = 0; i < inputTanks.length; i++) this.inputTanks[i].readFromNBT(nbt, "i" + i);
 		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].readFromNBT(nbt, "i" + i);
 
+		this.water.readFromNBT(nbt, "w");
+		this.lps.readFromNBT(nbt, "s");
+
 		this.power = nbt.getLong("power");
 		this.maxPower = nbt.getLong("maxPower");
 		for(int i = 0; i < 4; i++) this.chemplantModule[i].readFromNBT(nbt);
@@ -325,6 +328,9 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 
 		for(int i = 0; i < inputTanks.length; i++) this.inputTanks[i].writeToNBT(nbt, "i" + i);
 		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].writeToNBT(nbt, "i" + i);
+
+		this.water.writeToNBT(nbt, "w");
+		this.lps.writeToNBT(nbt, "s");
 
 		nbt.setLong("power", power);
 		nbt.setLong("maxPower", maxPower);
@@ -377,7 +383,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 
 	@Override
 	public void provideInfo(UpgradeType type, int level, List<String> info, boolean extendedInfo) {
-		info.add(IUpgradeInfoProvider.getStandardLabel(ModBlocks.machine_chemical_plant));
+		info.add(IUpgradeInfoProvider.getStandardLabel(ModBlocks.machine_chemical_factory));
 		if(type == UpgradeType.SPEED) {
 			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(KEY_SPEED, "+" + (level * 100 / 3) + "%"));
 			info.add(EnumChatFormatting.RED + I18nUtil.resolveKey(KEY_CONSUMPTION, "+" + (level * 50) + "%"));

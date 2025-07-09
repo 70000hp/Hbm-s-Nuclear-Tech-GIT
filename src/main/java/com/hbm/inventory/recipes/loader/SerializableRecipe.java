@@ -83,6 +83,7 @@ public abstract class SerializableRecipe {
 		recipeHandlers.add(new PedestalRecipes());
 		
 		//GENERIC
+		recipeHandlers.add(AssemblyMachineRecipes.INSTANCE);
 		recipeHandlers.add(ChemicalPlantRecipes.INSTANCE);
 
 		recipeHandlers.add(new MatDistribution());
@@ -237,7 +238,7 @@ public abstract class SerializableRecipe {
 		JsonObject json = gson.fromJson(reader, JsonObject.class);
 		JsonArray recipes = json.get("recipes").getAsJsonArray();
 		for(JsonElement recipe : recipes) {
-			this.readRecipe(recipe);
+			if(recipe != null) this.readRecipe(recipe);
 		}
 	}
 
