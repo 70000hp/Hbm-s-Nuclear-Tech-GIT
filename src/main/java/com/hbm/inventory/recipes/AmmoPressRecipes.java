@@ -25,7 +25,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 public class AmmoPressRecipes extends SerializableRecipe {
-	
+
 	public static List<AmmoPressRecipe> recipes = new ArrayList();
 
 	@Override
@@ -37,6 +37,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 		OreDictStack steel = new OreDictStack(STEEL.ingot());
 		OreDictStack wSteel = new OreDictStack(WEAPONSTEEL.ingot());
 		OreDictStack copper = new OreDictStack(CU.ingot());
+		OreDictStack coplate = new OreDictStack(CU.plate());
 		OreDictStack plastic = new OreDictStack(ANY_PLASTIC.ingot());
 		OreDictStack uranium = new OreDictStack(U238.ingot());
 		OreDictStack ferro = new OreDictStack(FERRO.ingot());
@@ -105,7 +106,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	steel,				null,
 				null,	smokeless.copy(3),	null,
 				null,	cSmall,				null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.P22_SP, 24),
 				null,	lead,		null,
 				null,	smokeless,	null,
@@ -122,11 +123,15 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	wSteel,				null,
 				null,	smokeless.copy(2),	null,
 				null,	sSmall,				null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.P9_SP, 12),
 				null,	lead,		null,
 				null,	smokeless,	null,
 				null,	cSmall,		null));
+		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.P9_FMJ, 12),
+			null,	coplate,		null,
+			null,	smokeless,	null,
+			null,	cSmall,		null));
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.P9_FMJ, 12),
 				null,	steel,		null,
 				null,	smokeless,	null,
@@ -139,7 +144,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	wSteel,				null,
 				null,	smokeless.copy(2),	null,
 				null,	sSmall,				null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.P45_SP, 8),
 				null,	lead,		null,
 				null,	smokeless,	null,
@@ -160,7 +165,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	uranium,			null,
 				null,	smokeless.copy(2),	null,
 				null,	sSmall,				null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.R556_SP, 16),
 				null,	lead.copy(2),		null,
 				null,	smokeless.copy(2),	null,
@@ -177,7 +182,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	wSteel.copy(2),		null,
 				null,	smokeless.copy(4),	null,
 				null,	sSmall.copy(2),		null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.R762_SP, 12),
 				null,	lead.copy(2),		null,
 				null,	smokeless.copy(2),	null,
@@ -202,7 +207,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				he,		ferro,				null,
 				null,	smokeless.copy(4),	null,
 				null,	sSmall.copy(2),		null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.BMG50_SP, 12),
 				null,	lead.copy(2),		null,
 				null,	smokeless.copy(3),	null,
@@ -286,14 +291,14 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				he,		ferro,				null,
 				null,	smokeless.copy(2),	null,
 				null,	sShell,				null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.G26_FLARE, 4),
 				null,	rp,			null,
 				null,	smokeless,	null,
 				null,	cBig,		null));
 
 		ComparableStack dyn = new ComparableStack(ModItems.ball_dynamite);
-		OreDictStack coplate = new OreDictStack(CU.plate());
+
 		OreDictStack diesel = new OreDictStack(Fluids.DIESEL.getDict(1_000));
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.G40_HE, 4),
 				null,	dyn,		null,
@@ -315,7 +320,7 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				wp,		he,			null,
 				null,	smokeless,	null,
 				null,	cBig,		null));
-		
+
 		recipes.add(new AmmoPressRecipe(DictFrame.fromOne(ModItems.ammo_standard, EnumAmmo.ROCKET_HE, 2),
 				null,	dyn,				null,
 				null,	cBig,				null,
@@ -445,16 +450,16 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				null,	pipe,		null,
 				null,	smokeless,	null));
 	}
-	
+
 	public static HashMap getRecipes() {
 		HashMap<Object, Object> recipes = new HashMap<Object, Object>();
-		
+
 		for(AmmoPressRecipe recipe : AmmoPressRecipes.recipes) {
 			List<AStack> inputs = new ArrayList();
 			for(AStack stack : recipe.input) if(stack != null) inputs.add(stack);
 			recipes.put(inputs.toArray(new AStack[0]), recipe.output.copy());
 		}
-		
+
 		return recipes;
 	}
 
@@ -481,11 +486,11 @@ public class AmmoPressRecipes extends SerializableRecipe {
 	@Override
 	public void readRecipe(JsonElement recipe) {
 		JsonObject obj = (JsonObject) recipe;
-		
+
 		ItemStack output = this.readItemStack(obj.get("output").getAsJsonArray());
 		JsonArray inputArray = obj.get("input").getAsJsonArray();
 		AStack[] input = new AStack[9];
-		
+
 		for(int i = 0; i < 9; i++) {
 			JsonElement element = inputArray.get(i);
 			if(element.isJsonNull()) {
@@ -494,17 +499,17 @@ public class AmmoPressRecipes extends SerializableRecipe {
 				input[i] = this.readAStack(element.getAsJsonArray());
 			}
 		}
-		
+
 		this.recipes.add(new AmmoPressRecipe(output, input));
 	}
 
 	@Override
 	public void writeRecipe(Object recipe, JsonWriter writer) throws IOException {
 		AmmoPressRecipe rec = (AmmoPressRecipe) recipe;
-		
+
 		writer.name("output");
 		this.writeItemStack(rec.output, writer);
-		
+
 		writer.name("input").beginArray();
 		for(int i = 0; i < rec.input.length; i++) {
 			if(rec.input[i] == null) {
@@ -515,11 +520,11 @@ public class AmmoPressRecipes extends SerializableRecipe {
 		}
 		writer.endArray();
 	}
-	
+
 	public static class AmmoPressRecipe {
 		public ItemStack output;
 		public AStack[] input;
-		
+
 		public AmmoPressRecipe(ItemStack output, AStack... input) {
 			this.output = output;
 			this.input = input;

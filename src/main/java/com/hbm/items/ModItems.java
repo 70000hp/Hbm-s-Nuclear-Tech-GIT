@@ -574,7 +574,7 @@ public class ModItems {
 	public static Item parts_legendary;
 
 	public static Item circuit;
-	public static Item misc_parts;
+	public static Item arcade_parts;
 
 	public static Item crt_display;
 	public static ItemEnumMulti circuit_star_piece;
@@ -643,7 +643,7 @@ public class ModItems {
 	public static Item seg_10;
 	public static Item seg_15;
 	public static Item seg_20;
-	
+
 	public static Item combine_scrap;
 
 	public static Item shimmer_head;
@@ -1199,6 +1199,7 @@ public class ModItems {
 	public static Item fluid_duct;
 
 	public static Item bobmazon;
+	public static Item bobmazon_arcade;
 	public static Item bobmazon_hidden;
 
 	public static Item launch_code_piece;
@@ -2797,7 +2798,7 @@ public class ModItems {
 		circuit_star = new ItemCustomLore().setRarity(EnumRarity.uncommon).setUnlocalizedName("circuit_star").setCreativeTab(null).setTextureName(RefStrings.MODID + ":circuit_star");
 		assembly_nuke = new Item().setUnlocalizedName("assembly_nuke").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":assembly_nuke");
 		casing = new ItemEnumMulti(ItemEnums.EnumCasingType.class, true, true).setUnlocalizedName("casing").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":casing");
-		misc_parts = new ItemArcadeComponent().setUnlocalizedName("misc_parts").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":misc_parts");
+		arcade_parts = new ItemArcadeComponent().setUnlocalizedName("arcade_parts").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":arcade_parts");
 
 		wiring_red_copper = new ItemWiring().setUnlocalizedName("wiring_red_copper").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":wiring_red_copper");
 
@@ -4144,6 +4145,7 @@ public class ModItems {
 		fluid_duct = new ItemFluidDuct().setUnlocalizedName("fluid_duct").setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":duct");
 
 		bobmazon = new ItemCatalog().setUnlocalizedName("bobmazon").setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab).setTextureName(RefStrings.MODID + ":bobmazon");
+		bobmazon_arcade = new ItemBobmazonArcade().setUnlocalizedName("bobmazon_arcade").setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab).setTextureName(RefStrings.MODID + ":bobmazon_arcade");
 		bobmazon_hidden = new ItemCatalog().setUnlocalizedName("bobmazon_hidden").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":bobmazon_special");
 
 		euphemium_helmet = new ArmorEuphemium(MainRegistry.aMatEuph, 0).setUnlocalizedName("euphemium_helmet").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":euphemium_helmet");
@@ -5593,7 +5595,7 @@ public class ModItems {
 		GameRegistry.registerItem(circuit_star, circuit_star.getUnlocalizedName());
 
 		//Arcade Parts
-		GameRegistry.registerItem(misc_parts, misc_parts.getUnlocalizedName());
+		GameRegistry.registerItem(arcade_parts, arcade_parts.getUnlocalizedName());
 
 		//Casing
 		GameRegistry.registerItem(casing, casing.getUnlocalizedName());
@@ -5758,6 +5760,7 @@ public class ModItems {
 		GameRegistry.registerItem(journal_bj, journal_bj.getUnlocalizedName());
 		GameRegistry.registerItem(journal_silver, journal_silver.getUnlocalizedName());
 		GameRegistry.registerItem(bobmazon, bobmazon.getUnlocalizedName());
+		GameRegistry.registerItem(bobmazon_arcade, bobmazon_arcade.getUnlocalizedName());
 		GameRegistry.registerItem(bobmazon_hidden, bobmazon_hidden.getUnlocalizedName());
 
 		//Hydraulic Press Stamps

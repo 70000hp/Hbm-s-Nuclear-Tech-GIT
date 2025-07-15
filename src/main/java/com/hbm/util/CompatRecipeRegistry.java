@@ -80,7 +80,7 @@ public class CompatRecipeRegistry {
 		if(outputFluids != null) recipe.outputFluids(copyFirst(outputFluids, 2));
 		ChemplantRecipes.recipes.add(recipe);
 	}
-	
+
 	/** Chemical plant recipe needs a unique name for the registry. Zero length arrays should stay null*/
 	public static void registerChemicalPlant(String name, boolean named, ItemStack icon, int duration, long power, AStack[] inputItems, FluidStack[] inputFluids, IOutput[] outputItems, FluidStack[] outputFluids) {
 		GenericRecipe recipe = new GenericRecipe(name).setDuration(duration).setPower(power);
@@ -269,6 +269,10 @@ public class CompatRecipeRegistry {
 		if(output == null && fluid == null) return;
 		ArcFurnaceRecipes.recipeList.add(new Pair(input, new ArcFurnaceRecipe().solid(output).fluid(fluid)));
 	}
+	public static void registerBobmazon(ItemStack output, AStack[] input, int requirement) {
+		BobmazonArcadeOffers.recipes.add(new BobmazonArcadeOffers.ArcadeOffer(output, input, BobmazonArcadeOffers.Requirement.values()[requirement]));
+	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 

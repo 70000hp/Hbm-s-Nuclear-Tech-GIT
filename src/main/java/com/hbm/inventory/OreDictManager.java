@@ -32,6 +32,7 @@ import com.hbm.items.ItemEnums.EnumBriquetteType;
 import com.hbm.items.ItemEnums.EnumChunkType;
 import com.hbm.items.ItemEnums.EnumCokeType;
 import com.hbm.items.ItemEnums.EnumTarType;
+import com.hbm.items.machine.ItemCircuit;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.Compat;
@@ -103,6 +104,12 @@ public class OreDictManager {
 	public static final String KEY_TOOL_TORCH = "ntmtorch";
 
 	public static final String KEY_GLYPHID_MEAT = "glyphidMeat";
+
+	public static final String KEY_CIRCUIT_T1 = "arcadeCircuit1";
+	public static final String KEY_CIRCUIT_T2 = "arcadeCircuit2";
+	public static final String KEY_CIRCUIT_T3 = "arcadeCircuit3";
+
+
 
 	/*
 	 * MATERIALS
@@ -547,6 +554,22 @@ public class OreDictManager {
 		 */
 		OreDictionary.registerOre(KEY_GLYPHID_MEAT, new ItemStack(glyphid_meat));
 		OreDictionary.registerOre(KEY_GLYPHID_MEAT, new ItemStack(glyphid_meat_grilled));
+
+		/*
+		 * ARCADE CIRCUIT DICT
+		 */
+		OreDictionary.registerOre(KEY_CIRCUIT_T1, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.ANALOG.ordinal()));
+		OreDictionary.registerOre(KEY_CIRCUIT_T1, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.ADVANCED.ordinal()));
+		OreDictionary.registerOre(KEY_CIRCUIT_T1, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.CAPACITOR_BOARD.ordinal()));
+		OreDictionary.registerOre(KEY_CIRCUIT_T1, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.BISMOID.ordinal()));
+
+		OreDictionary.registerOre(KEY_CIRCUIT_T2, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.ADVANCED.ordinal()));
+		OreDictionary.registerOre(KEY_CIRCUIT_T2, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.CAPACITOR_BOARD.ordinal()));
+		OreDictionary.registerOre(KEY_CIRCUIT_T2, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.BISMOID.ordinal()));
+
+		OreDictionary.registerOre(KEY_CIRCUIT_T3, new ItemStack(circuit, 1, ItemCircuit.EnumCircuitType.BISMOID.ordinal()));
+
+
 
 		for(NTMMaterial mat : Mats.orderedList) {
 			if(mat.smeltable == SmeltingBehavior.SMELTABLE) {

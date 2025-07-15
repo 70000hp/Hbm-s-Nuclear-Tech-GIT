@@ -125,7 +125,7 @@ public class CraftingManager {
 		addRecipeAuto(DictFrame.fromOne(ModItems.circuit, EnumCircuitType.CONTROLLER_CHASSIS), new Object[] { "PPP", "CBB", "PPP", 'P', ANY_PLASTIC.ingot(), 'C', ModItems.crt_display, 'B', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.PCB) });
 		addRecipeAuto(DictFrame.fromOne(ModItems.circuit, EnumCircuitType.ATOMIC_CLOCK), new Object[] { "ICI", "CSC", "ICI", 'I', ModItems.plate_polymer, 'C', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.CHIP), 'S', SR.dust() });
 
-		addRecipeAuto(DictFrame.fromOne(ModItems.misc_parts, EnumComponentType.MACHINE_PARTS, 4), new Object[] { "ICI", "C C", "ICI", 'I', STEEL.plateCast(), 'C', CU.plate()});
+		addRecipeAuto(DictFrame.fromOne(ModItems.arcade_parts, EnumComponentType.MACHINE_PARTS, 4), new Object[] { "ICI", "C C", "ICI", 'I', STEEL.plateCast(), 'C', CU.plate()});
 
 		addRecipeAuto(new ItemStack(ModItems.crt_display, 4), new Object[] { " A ", "SGS", " T ", 'A', AL.dust(), 'S', STEEL.plate(), 'G', KEY_ANYPANE, 'T', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.VACUUM_TUBE) });
 
