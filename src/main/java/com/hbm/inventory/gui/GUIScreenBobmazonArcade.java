@@ -179,7 +179,7 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 
 	}
 
-	class FolderButton {
+	public class FolderButton {
 
 		int xPos;
 		int yPos;

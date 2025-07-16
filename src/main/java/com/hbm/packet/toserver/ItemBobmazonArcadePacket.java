@@ -5,6 +5,7 @@ import com.hbm.inventory.RecipesCommon.*;
 import com.hbm.inventory.recipes.BobmazonArcadeOffers;
 import com.hbm.items.ModItems;
 import com.hbm.lib.ModDamageSource;
+import com.hbm.util.InventoryUtil;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class ItemBobmazonArcadePacket implements IMessage {
@@ -59,12 +61,7 @@ public class ItemBobmazonArcadePacket implements IMessage {
 
 			ItemStack stack = BobmazonArcadeOffers.recipes.get(m.offer).product;
 
-			if(p.capabilities.isCreativeMode || checkCost(p, offer)) {
-
-				if(!p.capabilities.isCreativeMode) payCost(p, offer);
-
-				p.inventoryContainer.detectAndSendChanges();
-
+			if(p.capabilities.isCreativeMode || InventoryUtil.doesPlayerHaveAStacks(p, Arrays.asList(offer.cost), true)) {
 				Random rand = world.rand;
 				EntityBobmazon bob = new EntityBobmazon(world);
 				bob.posX = p.posX + rand.nextGaussian() * 10;
@@ -80,34 +77,5 @@ public class ItemBobmazonArcadePacket implements IMessage {
 			return null;
 		}
 
-		private boolean checkCost(EntityPlayer player, BobmazonArcadeOffers.ArcadeOffer offer) {
-			int count = 0;
-
-			for(int i = 0; i < player.inventory.getSizeInventory(); i++) {
-
-				ItemStack stack = player.inventory.getStackInSlot(i);
-				for(AStack cost : offer.cost)
-					if(stack != null && cost.matchesRecipe(stack, false)) {
-						count++;
-					}
-
-				if(count == offer.cost.length) return true;
-			}
-
-			return false;
-		}
-
-		private void payCost(EntityPlayer player, BobmazonArcadeOffers.ArcadeOffer offer) {
-
-			for(int i = 0; i < player.inventory.getSizeInventory(); i++) {
-
-				ItemStack stack = player.inventory.getStackInSlot(i);
-				for(AStack cost : offer.cost)
-					if(stack != null && cost.matchesRecipe(stack, false)) {
-						player.inventory.decrStackSize(i, cost.stacksize);
-					}
-
-			}
-		}
 	}
 }
