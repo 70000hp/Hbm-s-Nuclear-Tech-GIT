@@ -177,4 +177,23 @@ public class CombinationRecipes extends SerializableRecipe {
 	public void deleteRecipes() {
 		recipes.clear();
 	}
+
+	public static class CombinationRecipe {
+		public FluidStack inputFluid;
+		public AStack inputItem;
+		public FluidStack outputFluid;
+		public ItemStack outputItem;
+		public int duration;
+
+		public CombinationRecipe(int duration) {
+			this.duration = duration;
+		}
+
+		public CombinationRecipe in(FluidStack stack) { this.inputFluid = stack; return this; }
+		public CombinationRecipe in(AStack stack) { this.inputItem = stack; return this; }
+		public CombinationRecipe out(FluidStack stack) { this.outputFluid = stack; return this; }
+		public CombinationRecipe out(ItemStack stack) { this.outputItem = stack; return this; }
+	}
+
+
 }

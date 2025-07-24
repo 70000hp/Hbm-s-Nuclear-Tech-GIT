@@ -2,6 +2,7 @@ package com.hbm.tileentity.machine;
 
 import java.util.List;
 
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
 import com.hbm.inventory.FluidStack;
@@ -30,21 +31,23 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityFurnaceCombination extends TileEntityMachinePolluting implements IFluidStandardSender, IGUIProvider, IFluidCopiable {
+public class TileEntityFurnaceCombination extends TileEntityMachinePolluting implements IFluidStandardTransceiverMK2, IGUIProvider, IFluidCopiable {
 
 	public boolean wasOn;
 	public int progress;
 	public static int processTime = 20_000;
-	
+
 	public int heat;
 	public static int maxHeat = 100_000;
 	public static double diffusion = 0.25D;
-	
-	public FluidTank tank;
+
+	public FluidTank input;
+	public FluidTank output;
 
 	public TileEntityFurnaceCombination() {
 		super(4, 50);
-		this.tank = new FluidTank(Fluids.NONE, 24_000);
+		this.input = new FluidTank(Fluids.NONE, 24_000);
+		this.output = new FluidTank(Fluids.NONE, 24_000);
 	}
 
 	@Override
@@ -54,51 +57,52 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 
 	@Override
 	public void updateEntity() {
-		
+
 		if(!worldObj.isRemote) {
 			this.tryPullHeat();
-			
+
 			if(this.worldObj.getTotalWorldTime() % 20 == 0) {
 				for(int i = 2; i < 6; i++) {
 					ForgeDirection dir = ForgeDirection.getOrientation(i);
 					ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
-					
+
 					for(int y = yCoord; y <= yCoord + 1; y++) {
 						for(int j = -1; j <= 1; j++) {
-							if(tank.getFill() > 0) this.sendFluid(tank, worldObj, xCoord + dir.offsetX * 2 + rot.offsetX * j, y, zCoord + dir.offsetZ * 2 + rot.offsetZ * j, dir);
+							this.trySubscribe(input.getTankType(), worldObj, xCoord + dir.offsetX * 2 + rot.offsetX * j, y, zCoord + dir.offsetZ * 2 + rot.offsetZ * j, dir);
+							if(input.getTankType() != Fluids.NONE)  this.trySubscribe(input.getTankType(), worldObj, xCoord + dir.offsetX * 2 + rot.offsetX * j, y, zCoord + dir.offsetZ * 2 + rot.offsetZ * j, dir);
+
+							if(output.getFill() > 0) this.sendFluid(output, worldObj, xCoord + dir.offsetX * 2 + rot.offsetX * j, y, zCoord + dir.offsetZ * 2 + rot.offsetZ * j, dir);
 							this.sendSmoke(xCoord + dir.offsetX * 2 + rot.offsetX * j, y, zCoord + dir.offsetZ * 2 + rot.offsetZ * j, dir);
 						}
 					}
 				}
-	
+
 				for(int x = xCoord - 1; x <= xCoord + 1; x++) {
 					for(int z = zCoord - 1; z <= zCoord + 1; z++) {
-						if(tank.getFill() > 0) this.sendFluid(tank, worldObj, x, yCoord + 2, z, ForgeDirection.UP);
+						if(output.getFill() > 0) this.sendFluid(output, worldObj, x, yCoord + 2, z, ForgeDirection.UP);
 						this.sendSmoke(x, yCoord + 2, z, ForgeDirection.UP);
 					}
 				}
 			}
-			
+
 			this.wasOn = false;
-			
-			tank.unloadTank(2, 3, slots);
-			
+
 			if(canSmelt()) {
 				int burn = heat / 100;
-				
+
 				if(burn > 0) {
 					this.wasOn = true;
 					this.progress += burn;
 					this.heat -= burn;
-					
+
 					if(progress >= processTime) {
 						this.markChanged();
 						progress -= this.processTime;
-						
+
 						Pair<ItemStack, FluidStack> pair = CombinationRecipes.getOutput(slots[0]);
 						ItemStack out = pair.getKey();
 						FluidStack fluid = pair.getValue();
-						
+
 						if(out != null)  {
 							if(slots[1] == null) {
 								slots[1] = out.copy();
@@ -106,94 +110,94 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 								slots[1].stackSize += out.stackSize;
 							}
 						}
-						
+
 						if(fluid != null) {
-							if(tank.getTankType() != fluid.type) {
-								tank.setTankType(fluid.type);
+							if(output.getTankType() != fluid.type) {
+								output.setTankType(fluid.type);
 							}
-							
-							tank.setFill(tank.getFill() + fluid.fill);
+
+							output.setFill(output.getFill() + fluid.fill);
 						}
-						
+
 						this.decrStackSize(0, 1);
 					}
-					
+
 					List<Entity> entities = worldObj.getEntitiesWithinAABB(Entity.class, AxisAlignedBB.getBoundingBox(xCoord - 0.5, yCoord + 2, zCoord - 0.5, xCoord + 1.5, yCoord + 4, zCoord + 1.5));
-					
+
 					for(Entity e : entities) e.setFire(5);
-					
+
 					if(worldObj.getTotalWorldTime() % 10 == 0) this.worldObj.playSoundEffect(this.xCoord, this.yCoord + 1, this.zCoord, "hbm:weapon.flamethrowerShoot", 0.25F, 0.5F);
 					if(worldObj.getTotalWorldTime() % 20 == 0) this.pollute(PollutionType.SOOT, PollutionHandler.SOOT_PER_SECOND * 3);
 				}
 			} else {
 				this.progress = 0;
 			}
-			
+
 			this.networkPackNT(50);
 		} else {
-			
+
 			if(this.wasOn && worldObj.rand.nextInt(15) == 0) {
 				worldObj.spawnParticle("lava", xCoord + 0.5 + worldObj.rand.nextGaussian() * 0.5, yCoord + 2, zCoord + 0.5 + worldObj.rand.nextGaussian() * 0.5, 0, 0, 0);
 			}
 		}
 	}
-	
+
 	@Override
 	public void serialize(ByteBuf buf) {
 		super.serialize(buf);
 		buf.writeBoolean(wasOn);
 		buf.writeInt(heat);
 		buf.writeInt(progress);
-		tank.serialize(buf);
+		output.serialize(buf);
 	}
-	
+
 	@Override
 	public void deserialize(ByteBuf buf) {
 		super.deserialize(buf);
 		wasOn = buf.readBoolean();
 		heat = buf.readInt();
 		progress = buf.readInt();
-		tank.deserialize(buf);
+		output.deserialize(buf);
 	}
-	
+
 	public boolean canSmelt() {
-		if(slots[0] == null) return false;
+		if(slots[0] == null && input.getTankType() == Fluids.NONE) return false;
 		Pair<ItemStack, FluidStack> pair = CombinationRecipes.getOutput(slots[0]);
-		
+
 		if(pair == null) return false;
-		
+
 		ItemStack out = pair.getKey();
 		FluidStack fluid = pair.getValue();
-		
+
 		if(out != null) {
 			if(slots[1] != null) {
 				if(!out.isItemEqual(slots[1])) return false;
 				if(out.stackSize + slots[1].stackSize > slots[1].getMaxStackSize()) return false;
 			}
 		}
-		
+
 		if(fluid != null) {
-			if(tank.getTankType() != fluid.type && tank.getFill() > 0) return false;
-			if(tank.getTankType() == fluid.type && tank.getFill()  + fluid.fill > tank.getMaxFill()) return false;
+			if(output.getTankType() != fluid.type && output.getFill() > 0) return false;
+			if(output.getTankType() == fluid.type && output.getFill()  + fluid.fill > output.getMaxFill()) return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	protected void tryPullHeat() {
-		
+
 		if(this.heat >= this.maxHeat) return;
-		
+
 		TileEntity con = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-		
+
 		if(con instanceof IHeatSource) {
 			IHeatSource source = (IHeatSource) con;
 			int diff = source.getHeatStored() - this.heat;
-			
+
 			if(diff == 0) {
 				return;
 			}
-			
+
 			if(diff > 0) {
 				diff = (int) Math.ceil(diff * diffusion);
 				source.useUpHeat(diff);
@@ -203,10 +207,10 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 				return;
 			}
 		}
-		
+
 		this.heat = Math.max(this.heat - Math.max(this.heat / 1000, 1), 0);
 	}
-	
+
 	@Override
 	public int[] getAccessibleSlotsFromSide(int meta) {
 		return new int[] { 0, 1 };
@@ -221,19 +225,19 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 	public boolean canExtractItem(int i, ItemStack itemStack, int j) {
 		return i == 1;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		this.tank.readFromNBT(nbt, "tank");
+		this.output.readFromNBT(nbt, "tank");
 		this.progress = nbt.getInteger("prog");
 		this.heat = nbt.getInteger("heat");
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		this.tank.writeToNBT(nbt, "tank");
+		this.output.writeToNBT(nbt, "tank");
 		nbt.setInteger("prog", progress);
 		nbt.setInteger("heat", heat);
 	}
@@ -248,12 +252,12 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIFurnaceCombo(player.inventory, this);
 	}
-	
+
 	AxisAlignedBB bb = null;
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-		
+
 		if(bb == null) {
 			bb = AxisAlignedBB.getBoundingBox(
 					xCoord - 1,
@@ -264,10 +268,10 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 					zCoord + 2
 					);
 		}
-		
+
 		return bb;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared() {
@@ -276,11 +280,16 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 
 	@Override
 	public FluidTank[] getAllTanks() {
-		return new FluidTank[] {tank};
+		return new FluidTank[] {output};
 	}
 
 	@Override
 	public FluidTank[] getSendingTanks() {
-		return new FluidTank[] {tank, smoke, smoke_leaded, smoke_poison};
+		return new FluidTank[] {output, smoke, smoke_leaded, smoke_poison};
+	}
+
+	@Override
+	public FluidTank[] getReceivingTanks() {
+		return new FluidTank[] {input};
 	}
 }
