@@ -64,7 +64,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 public class ModItems {
-	
+
 	public static HashSet<Item> excludeNEI = new HashSet();
 
 	public static void mainRegistry() {
@@ -101,6 +101,7 @@ public class ModItems {
 	public static Item ingot_titanium;
 	public static Item ingot_cobalt;
 	public static Item sulfur;
+	public static Item sulfur_small;
 	public static Item nitra;
 	public static Item nitra_small;
 
@@ -2078,7 +2079,7 @@ public class ModItems {
 	public static Item hazmat_paa_boots;
 
 	public static Item rebar_placer;
-	
+
 	public static Item wand;
 	public static Item wand_s;
 	public static Item wand_d;
@@ -2274,6 +2275,7 @@ public class ModItems {
 		ingot_firebrick = new Item().setUnlocalizedName("ingot_firebrick").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":ingot_firebrick");
 		ingot_smore = new ItemFood(10, 20F, false).setUnlocalizedName("ingot_smore").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":ingot_smore");
 		sulfur = new Item().setUnlocalizedName("sulfur").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":sulfur");
+		sulfur_small = new Item().setUnlocalizedName("sulfur_small").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":sulfur_small");
 		nitra = new Item().setUnlocalizedName("nitra").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":nitra");
 		nitra_small = new Item().setUnlocalizedName("nitra_small").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":nitra_small");
 
@@ -4991,9 +4993,9 @@ public class ModItems {
 	}
 
 	private static void registerItem() {
-		
+
 		excludeNEI.add(item_secret);
-		
+
 		//Weapons
 		GameRegistry.registerItem(redstone_sword, redstone_sword.getUnlocalizedName());
 		GameRegistry.registerItem(big_sword, big_sword.getUnlocalizedName());
@@ -5177,6 +5179,7 @@ public class ModItems {
 		GameRegistry.registerItem(coal_infernal, coal_infernal.getUnlocalizedName());
 		GameRegistry.registerItem(briquette, briquette.getUnlocalizedName());
 		GameRegistry.registerItem(sulfur, sulfur.getUnlocalizedName());
+		GameRegistry.registerItem(sulfur_small, sulfur_small.getUnlocalizedName());
 		GameRegistry.registerItem(niter, niter.getUnlocalizedName());
 		GameRegistry.registerItem(nitra, nitra.getUnlocalizedName());
 		GameRegistry.registerItem(nitra_small, nitra_small.getUnlocalizedName());
@@ -5703,7 +5706,7 @@ public class ModItems {
 		GameRegistry.registerItem(fluid_barrel_empty, fluid_barrel_empty.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_barrel_full, fluid_barrel_full.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_barrel_infinite, fluid_barrel_infinite.getUnlocalizedName());
-		
+
 		//Packaged fluids
 		GameRegistry.registerItem(fluid_pack_empty, fluid_pack_empty.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_pack_full, fluid_pack_full.getUnlocalizedName());

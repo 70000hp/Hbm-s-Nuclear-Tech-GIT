@@ -120,7 +120,7 @@ public class BobmazonArcadeOffers extends SerializableRecipe {
 	}
 
 	public enum Requirement {
-  		EARLY,
+		EARLY,
 		OIL,
 		NUCLEAR_EARLY,
 		NUCLEAR_LATE,

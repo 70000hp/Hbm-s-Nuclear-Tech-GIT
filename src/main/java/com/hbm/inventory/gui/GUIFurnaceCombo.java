@@ -52,12 +52,12 @@ public class GUIFurnaceCombo extends GuiInfoContainer {
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
 		int p = furnace.progress * 38 / furnace.processTime;
-		drawTexturedModalRect(guiLeft + 45, guiTop + 37, 176, 0, p, 5);
+		drawTexturedModalRect(guiLeft + 61, guiTop + 29, 176, 0, p, 5);
 
 		int h = furnace.heat * 37 / furnace.maxHeat;
-		drawTexturedModalRect(guiLeft + 45, guiTop + 46, 176, 5, h, 5);
+		drawTexturedModalRect(guiLeft + 61, guiTop + 38, 176, 5, h, 5);
 
-		furnace.input.renderTank(x, y, guiLeft + 21, guiTop + 17, 16, 52);
-		furnace.output.renderTank(x, y, guiLeft + 132, guiTop + 17, 16, 52);
+		furnace.input.renderTank(guiLeft + 22, guiTop + 70, this.zLevel, 16, 52);
+		furnace.output.renderTank(guiLeft + 133, guiTop + 70, this.zLevel, 16, 52);
 	}
 }

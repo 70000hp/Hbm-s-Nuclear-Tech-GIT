@@ -19,12 +19,12 @@ public class ContainerFurnaceCombo extends Container {
 		this.furnace = furnace;
 
 		//input
-		this.addSlotToContainer(new Slot(furnace, 0, 41, 27));
+		this.addSlotToContainer(new Slot(furnace, 0, 42, 28));
 		//output
-		this.addSlotToContainer(new SlotSmelting(invPlayer.player, furnace, 1, 104, 26));
-		this.addSlotToContainer(new SlotSmelting(invPlayer.player, furnace, 2, 104, 51));
+		this.addSlotToContainer(new SlotSmelting(invPlayer.player, furnace, 1, 105, 28));
+		this.addSlotToContainer(new SlotSmelting(invPlayer.player, furnace, 2, 105, 52));
 		//Fluid ID
-		this.addSlotToContainer(new Slot(furnace, 3, 41, 51));
+		this.addSlotToContainer(new Slot(furnace, 3, 42, 52));
 
 		for(int i = 0; i < 3; i++) {
 			for(int j = 0; j < 9; j++) {

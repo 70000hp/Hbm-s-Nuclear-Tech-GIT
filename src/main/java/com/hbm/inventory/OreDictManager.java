@@ -437,7 +437,7 @@ public class OreDictManager {
 		/*
 		 * DUST AND GEM ORES
 		 */
-		S																				.dust(sulfur)			.block(block_sulfur)	.ore(ore_sulfur, ore_nether_sulfur, DictFrame.fromOne(ore_basalt, EnumBasaltOreType.SULFUR), DictFrame.fromOne(stone_resource, EnumStoneType.SULFUR))	.oreNether(ore_nether_sulfur);
+		S																				.dust(sulfur).dustSmall(sulfur_small)			.block(block_sulfur)	.ore(ore_sulfur, ore_nether_sulfur, DictFrame.fromOne(ore_basalt, EnumBasaltOreType.SULFUR), DictFrame.fromOne(stone_resource, EnumStoneType.SULFUR))	.oreNether(ore_nether_sulfur);
 		KNO																				.dust(niter)			.block(block_niter)		.ore(ore_niter);
 		F																				.dust(fluorite)			.block(block_fluorite)	.ore(ore_fluorite, DictFrame.fromOne(ore_basalt, EnumBasaltOreType.FLUORITE));
 		LIGNITE							.gem(lignite)									.dust(powder_lignite)							.ore(ore_lignite);
@@ -454,7 +454,7 @@ public class OreDictManager {
 		MALACHITE						.ingot(DictFrame.fromOne(chunk_ore, EnumChunkType.MALACHITE))									.ore(fromOne(stone_resource, EnumStoneType.MALACHITE));
 		LIMESTONE																		.dust(powder_limestone)							.ore(fromOne(stone_resource, EnumStoneType.LIMESTONE));
 		BAUXITE																															.gem(fromOne(stone_resource, EnumStoneType.BAUXITE));
-		CRYOLITE	.crystal(fromOne(chunk_ore, EnumChunkType.CRYOLITE));
+		CRYOLITE	.crystal(fromOne(chunk_ore, EnumChunkType.CRYOLITE))			.gem(fromOne(chunk_ore, EnumChunkType.CRYOLITE));
 		SLAG																									.block(block_slag);
 
 		/*

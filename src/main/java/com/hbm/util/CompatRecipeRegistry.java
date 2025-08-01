@@ -94,11 +94,10 @@ public class CompatRecipeRegistry {
 	}
 
 	/** Either solid or liquid output can be null */
-	public static void registerCombination(AStack input, ItemStack output, FluidStack fluid) {
-		if(output == null && fluid == null) return;
-		Object o = input instanceof OreDictStack ? ((OreDictStack) input).name : input;
-		CombinationRecipes.recipes.put(o, new Pair(output, fluid));
+	public static void registerCombination(FluidStack inputFluid, AStack inputItem, FluidStack outputFluid, ItemStack outputItem) {
+		CombinationRecipes.recipes.add(new CombinationRecipes.CombinationRecipe().in(inputFluid).in(inputItem).out(outputFluid).out(outputItem));
 	}
+
 
 	/** Crucible recipes need unique IDs, game will crash when an ID collision is detected! */
 	public static void registerCrucible(int index, String name, int frequency, ItemStack icon, MaterialStack[] input, MaterialStack[] output) {

@@ -11,6 +11,8 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIFurnaceCombo;
 import com.hbm.inventory.recipes.CombinationRecipes;
+import com.hbm.inventory.recipes.CombinationRecipes;
+import com.hbm.inventory.recipes.PyroOvenRecipes;
 import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachinePolluting;
@@ -60,6 +62,7 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 
 		if(!worldObj.isRemote) {
 			this.tryPullHeat();
+			input.setType(3, slots);
 
 			if(this.worldObj.getTotalWorldTime() % 20 == 0) {
 				for(int i = 2; i < 6; i++) {
@@ -99,27 +102,7 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 						this.markChanged();
 						progress -= this.processTime;
 
-						Pair<ItemStack, FluidStack> pair = CombinationRecipes.getOutput(slots[0]);
-						ItemStack out = pair.getKey();
-						FluidStack fluid = pair.getValue();
-
-						if(out != null)  {
-							if(slots[1] == null) {
-								slots[1] = out.copy();
-							} else {
-								slots[1].stackSize += out.stackSize;
-							}
-						}
-
-						if(fluid != null) {
-							if(output.getTankType() != fluid.type) {
-								output.setTankType(fluid.type);
-							}
-
-							output.setFill(output.getFill() + fluid.fill);
-						}
-
-						this.decrStackSize(0, 1);
+						finishRecipe(getMatchingRecipe());
 					}
 
 					List<Entity> entities = worldObj.getEntitiesWithinAABB(Entity.class, AxisAlignedBB.getBoundingBox(xCoord - 0.5, yCoord + 2, zCoord - 0.5, xCoord + 1.5, yCoord + 4, zCoord + 1.5));
@@ -148,6 +131,7 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 		buf.writeBoolean(wasOn);
 		buf.writeInt(heat);
 		buf.writeInt(progress);
+		input.serialize(buf);
 		output.serialize(buf);
 	}
 
@@ -157,29 +141,53 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 		wasOn = buf.readBoolean();
 		heat = buf.readInt();
 		progress = buf.readInt();
+		input.deserialize(buf);
 		output.deserialize(buf);
 	}
 
-	public boolean canSmelt() {
-		if(slots[0] == null && input.getTankType() == Fluids.NONE) return false;
-		Pair<ItemStack, FluidStack> pair = CombinationRecipes.getOutput(slots[0]);
+	protected CombinationRecipes.CombinationRecipe lastValidRecipe;
 
-		if(pair == null) return false;
+	public CombinationRecipes.CombinationRecipe getMatchingRecipe() {
 
-		ItemStack out = pair.getKey();
-		FluidStack fluid = pair.getValue();
+		if(lastValidRecipe != null && doesRecipeMatch(lastValidRecipe)) return lastValidRecipe;
 
-		if(out != null) {
-			if(slots[1] != null) {
-				if(!out.isItemEqual(slots[1])) return false;
-				if(out.stackSize + slots[1].stackSize > slots[1].getMaxStackSize()) return false;
+		for(CombinationRecipes.CombinationRecipe rec : CombinationRecipes.recipes) {
+			if(doesRecipeMatch(rec)) {
+				lastValidRecipe = rec;
+				return rec;
 			}
 		}
 
-		if(fluid != null) {
-			if(output.getTankType() != fluid.type && output.getFill() > 0) return false;
-			if(output.getTankType() == fluid.type && output.getFill()  + fluid.fill > output.getMaxFill()) return false;
+		return null;
+	}
+
+	public boolean doesRecipeMatch(CombinationRecipes.CombinationRecipe recipe) {
+
+		if(recipe.inputFluid != null) {
+			if(input.getTankType() != recipe.inputFluid.type) return false; // recipe needs fluid, fluid doesn't match
 		}
+		if(recipe.inputItem != null) {
+			if(slots[0] == null) return false; // recipe needs item, no item present
+			return recipe.inputItem.matchesRecipe(slots[0], true); // recipe needs item, item doesn't match
+		} else {
+			return slots[0] == null; // recipe does not need item, but item is present
+		}
+	}
+
+	public boolean canSmelt() {
+		CombinationRecipes.CombinationRecipe recipe = this.getMatchingRecipe();
+		if(recipe == null) return false; // no matching recipe
+		if(recipe.inputFluid != null && input.getFill() < recipe.inputFluid.fill) return false; // not enough input fluid
+		if(recipe.inputItem != null && slots[0].stackSize < recipe.inputItem.stacksize) return false; // not enough input item
+		if(recipe.outputFluid != null && recipe.outputFluid.fill + output.getFill() > output.getMaxFill() && recipe.outputFluid.type == output.getTankType()) return false; // too much output fluid
+
+		if(recipe.outputItem != null && slots[1] != null && recipe.outputItem.stackSize + slots[1].stackSize > slots[1].getMaxStackSize()) return false; // too much output item
+		if(recipe.outputItem != null && slots[1] != null && recipe.outputItem.getItem() != slots[1].getItem()) return false; // output item doesn't match
+		if(recipe.outputItem != null && slots[1] != null && recipe.outputItem.getItemDamage() != slots[1].getItemDamage()) return false; // output meta doesn't match
+
+		if(recipe.outputByproduct == null || slots[2] != null && recipe.outputByproduct.stackSize + slots[2].stackSize > slots[2].getMaxStackSize()) return false; // too much output item
+		if(recipe.outputByproduct == null || slots[2] != null && recipe.outputByproduct.getItem() != slots[2].getItem()) return false; // output item doesn't match
+		if(recipe.outputByproduct == null || slots[2] != null && recipe.outputByproduct.getItemDamage() != slots[2].getItemDamage()) return false; // output meta doesn't match
 
 		return true;
 	}
@@ -211,19 +219,46 @@ public class TileEntityFurnaceCombination extends TileEntityMachinePolluting imp
 		this.heat = Math.max(this.heat - Math.max(this.heat / 1000, 1), 0);
 	}
 
+	public void finishRecipe(CombinationRecipes.CombinationRecipe recipe) {
+		if(recipe.outputItem != null) {
+			if(slots[1] == null) {
+				slots[1] = recipe.outputItem.copy();
+			} else {
+				slots[1].stackSize += recipe.outputItem.stackSize;
+			}
+		}
+		if(recipe.outputByproduct != null) {
+			if(slots[2] == null) {
+				slots[2] = recipe.outputByproduct.copy();
+			} else {
+				slots[2].stackSize += recipe.outputByproduct.stackSize;
+			}
+		}
+		if(recipe.outputFluid != null) {
+			output.setTankType(recipe.outputFluid.type);
+			output.setFill(output.getFill() + recipe.outputFluid.fill);
+		}
+		if(recipe.inputItem != null) {
+			this.decrStackSize(0, recipe.inputItem.stacksize);
+		}
+		if(recipe.inputFluid != null) {
+			input.setFill(input.getFill() - recipe.inputFluid.fill);
+		}
+	}
+
 	@Override
 	public int[] getAccessibleSlotsFromSide(int meta) {
-		return new int[] { 0, 1 };
+		return new int[] { 0, 1, 2 };
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemStack) {
-		return i == 0 && CombinationRecipes.getOutput(itemStack) != null;
+		return i == 0;
 	}
 
 	@Override
 	public boolean canExtractItem(int i, ItemStack itemStack, int j) {
-		return i == 1;
+		return i == 1 || i == 2;
 	}
 
 	@Override

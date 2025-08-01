@@ -16,11 +16,12 @@ public class CombinationHandler extends NEIUniversalHandler {
 	public String getKey() {
 		return "ntmCombination";
 	}
-	
+
 	@Override
 	public void loadTransferRects() {
 		super.loadTransferRects();
-		transferRectsGui.add(new RecipeTransferRect(new Rectangle(49, 44, 18, 18), "ntmCombination"));
+		//the offsets I only found via painful trial and error idfk how this works
+		transferRectsGui.add(new RecipeTransferRect(new Rectangle(70 - 5, 47 - 11, 18, 18), "ntmCombination"));
 		guiGui.add(GUIFurnaceCombo.class);
 		RecipeTransferRectHandler.registerRectsToGuis(guiGui, transferRectsGui);
 	}
