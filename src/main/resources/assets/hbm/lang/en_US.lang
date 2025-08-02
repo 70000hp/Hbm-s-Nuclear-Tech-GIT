@@ -3177,6 +3177,13 @@ item.insert_polonium.name=Polonium Insert
 item.insert_steel.name=Heavy Steel Insert
 item.insert_xsapi.name=XSAPI Insert
 item.insert_yharonite.name=Yharonite Insert
+item.item_expensive.bronze_tubes.name=Bronze Structural Elements
+item.item_expensive.circuit.name=Extensive Circuit Board
+item.item_expensive.computer.name=Mainframe
+item.item_expensive.ferro_plating.name=Reinforced Ferrouranium Panels
+item.item_expensive.heavy_frame.name=Heavy Framework
+item.item_expensive.lead_plating.name=Radiation Resistant Plating
+item.item_expensive.steel_plating.name=Bolted Steel Plating
 item.item_secret.aberrator.name=Aberrator Part
 item.item_secret.canister.name=Composition SB-26
 item.item_secret.controller.name=Proprietary Control Unit
@@ -4760,6 +4767,8 @@ potion.hbm_radx=Rad-X
 potion.hbm_stability=Stability
 potion.hbm_taint=Tainted
 potion.hbm_telekinesis=! ! !
+
+purex.recycle=Re-enrichment of %s
 
 radar.clearMap=Clear Map
 radar.detectMissiles=Detect Missiles
