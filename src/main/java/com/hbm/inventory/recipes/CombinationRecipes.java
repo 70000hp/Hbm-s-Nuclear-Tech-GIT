@@ -75,7 +75,7 @@ public class CombinationRecipes extends SerializableRecipe {
 		//woods
 		recipes.add(new CombinationRecipe()
 			.in(new OreDictStack(KEY_LOG))
-			.out(new ItemStack(Items.coal, 1 ,1), DictFrame.fromOne(ModItems.powder_ash, EnumAshType.WOOD, 2))
+			.out(new ItemStack(Items.coal, 1 ,1))
 			.out(new FluidStack(Fluids.WOODOIL, 250)));
 		recipes.add(new CombinationRecipe()
 			.in(new OreDictStack(KEY_SAPLING))
