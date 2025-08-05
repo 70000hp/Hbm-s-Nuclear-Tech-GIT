@@ -69,6 +69,8 @@ public class PacketDispatcher {
 		wrapper.registerMessage(SerializableRecipePacket.Handler.class, SerializableRecipePacket.class, i++, Side.CLIENT);
 		//Signals server to buy offer from bobmazon
 		wrapper.registerMessage(ItemBobmazonArcadePacket.Handler.class, ItemBobmazonArcadePacket.class, i++, Side.SERVER);
+		//Syncing of NBT for guns
+		wrapper.registerMessage(HeldItemNBTPacket.Handler.class, HeldItemNBTPacket.class, i++, Side.CLIENT);
 	}
 
 }
