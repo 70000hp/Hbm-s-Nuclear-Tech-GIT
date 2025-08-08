@@ -23,9 +23,8 @@ public class FractionRecipes extends SerializableRecipe {
 
 	@Override
 	public void registerDefaults() {
-		fractions.put(Fluids.HEAVYOIL,			new Pair(new FluidStack(Fluids.BITUMEN,					30),		new FluidStack(Fluids.SMEAR,				70)));
-		fractions.put(Fluids.HEAVYOIL_VACUUM,	new Pair(new FluidStack(Fluids.SMEAR,					40),		new FluidStack(Fluids.HEATINGOIL_VACUUM,	60)));
-		fractions.put(Fluids.SMEAR,				new Pair(new FluidStack(Fluids.HEATINGOIL,				60),		new FluidStack(Fluids.LUBRICANT,			40)));
+		fractions.put(Fluids.HEAVYOIL,			new Pair(new FluidStack(Fluids.BITUMEN,					30),		new FluidStack(Fluids.HEATINGOIL,				70)));
+		fractions.put(Fluids.HEAVYOIL_VACUUM,	new Pair(new FluidStack(Fluids.BITUMEN,					40),		new FluidStack(Fluids.HEATINGOIL_VACUUM,	60)));
 		fractions.put(Fluids.NAPHTHA,			new Pair(new FluidStack(Fluids.HEATINGOIL,				40),		new FluidStack(Fluids.DIESEL,				60)));
 		fractions.put(Fluids.NAPHTHA_DS,		new Pair(new FluidStack(Fluids.XYLENE,					60),		new FluidStack(Fluids.DIESEL_REFORM,		40)));
 		fractions.put(Fluids.NAPHTHA_CRACK,		new Pair(new FluidStack(Fluids.HEATINGOIL,				30),		new FluidStack(Fluids.DIESEL_CRACK,			70)));

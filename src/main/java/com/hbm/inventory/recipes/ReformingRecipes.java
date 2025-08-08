@@ -17,13 +17,13 @@ import com.hbm.util.Tuple.Triplet;
 import net.minecraft.item.ItemStack;
 
 public class ReformingRecipes extends SerializableRecipe {
-	
+
 	public static HashMap<FluidType, Triplet<FluidStack, FluidStack, FluidStack>> recipes = new HashMap();
 
 	@Override
 	public void registerDefaults() {
 		recipes.put(Fluids.HEATINGOIL, new Triplet(
-				new FluidStack(Fluids.NAPHTHA, 50),
+				new FluidStack(Fluids.DIESEL_REFORM, 50),
 				new FluidStack(Fluids.PETROLEUM, 15),
 				new FluidStack(Fluids.HYDROGEN, 10)
 				));
@@ -68,15 +68,15 @@ public class ReformingRecipes extends SerializableRecipe {
 				new FluidStack(Fluids.HYDROGEN, 15)
 				));
 	}
-	
+
 	public static Triplet<FluidStack, FluidStack, FluidStack> getOutput(FluidType type) {
 		return recipes.get(type);
 	}
-	
+
 	public static HashMap<Object, Object[]> getRecipes() {
 
 		HashMap<Object, Object[]> map = new HashMap<Object, Object[]>();
-		
+
 		for(Entry<FluidType, Triplet<FluidStack, FluidStack, FluidStack>> recipe : recipes.entrySet()) {
 			map.put(ItemFluidIcon.make(recipe.getKey(), 1000),
 					new ItemStack[] {
@@ -84,7 +84,7 @@ public class ReformingRecipes extends SerializableRecipe {
 							ItemFluidIcon.make(recipe.getValue().getY().type,	recipe.getValue().getY().fill * 10),
 							ItemFluidIcon.make(recipe.getValue().getZ().type,	recipe.getValue().getZ().fill * 10) });
 		}
-		
+
 		return map;
 	}
 
@@ -106,14 +106,14 @@ public class ReformingRecipes extends SerializableRecipe {
 		FluidStack output1 = this.readFluidStack(obj.get("output1").getAsJsonArray());
 		FluidStack output2 = this.readFluidStack(obj.get("output2").getAsJsonArray());
 		FluidStack output3 = this.readFluidStack(obj.get("output3").getAsJsonArray());
-		
+
 		recipes.put(input, new Triplet(output1, output2, output3));
 	}
 
 	@Override
 	public void writeRecipe(Object recipe, JsonWriter writer) throws IOException {
 		Entry<FluidType, Triplet<FluidStack, FluidStack, FluidStack>> rec = (Entry<FluidType, Triplet<FluidStack, FluidStack, FluidStack>>) recipe;
-		
+
 		writer.name("input").value(rec.getKey().getName());
 		writer.name("output1"); this.writeFluidStack(rec.getValue().getX(), writer);
 		writer.name("output2"); this.writeFluidStack(rec.getValue().getY(), writer);

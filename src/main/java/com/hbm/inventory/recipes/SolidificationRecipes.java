@@ -85,10 +85,8 @@ public class SolidificationRecipes extends SerializableRecipe {
 
 		registerRecipe(BALEFIRE,		250,			ModItems.solid_fuel_bf);
 
-		registerSFAuto(SMEAR);
 		registerSFAuto(HEATINGOIL);
 		registerSFAuto(HEATINGOIL_VACUUM);
-		registerSFAuto(RECLAIMED);
 		registerSFAuto(PETROIL);
 		registerSFAuto(NAPHTHA);
 		registerSFAuto(NAPHTHA_CRACK);
