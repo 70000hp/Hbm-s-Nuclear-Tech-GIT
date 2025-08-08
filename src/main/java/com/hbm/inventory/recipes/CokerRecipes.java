@@ -33,10 +33,8 @@ public class CokerRecipes extends SerializableRecipe {
 		registerAuto(HEAVYOIL,				OIL_COKER);
 		registerAuto(HEAVYOIL_VACUUM,		REFORMATE);
 		registerAuto(COALCREOSOTE,			NAPHTHA_COKER);
-		registerAuto(SMEAR,					OIL_COKER);
 		registerAuto(HEATINGOIL,			OIL_COKER);
 		registerAuto(HEATINGOIL_VACUUM,		OIL_COKER);
-		registerAuto(RECLAIMED,				NAPHTHA_COKER);
 		registerAuto(NAPHTHA,				NAPHTHA_COKER);
 		registerAuto(NAPHTHA_DS,			NAPHTHA_COKER);
 		registerAuto(NAPHTHA_CRACK,			NAPHTHA_COKER);
