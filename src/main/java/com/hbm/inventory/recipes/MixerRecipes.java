@@ -63,9 +63,11 @@ public class MixerRecipes extends SerializableRecipe {
 		register(Fluids.RADIOSOLVENT, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.REFORMGAS, 750)).setStack2(new FluidStack(Fluids.CHLORINE, 250)));
 		register(Fluids.SCHRABIDIC, new MixerRecipe(16_000, 100).setStack1(new FluidStack(Fluids.SAS3, 8_000)).setStack2(new FluidStack(Fluids.PEROXIDE, 6_000)).setSolid(new ComparableStack(ModItems.pellet_charged)));
 
-		register(Fluids.PETROIL, new MixerRecipe(1_000, 30).setStack1(new FluidStack(Fluids.RECLAIMED, 800)).setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
+		register(Fluids.PETROIL,
+			new MixerRecipe(1_000, 30).setStack1(new FluidStack(Fluids.HEATINGOIL, 800)).setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
 		register(Fluids.LUBRICANT,
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.HEATINGOIL, 500)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 500)),
+				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.OIL_COKER, 800)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 200)),
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.FISHOIL, 800)).setStack2(new FluidStack(Fluids.ETHANOL, 200)),
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.SUNFLOWEROIL, 800)).setStack2(new FluidStack(Fluids.ETHANOL, 200)));
 		register(Fluids.BIOFUEL,
