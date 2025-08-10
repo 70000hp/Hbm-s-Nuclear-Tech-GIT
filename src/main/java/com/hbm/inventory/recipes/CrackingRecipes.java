@@ -20,14 +20,14 @@ import net.minecraft.item.ItemStack;
 public class CrackingRecipes extends SerializableRecipe {
 
 	//cracking in percent
-	public static final int oil_crack_oil = 80;
+	public static final int oil_crack_oil = 60;
 	public static final int oil_crack_petro = 20;
 	public static final int bitumen_crack_oil = 80;
 	public static final int bitumen_crack_aroma = 20;
-	public static final int smear_crack_napht = 60;
-	public static final int smear_crack_petro = 40;
-	public static final int gas_crack_petro = 30;
-	public static final int gas_crack_unsat = 20;
+	public static final int smear_crack_napht = 70;
+	public static final int smear_crack_petro = 30;
+	public static final int gas_crack_petro = 60;
+	public static final int gas_crack_unsat = 40;
 	public static final int diesel_crack_kero = 40;
 	public static final int diesel_crack_petro = 30;
 	public static final int kero_crack_petro = 60;
@@ -42,10 +42,11 @@ public class CrackingRecipes extends SerializableRecipe {
 	public void registerDefaults() {
 		cracking.put(Fluids.OIL,				new Pair(new FluidStack(Fluids.CRACKOIL,		oil_crack_oil),		new FluidStack(Fluids.PETROLEUM,	oil_crack_petro)));
 		cracking.put(Fluids.BITUMEN,			new Pair(new FluidStack(Fluids.OIL,				bitumen_crack_oil),	new FluidStack(Fluids.AROMATICS,	bitumen_crack_aroma)));
-		cracking.put(Fluids.HEATINGOIL,			new Pair(new FluidStack(Fluids.NAPHTHA,			smear_crack_napht),	new FluidStack(Fluids.PETROLEUM,	smear_crack_petro)));
+		cracking.put(Fluids.HEATINGOIL,			new Pair(new FluidStack(Fluids.NAPHTHA,			smear_crack_napht),	new FluidStack(Fluids.AROMATICS,	smear_crack_petro)));
 		cracking.put(Fluids.GAS,				new Pair(new FluidStack(Fluids.PETROLEUM,		gas_crack_petro),	new FluidStack(Fluids.UNSATURATEDS,	gas_crack_unsat)));
 		cracking.put(Fluids.DIESEL,				new Pair(new FluidStack(Fluids.KEROSENE,		diesel_crack_kero),	new FluidStack(Fluids.PETROLEUM,	diesel_crack_petro)));
 		cracking.put(Fluids.DIESEL_CRACK,		new Pair(new FluidStack(Fluids.KEROSENE,		diesel_crack_kero),	new FluidStack(Fluids.PETROLEUM,	diesel_crack_petro)));
+		cracking.put(Fluids.DIESEL_REFORM,		new Pair(new FluidStack(Fluids.KEROSENE,		diesel_crack_kero),	new FluidStack(Fluids.REFORMGAS,	diesel_crack_petro)));
 		cracking.put(Fluids.KEROSENE,			new Pair(new FluidStack(Fluids.PETROLEUM,		kero_crack_petro),	new FluidStack(Fluids.NONE,			0)));
 		cracking.put(Fluids.WOODOIL,			new Pair(new FluidStack(Fluids.HEATINGOIL,		wood_crack_heat),	new FluidStack(Fluids.AROMATICS,	wood_crack_aroma)));
 		cracking.put(Fluids.XYLENE,				new Pair(new FluidStack(Fluids.AROMATICS,		xyl_crack_aroma),	new FluidStack(Fluids.PETROLEUM,	xyl_crack_petro)));
