@@ -50,6 +50,11 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.inputFluids(new FluidStack(Fluids.WATER, 8_000))
 				.outputFluids(new FluidStack(Fluids.HYDROGEN, 500)));
 
+		this.register(new GenericRecipe("chem.hydrogensyngas").setupNamed(10, 200).setIcon(ModItems.gas_full, Fluids.HYDROGEN.getID())
+			.inputFluids(new FluidStack(Fluids.SYNGAS, 125))
+			.inputFluids(new FluidStack(Fluids.OXYGEN, 250))
+			.outputFluids(new FluidStack(Fluids.HYDROGEN, 500)));
+
 		this.register(new GenericRecipe("chem.oxygen").setupNamed(20, 400).setIcon(ModItems.gas_full, Fluids.OXYGEN.getID())
 				.inputFluids(new FluidStack(Fluids.AIR, 8_000))
 				.outputFluids(new FluidStack(Fluids.OXYGEN, 500)));

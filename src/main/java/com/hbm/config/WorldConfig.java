@@ -58,6 +58,10 @@ public class WorldConfig {
 	public static int bedrockPhosphorusSpawn = 50;
 	public static int bedrockQuartzSpawn = 100;
 
+	public static int bedrockNetherHematiteSpawn = 90;
+	public static int bedrockInfernalCoalSpawn = 100;
+
+
 	public static int ironClusterSpawn = 4;
 	public static int titaniumClusterSpawn = 2;
 	public static int aluminiumClusterSpawn = 3;
@@ -182,6 +186,9 @@ public class WorldConfig {
 		bedrockGlowstoneSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN00_bedrockGlowstoneWeight", "Spawn weight for glowstone bedrock ore", 100);
 		bedrockPhosphorusSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN01_bedrockPhosphorusWeight", "Spawn weight for phosphorus bedrock ore", 50);
 		bedrockQuartzSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN01_bedrockQuartzWeight", "Spawn weight for quartz bedrock ore", 100);
+
+		bedrockInfernalCoalSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN03_bedrockInfernalCoalWeight", "Spawn weight for infernal coal bedrock ore in the nether", 90);
+		bedrockNetherHematiteSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN04_bedrockNetherHematiteWeight", "Spawn weight for hematite bedrock ore in the nether", 90);
 
 		ironClusterSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.C00_ironClusterSpawn", "Amount of iron cluster veins per chunk", 4);
 		titaniumClusterSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.C01_titaniumClusterSpawn", "Amount of titanium cluster veins per chunk", 2);
