@@ -150,6 +150,9 @@ public class CombinationRecipes extends SerializableRecipe {
 			.out(new ItemStack(Items.sugar, 2))
 			.out(new FluidStack(Fluids.ETHANOL, 150)));
 		recipes.add(new CombinationRecipe()
+			.in(new ComparableStack(ModBlocks.plant_flower, 1, 3))
+			.out(new FluidStack(Fluids.ETHANOL, 50)));
+		recipes.add(new CombinationRecipe()
 			.in(new ComparableStack(Blocks.clay))
 			.out(new ItemStack(Blocks.brick_block, 1)));
 

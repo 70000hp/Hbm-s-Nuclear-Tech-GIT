@@ -50,9 +50,11 @@ public class BedrockOre {
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(DictFrame.fromOne(ModItems.chunk_ore, EnumChunkType.RARE),			2,	0x8F9999,	new FluidStack(Fluids.PEROXIDE, 500)),	WorldConfig.bedrockRareEarthSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(DictFrame.fromOne(ModBlocks.stone_resource, EnumStoneType.BAUXITE, 2),1,	0xEF7213),										WorldConfig.bedrockBauxiteSpawn);
 
-		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.glowstone_dust, 4),		1,	0xF9FF4D),							WorldConfig.bedrockGlowstoneSpawn);
+		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.glowstone_dust, 8),		1,	0xF9FF4D),							WorldConfig.bedrockGlowstoneSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.powder_fire, 4),		1,	0xD7341F),							WorldConfig.bedrockPhosphorusSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.quartz, 4),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
+		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.fragment_coltan, 4),				2,	0xF0EFDD,	new FluidStack(Fluids.CHLORINE, 100)),		WorldConfig.bedrockNetherColtanSpawn);
+
 
 
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.coal_infernal, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);

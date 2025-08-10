@@ -32,7 +32,7 @@ public class SolderingRecipes extends SerializableRecipe {
 	public void registerDefaults() {
 
 		boolean lbsm = GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSimpleCrafting;
-
+		boolean toggle528 = GeneralConfig.enable528;
 		/*
 		 * CIRCUITS
 		 */
@@ -89,6 +89,21 @@ public class SolderingRecipes extends SerializableRecipe {
 				new AStack[] {
 						new OreDictStack(PB.wireFine(), 12)}
 		));
+
+		if(!toggle528){
+			recipes.add(new SolderingRecipe(new ItemStack(ModItems.circuit, 2, EnumCircuitType.BISMOID.ordinal()), 400, 10_000,
+				new FluidStack(Fluids.SOLVENT, 1_000),
+				new AStack[] {
+					new ComparableStack(ModItems.circuit, 2, EnumCircuitType.CHIP_BISMOID),
+					new ComparableStack(ModItems.circuit, lbsm ? 4 : 16, EnumCircuitType.CHIP),
+					new ComparableStack(ModItems.circuit, 8, EnumCircuitType.CAPACITOR_TANTALIUM)},
+				new AStack[] {
+					new ComparableStack(ModItems.circuit, 12, EnumCircuitType.PCB),
+					new OreDictStack(ANY_HARDPLASTIC.ingot(), 2)},
+				new AStack[] {
+					new OreDictStack(PB.wireFine(), 12)}
+			));
+		}
 
 		recipes.add(new SolderingRecipe(new ItemStack(ModItems.circuit, 1, EnumCircuitType.QUANTUM.ordinal()), 400, 100_000,
 				new FluidStack(Fluids.HELIUM4, 1_000),

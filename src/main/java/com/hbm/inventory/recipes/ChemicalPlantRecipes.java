@@ -85,8 +85,8 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputFluids(new FluidStack(Fluids.POTASSIUM_CHLORIDE, 250), new FluidStack(Fluids.CALCIUM_CHLORIDE, 250)));
 
 		/// OILS ///
-		this.register(new GenericRecipe("chem.ethanol").setupNamed(50, 100).setIcon(ModItems.canister_full, Fluids.ETHANOL.getID())
-				.inputItems(new ComparableStack(Items.sugar, 10))
+		this.register(new GenericRecipe("chem.ethanol").setupNamed(50, 50).setIcon(ModItems.canister_full, Fluids.ETHANOL.getID())
+				.inputItems(new ComparableStack(Items.sugar, 9))
 				.outputFluids(new FluidStack(Fluids.ETHANOL, 1000)));
 
 		this.register(new GenericRecipe("chem.biogas").setupNamed(60, 100).setIcon(ModItems.gas_full, Fluids.BIOGAS.getID())
@@ -234,21 +234,25 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputItems(new ItemStack(ModItems.powder_schrabidate)));
 
 		/// COLTAN ///
-		this.register(new GenericRecipe("chem.coltancleaning").setup(60, 100)
-				.inputItems(new OreDictStack(COLTAN.dust(), 2), new OreDictStack(COAL.dust()))
-				.inputFluids(new FluidStack(Fluids.PEROXIDE, 250), new FluidStack(Fluids.HYDROGEN, 500))
-				.outputItems(new ItemStack(ModItems.powder_coltan), new ItemStack(ModItems.powder_niobium), new ItemStack(ModItems.dust))
-				.outputFluids(new FluidStack(Fluids.WATER, 500)));
+		this.register(new GenericRecipe("chem.coltancleaning").setup(60, 500)
+				.inputItems(new OreDictStack(COLTAN.dust(), 1))
+				.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 500), new FluidStack(Fluids.HYDROGEN, 500))
+				.outputItems(new ItemStack(ModItems.powder_coltan), new ItemStack(ModItems.powder_niobium)));
 
-		this.register(new GenericRecipe("chem.coltanpain").setup(120, 100)
-				.inputItems(new ComparableStack(ModItems.powder_coltan), new OreDictStack(F.dust()))
-				.inputFluids(new FluidStack(Fluids.GAS, 1000), new FluidStack(Fluids.OXYGEN, 500))
+		this.register(new GenericRecipe("chem.coltanpainA").setup(120, 500)
+				.inputItems(new ComparableStack(ModItems.powder_coltan, 2), new OreDictStack(AL.dust()))
+				.inputFluids(new FluidStack(Fluids.ETHANOL, 800))
 				.outputFluids(new FluidStack(Fluids.PAIN, 1000)));
 
-		this.register(new GenericRecipe("chem.coltancrystal").setup(80, 100)
-				.inputFluids(new FluidStack(Fluids.PAIN, 1000), new FluidStack(Fluids.PEROXIDE, 500))
-				.outputItems(new ItemStack(ModItems.gem_tantalium), new ItemStack(ModItems.dust, 3))
-				.outputFluids(new FluidStack(Fluids.WATER, 250)));
+		this.register(new GenericRecipe("chem.coltanpainS").setup(60, 500)
+			.inputItems(new ComparableStack(ModItems.powder_coltan, 1))
+			.inputFluids(new FluidStack(Fluids.ETHANOL, 400), new FluidStack(Fluids.SODIUM, 200))
+			.outputFluids(new FluidStack(Fluids.PAIN, 500)));
+
+		this.register(new GenericRecipe("chem.coltancrystal").setup(60, 500)
+				.inputFluids(new FluidStack(Fluids.PAIN, 500), new FluidStack(Fluids.OXYGEN, 500))
+				.outputItems(new ItemStack(ModItems.gem_tantalium, 1))
+				.outputFluids(new FluidStack(Fluids.VITRIOL, 500)));
 
 		/// EXPLOSIVES ///
 		this.register(new GenericRecipe("chem.cordite").setup(40, 100)
