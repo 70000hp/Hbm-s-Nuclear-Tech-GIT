@@ -1,7 +1,10 @@
 ## Changed
-* All the never completed missile parts (20/20 fuselage, 20 warhead, 10 and 15 tec kerosene thrusters) have been removed
-* The electric arc furnace now scrapes the vanilla furnace recipe list on server start in addition to postinit, making sure recipes added during postinit after NTM loads (like Thermal's ingots) are covered too
+* QMAW now has buttons for returning to previously viewed pages
+* QMAW file detection now includes subfolders to `manual`
+* OpenComputers integration for the ZIRNOX should now return values in °C and bar instead of unexplained weird internal units
 
 ## Fixed
-* Fixed GT6 compatibility watz pellets crashing due to misconfigured recipes
-* Removed failed attempt at fixing the gun desync dupe which made things worse
+* Fixed QMAW not working at all
+* Potentially fixed a bug where proxy tile entities would reference unloaded core tile entities which would cause bizarre item voiding/duping issues in rare cases
+* Fixed fusion reactor automation being able to remove items other than the breeding output slot
+* Fixed chunkloading transport drones getting stuck due to off-by-one rounding errors
