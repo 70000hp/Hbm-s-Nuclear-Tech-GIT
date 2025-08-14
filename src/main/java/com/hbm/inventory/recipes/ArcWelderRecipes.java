@@ -65,6 +65,9 @@ public class ArcWelderRecipes extends SerializableRecipe {
 		//mid-game, single combustion engine running on LPG
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_TITANIUM.id), 600, 50_000L,
 				new OreDictStack(TI.plateCast(), 2)));
+		//mid-game, single combustion engine running on LPG
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_LEAD.id), 300, 10_000L, new FluidStack(Fluids.HYDROGEN, 16_000),
+			new OreDictStack(PB.plateCast(), 2)));
 		//mid-game PWR
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_ZIRCONIUM.id), 600, 10_000L,
 				new OreDictStack(ZR.plateCast(), 2)));

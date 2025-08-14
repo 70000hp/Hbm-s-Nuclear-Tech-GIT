@@ -24,30 +24,45 @@ public class BobmazonArcadeOffers extends SerializableRecipe {
 
 	@Override
 	public void registerDefaults() {
-		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.plushie, 1, BlockPlushie.PlushieType.YOMI.ordinal()),
-			new AStack[] {
-				new ComparableStack(ModItems.arcade_parts, 16, EnumComponentType.MACHINE_PARTS),
-				new OreDictStack(OreDictManager.KEY_CIRCUIT_T1, 2),
-				new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MILITARY_PACKAGE)
-			}));
-
+		//stick and stone stage shortcuts
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.pump_steam),
+			new ComparableStack(ModItems.arcade_parts, 2, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_ammo_press),
+			new ComparableStack(ModItems.arcade_parts, 2, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_boiler),
+			new ComparableStack(ModItems.arcade_parts, 2, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_crucible),
+			new ComparableStack(ModItems.ingot_firebrick, 16),
+			new ComparableStack(ModItems.arcade_parts, 2, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.foundry_basin, 4),
+			new ComparableStack(ModItems.ingot_firebrick, 4),
+			new ComparableStack(ModItems.arcade_parts, 1, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.foundry_mold, 4),
+			new ComparableStack(ModItems.ingot_firebrick, 4),
+			new ComparableStack(ModItems.arcade_parts, 1, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.foundry_outlet, 8),
+			new ComparableStack(ModItems.ingot_firebrick, 4),
+			new ComparableStack(ModItems.arcade_parts, 1, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.foundry_channel, 16),
+			new ComparableStack(ModItems.ingot_firebrick, 4),
+			new ComparableStack(ModItems.arcade_parts, 1, EnumComponentType.MACHINE_PARTS)));
+		//electricity
 		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_arc_welder),
-			new AStack[] {
-				new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MACHINE_PARTS),
-			}));
+			new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_assembly_machine),
+			new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MACHINE_PARTS)));
+		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_shredder),
+			new ComparableStack(ModItems.arcade_parts, 2, EnumComponentType.MACHINE_PARTS),
+			new OreDictStack(OreDictManager.KEY_CIRCUIT_T1, 1)));
 		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_crystallizer),
-			new AStack[] {
-				new ComparableStack(ModItems.arcade_parts, 12, EnumComponentType.MACHINE_PARTS),
-				new OreDictStack(OreDictManager.KEY_CIRCUIT_T2, 4),
-				new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MILITARY_PACKAGE)
-			}));
+			new ComparableStack(ModItems.arcade_parts, 12, EnumComponentType.MACHINE_PARTS),
+			new OreDictStack(OreDictManager.KEY_CIRCUIT_T2, 4),
+			new ComparableStack(ModItems.arcade_parts, 4, EnumComponentType.MILITARY_PACKAGE)));
 		recipes.add(new ArcadeOffer(new ItemStack(ModBlocks.machine_catalytic_reformer),
-			new AStack[] {
-				new ComparableStack(ModItems.arcade_parts, 48, EnumComponentType.MACHINE_PARTS),
-				new OreDictStack(OreDictManager.KEY_CIRCUIT_T3, 12),
-				new ComparableStack(ModItems.arcade_parts, 16, EnumComponentType.MILITARY_PACKAGE),
-				new ComparableStack(ModItems.part_generic, 8, ItemGenericPart.EnumPartType.LDE)
-			}));
+			new ComparableStack(ModItems.arcade_parts, 48, EnumComponentType.MACHINE_PARTS),
+			new OreDictStack(OreDictManager.KEY_CIRCUIT_T3, 12),
+			new ComparableStack(ModItems.arcade_parts, 16, EnumComponentType.MILITARY_PACKAGE),
+			new ComparableStack(ModItems.part_generic, 8, ItemGenericPart.EnumPartType.LDE)));
 	}
 
 	@Override
@@ -80,7 +95,7 @@ public class BobmazonArcadeOffers extends SerializableRecipe {
 		AStack[] cost = readAStackArray(obj.get("cost").getAsJsonArray());
 		Requirement extraReq = Requirement.values()[obj.get("extraReq").getAsInt()];
 
-		recipes.add(new ArcadeOffer(product, cost, extraReq));
+		recipes.add(new ArcadeOffer(product,extraReq, cost));
 	}
 
 	@Override
@@ -107,11 +122,11 @@ public class BobmazonArcadeOffers extends SerializableRecipe {
 		public AStack[] cost;
 		public Requirement extraReq;
 
-		public ArcadeOffer(ItemStack product, AStack[] cost){
-			this(product, cost, null);
+		public ArcadeOffer(ItemStack product, AStack... cost){
+			this(product, null, cost);
 		}
 
-		public ArcadeOffer(ItemStack product, AStack[] cost, Requirement extraReq){
+		public ArcadeOffer(ItemStack product, Requirement extraReq, AStack... cost){
 			this.product = product;
 			this.cost = cost;
 			this.extraReq = extraReq;
