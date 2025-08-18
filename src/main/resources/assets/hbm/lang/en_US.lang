@@ -184,6 +184,14 @@ armorMod.type.leggings=Leggings
 armorMod.type.servo=Servos
 armorMod.type.special=Special
 
+autoswitch=Part of auto switch group "%s"$Recipe changes based on first ingredient
+autoswitch.plate=Reprocessing Plate Fuel
+autoswitch.plates=Metal Plates
+autoswitch.pwr=Reprocessing PWR Fuel
+autoswitch.schrab=Schrabidium Extraction
+autoswitch.watz=Reprocessing Watz Pellet
+autoswitch.zirnox=Reprocessing ZIRNOX Fuel
+
 battery.mode.buffer=Input/Output Mode
 battery.mode.input=Input Mode
 battery.mode.off=OffW
@@ -697,6 +705,10 @@ commands.satellite.satellite_descended=Satellite successfully descended.
 commands.satellite.satellite_orbited=Satellite launched.
 commands.satellite.should_be_run_as_player=This command should be run by a player!
 
+commands.locate.no_match=No structures with that name!
+commands.locate.none_found=No structures found nearby!
+commands.locate.success.coordinates=Structure %s found at %d, %d
+
 container.ammoBag=Ammo Bag
 container.amsBase=AMS Base (Deco)
 container.amsEmitter=AMS Emitter (Deco)
@@ -794,6 +806,7 @@ container.machineLargeTurbine=Industrial Steam Turbine
 container.machineLiquefactor=Liquefactor
 container.machineMixer=Industrial Mixer
 container.machineOreSlopper=B.O.P.
+container.machinePUREX=PUREX
 container.machinePyroOven=Pyrolysis Oven
 container.machineRefinery=Oil Refinery
 container.machineRotaryFurnace=Rotary Furnace
@@ -2913,6 +2926,7 @@ item.gun_amat.name=Anti-Materiel Rifle
 item.gun_amat_penance.name=Penance
 item.gun_amat_subtlety.name=Subtlety
 item.gun_autoshotgun.name=Auto Shotgun
+item.gun_autoshotgun_heretic.name=The Heretic
 item.gun_autoshotgun_sexy.name=Sexy
 item.gun_autoshotgun_shredder.name=Shredder
 item.gun_b92.name=§9B92 Energy Pistol§r
@@ -3178,6 +3192,8 @@ item.insert_steel.name=Heavy Steel Insert
 item.insert_xsapi.name=XSAPI Insert
 item.insert_yharonite.name=Yharonite Insert
 item.item_expensive.bronze_tubes.name=Bronze Structural Elements
+item.item_expensive.circuit.name=Extensive Circuit Board
+item.item_expensive.computer.name=Mainframe
 item.item_expensive.ferro_plating.name=Reinforced Ferrouranium Panels
 item.item_expensive.heavy_frame.name=Heavy Framework
 item.item_expensive.lead_plating.name=Radiation Resistant Plating
@@ -4765,6 +4781,11 @@ potion.hbm_stability=Stability
 potion.hbm_taint=Tainted
 potion.hbm_telekinesis=! ! !
 
+purex.recycle=Reprocessing of %s
+purex.schrab=Schrabidium extraction from %s
+
+qmaw.tab=[ Press %s for help ]
+
 radar.clearMap=Clear Map
 radar.detectMissiles=Detect Missiles
 radar.detectPlayers=Detect Players
@@ -5593,6 +5614,8 @@ tile.machine_powerrtg.name=PT Isotope Cell
 tile.machine_press.name=Burner Press
 tile.machine_puf6_tank.name=Plutonium Hexafluoride Tank
 tile.machine_pumpjack.name=Pumpjack
+tile.machine_purex.name=PUREX
+tile.machine_purex.desc=Reprocessing machine for many nuclear fuels.$Most recipes require kerosene and nitric acid.
 tile.machine_pyrooven.name=Pyrolysis Oven
 tile.machine_radar.name=Radar
 tile.machine_radar_large.name=Large Radar

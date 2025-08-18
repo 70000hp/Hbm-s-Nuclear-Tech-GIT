@@ -40,6 +40,7 @@ import com.hbm.lib.HbmWorld;
 import com.hbm.lib.RefStrings;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.potion.HbmPotion;
+import com.hbm.qmaw.QMAWLoader;
 import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.tileentity.TileMappings;
 import com.hbm.tileentity.bomb.TileEntityLaunchPadBase;
@@ -253,6 +254,8 @@ public class MainRegistry {
 	@EventHandler
 	public void PreLoad(FMLPreInitializationEvent PreEvent) {
 		CrashHelper.init();
+		
+		QMAWLoader.registerModFileURL(FMLCommonHandler.instance().findContainerFor(RefStrings.MODID).getSource());
 
 		startupTime = System.currentTimeMillis();
 		configDir = PreEvent.getModConfigurationDirectory();
@@ -718,7 +721,7 @@ public class MainRegistry {
 		//progression achieves
 		achBurnerPress = new Achievement("achievement.burnerPress", "burnerPress", 0, 0, new ItemStack(ModBlocks.machine_press), null).initIndependentStat().registerStat();
 		achBlastFurnace = new Achievement("achievement.blastFurnace", "blastFurnace", 1, 3, new ItemStack(ModBlocks.machine_difurnace_off), achBurnerPress).initIndependentStat().registerStat();
-		achAssembly = new Achievement("achievement.assembly", "assembly", 3, -1, new ItemStack(ModBlocks.machine_assembler), achBurnerPress).initIndependentStat().registerStat();
+		achAssembly = new Achievement("achievement.assembly", "assembly", 3, -1, new ItemStack(ModBlocks.machine_assembly_machine), achBurnerPress).initIndependentStat().registerStat();
 		achSelenium = new Achievement("achievement.selenium", "selenium", 3, 2, ModItems.ingot_starmetal, achBurnerPress).initIndependentStat().setSpecial().registerStat();
 		achChemplant = new Achievement("achievement.chemplant", "chemplant", 6, -1, new ItemStack(ModBlocks.machine_chemical_plant), achAssembly).initIndependentStat().registerStat();
 		achConcrete	= new Achievement("achievement.concrete", "concrete", 6, -4, new ItemStack(ModBlocks.concrete), achChemplant).initIndependentStat().registerStat();
@@ -848,6 +851,12 @@ public class MainRegistry {
 
 	@EventHandler
 	public static void PostLoad(FMLPostInitializationEvent PostEvent) {
+		// to make sure that foreign registered fluids are accounted for,
+		// even when the reload listener is registered too late due to load order
+		// IMPORTANT: fluids have to load before recipes. weird shit happens if not.
+		Fluids.reloadFluids();
+		FluidContainerRegistry.register();
+		
 		MagicRecipes.register();
 		LemegetonRecipes.register();
 		SILEXRecipes.register();
@@ -876,7 +885,6 @@ public class MainRegistry {
 		ArmorUtil.register();
 		HazmatRegistry.registerHazmats();
 		DamageResistanceHandler.init();
-		FluidContainerRegistry.register();
 		BlockToolConversion.registerRecipes();
 		AchievementHandler.register();
 
@@ -908,10 +916,6 @@ public class MainRegistry {
 		Compat.handleRailcraftNonsense();
 		SuicideThreadDump.register();
 		CommandReloadClient.register();
-
-		// to make sure that foreign registered fluids are accounted for,
-		// even when the reload listener is registered too late due to load order
-		Fluids.reloadFluids();
 
 		//ExplosionTests.runTest();
 	}
@@ -967,6 +971,8 @@ public class MainRegistry {
 		event.registerServerCommand(new CommandRadiation());
 		event.registerServerCommand(new CommandPacketInfo());
 		event.registerServerCommand(new CommandReloadServer());
+		event.registerServerCommand(new CommandLocate());
+		ArcFurnaceRecipes.registerFurnaceSmeltables(); // because we have to wait for other mods to take their merry ass time to register recipes
 	}
 
 	@EventHandler
@@ -1723,6 +1729,11 @@ public class MainRegistry {
 		ignoreMappings.add("hbm:item.journal_silver");
 		ignoreMappings.add("hbm:tile.machine_arc_furnace_off");
 		ignoreMappings.add("hbm:tile.machine_arc_furnace_on");
+		ignoreMappings.add("hbm:item.heavy_component");
+		ignoreMappings.add("hbm:item.mp_w_20");
+		ignoreMappings.add("hbm:item.mp_f_20");
+		ignoreMappings.add("hbm:item.mp_thruster_10_kerosene_tec");
+		ignoreMappings.add("hbm:item.mp_thruster_15_kerosene_tec");
 
 		/// REMAP ///
 		remapItems.put("hbm:item.gadget_explosive8", ModItems.early_explosive_lenses);
