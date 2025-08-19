@@ -1,10 +1,6 @@
 ## Changed
-* QMAW now has buttons for returning to previously viewed pages
-* QMAW file detection now includes subfolders to `manual`
-* OpenComputers integration for the ZIRNOX should now return values in °C and bar instead of unexplained weird internal units
+* Blueprint folders can now be bought on bobmazon (64 for blue recipes, 256 for beige ones)
 
 ## Fixed
-* Fixed QMAW not working at all
-* Potentially fixed a bug where proxy tile entities would reference unloaded core tile entities which would cause bizarre item voiding/duping issues in rare cases
-* Fixed fusion reactor automation being able to remove items other than the breeding output slot
-* Fixed chunkloading transport drones getting stuck due to off-by-one rounding errors
+* Fixed the QMAW loader crashing servers
+  * Oops
