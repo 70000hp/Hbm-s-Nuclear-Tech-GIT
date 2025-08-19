@@ -224,7 +224,7 @@ public class AnvilRecipes extends SerializableRecipe {
 				new AnvilOutput(new ItemStack(ModBlocks.machine_difurnace_off))).setTier(1));
 
 		boolean exp = GeneralConfig.enableExpensiveMode;
-		
+
 		constructionRecipes.add(new AnvilConstructionRecipe(
 				new AStack[] {
 						new OreDictStack(STEEL.ingot(), 8),
@@ -361,7 +361,7 @@ public class AnvilRecipes extends SerializableRecipe {
 				new AStack[] {
 						new ComparableStack(ModItems.ingot_firebrick, 20),
 						new OreDictStack(CU.ingot(), 8),
-						new OreDictStack(STEEL.plate(), 8)
+						new OreDictStack(IRON.ingot(), 8)
 				}, new AnvilOutput(new ItemStack(ModBlocks.machine_crucible))).setTier(2));
 
 		constructionRecipes.add(new AnvilConstructionRecipe(

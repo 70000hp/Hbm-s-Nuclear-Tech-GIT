@@ -37,6 +37,15 @@ public class SolderingRecipes extends SerializableRecipe {
 		 * CIRCUITS
 		 */
 
+		recipes.add(new SolderingRecipe(new ItemStack(ModItems.circuit, 2, EnumCircuitType.VACUUM_TUBE.ordinal()), 50, 100,
+			new AStack[] {
+				new OreDictStack(KEY_ANYGLASS, 1)},
+			new AStack[] {
+				new OreDictStack(CARBON.wireFine(), 1)},
+			new AStack[] {
+				new ComparableStack(ModItems.plate_polymer, 2)}
+		));
+
 		recipes.add(new SolderingRecipe(new ItemStack(ModItems.circuit, 1, EnumCircuitType.ANALOG.ordinal()), 100, 100,
 				new AStack[] {
 						new ComparableStack(ModItems.circuit, 4, EnumCircuitType.VACUUM_TUBE)},

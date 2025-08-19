@@ -26,7 +26,7 @@ import com.hbm.items.ItemEnums.EnumCasingType;
 import com.hbm.items.ItemEnums.EnumExpensiveType;
 import com.hbm.items.ItemEnums.EnumSecretType;
 import com.hbm.items.ItemGenericPart.EnumPartType;
-import com.hbm.items.machine.ItemArcadeComponent;
+import com.hbm.items.machine.ItemArcadeComponent.EnumComponentType;
 import com.hbm.items.machine.ItemFluidIcon;
 import com.hbm.items.machine.ItemCircuit.EnumCircuitType;
 import com.hbm.items.machine.ItemDrillbit.EnumDrillType;
@@ -58,10 +58,12 @@ public class AssemblyMachineRecipes extends GenericRecipes<GenericRecipe> {
 	@Override
 	public void registerDefaults() {
 
-		this.register(new GenericRecipe("ass.packageM").setup(50, 100).outputItems(DictFrame.fromOne(ModItems.arcade_parts, ItemArcadeComponent.EnumComponentType.MILITARY_PACKAGE, 1))
-			.inputItems(new OreDictStack(DURA.lightReceiver(), 1), new OreDictStack(GUNMETAL.lightBarrel(), 1), new OreDictStack(STEEL.plateWelded(), 2)));
-		this.register(new GenericRecipe("ass.packageM2").setup(40, 100).outputItems(DictFrame.fromOne(ModItems.arcade_parts, ItemArcadeComponent.EnumComponentType.MILITARY_PACKAGE, 2))
-			.inputItems(new OreDictStack(DURA.lightReceiver(), 1), new OreDictStack(GUNMETAL.lightBarrel(), 1), new OreDictStack(STEEL.plateWelded(), 2), new ComparableStack(ModItems.ammo_standard, 16, GunFactory.EnumAmmo.P9_FMJ)));
+		this.register(new GenericRecipe("ass.packageM").setup(60, 500).outputItems(DictFrame.fromOne(ModItems.arcade_parts, EnumComponentType.MILITARY_PACKAGE, 1))
+			.inputItems(new OreDictStack(DURA.lightReceiver(), 1), new OreDictStack(GUNMETAL.lightBarrel(), 1), new OreDictStack(STEEL.plateWelded(), 2))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 500)));
+		this.register(new GenericRecipe("ass.packageM2").setup(60, 500).outputItems(DictFrame.fromOne(ModItems.arcade_parts, EnumComponentType.MILITARY_PACKAGE, 2))
+			.inputItems(new OreDictStack(DURA.lightReceiver(), 1), new OreDictStack(GUNMETAL.lightBarrel(), 1), new OreDictStack(STEEL.plateWelded(), 2), new ComparableStack(ModItems.ammo_standard, 16, GunFactory.EnumAmmo.P9_FMJ))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 500)));
 
 		// plates and ingots
 		String autoPlate = "autoswitch.plates";
@@ -95,8 +97,8 @@ public class AssemblyMachineRecipes extends GenericRecipes<GenericRecipe> {
 		// expensive parts
 		this.register(new GenericRecipe("ass.exsteelplating").setup(200, 400).outputItems(new ItemStack(ModItems.item_expensive, 1, EnumExpensiveType.STEEL_PLATING.ordinal()))
 				.inputItems(new OreDictStack(STEEL.plateCast(), 4), new OreDictStack(TI.plate(), 4), new OreDictStack(STEEL.bolt(), 16)));
-		this.register(new GenericRecipe("ass.exheavyframe").setup(600, 800).outputItems(new ItemStack(ModItems.item_expensive, 1, EnumExpensiveType.HEAVY_FRAME.ordinal()))
-				.inputItems(new ComparableStack(ModItems.item_expensive, 3, EnumExpensiveType.STEEL_PLATING), new OreDictStack(ANY_PLASTIC.ingot(), 8), new OreDictStack(CU.plateWelded(), 4), new OreDictStack(DESH.ingot(), 1), new OreDictStack(DURA.bolt(), 32)));
+		this.register(new GenericRecipe("ass.exheavyframe").setup(120, 8_000).outputItems(new ItemStack(ModItems.item_expensive, 2, EnumExpensiveType.HEAVY_FRAME.ordinal()))
+				.inputItems(new ComparableStack(ModItems.arcade_parts, 12, EnumComponentType.MACHINE_PARTS), new OreDictStack(ANY_PLASTIC.ingot(), 8), new OreDictStack(CU.plateWelded(), 2), new OreDictStack(ANY_TAR.any(), 6)));
 		this.register(new GenericRecipe("ass.excircuit").setup(400, 4_000).outputItems(new ItemStack(ModItems.item_expensive, 1, EnumExpensiveType.CIRCUIT.ordinal()))
 				.inputItems(new ComparableStack(ModItems.circuit, 12, EnumCircuitType.BASIC), new ComparableStack(ModItems.circuit, 8, EnumCircuitType.CAPACITOR), new OreDictStack(GOLD.wireFine(), 32))
 				.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 1_000)));

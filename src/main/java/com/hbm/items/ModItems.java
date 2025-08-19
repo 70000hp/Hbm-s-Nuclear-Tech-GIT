@@ -333,6 +333,7 @@ public class ModItems {
 	public static Item plate_euphemium;
 	public static Item bolt;
 	public static Item bolt_spike;
+	/**actually just insulator, god knows why its called this **/
 	public static Item plate_polymer;
 	public static Item plate_kevlar;
 	public static Item plate_dineutronium;
