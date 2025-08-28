@@ -1,9 +1,8 @@
 package com.hbm.inventory.fluid;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -797,7 +796,7 @@ public class Fluids {
 	private static void readCustomFluids(File file) {
 
 		try {
-			JsonObject json = gson.fromJson(new FileReader(file), JsonObject.class);
+			JsonObject json = gson.fromJson(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8), JsonObject.class);
 
 			for(Entry<String, JsonElement> entry : json.entrySet()) {
 
