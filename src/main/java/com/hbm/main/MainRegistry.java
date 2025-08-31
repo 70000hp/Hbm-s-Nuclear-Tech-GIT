@@ -58,6 +58,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
@@ -357,7 +358,7 @@ public class MainRegistry {
 				}
 			}
 		});
-		
+
 		DispenserBehaviorHandler.init();
 		MicroBlocksCompatHandler.preInit();
 	}
@@ -549,7 +550,7 @@ public class MainRegistry {
 		// IMPORTANT: fluids have to load before recipes. weird shit happens if not.
 		Fluids.reloadFluids();
 		FluidContainerRegistry.register();
-		
+
 		MagicRecipes.register();
 		LemegetonRecipes.register();
 		SILEXRecipes.register();
