@@ -467,7 +467,7 @@ public class OreDictManager {
 		 * PHOSPHORUS
 		 */
 		P_WHITE	.hot(5)	.ingot(ingot_phosphorus)	.block(block_white_phosphorus);
-		P_RED			.dust(powder_fire)			.block(block_red_phosphorus);
+		P_RED	.ore(ore_nether_fire)		.dust(powder_fire)			.block(block_red_phosphorus);
 
 		/*
 		 * RARE METALS
@@ -935,12 +935,12 @@ public class OreDictManager {
 			for(Block b : blocks) registerStack(tag, new ItemStack(b));
 			return this;
 		}
-		
+
 		public DictFrame hazIngot() {
 			hazMult = HazardRegistry.ingot;
 			return autoRegHazard(INGOT);
 		}
-		
+
 		// TODO: rethink this. currently, keys are only registered on-demand if the dict frame has a valid entry, even though we can maximize compatibility
 		// by simply registereing all known shapes in the haz reg, whether it exists or not
 		public DictFrame autoRegHazard(MaterialShapes shape) {

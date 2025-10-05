@@ -12,8 +12,6 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIMiningLaser;
 import com.hbm.inventory.recipes.CentrifugeRecipes;
-import com.hbm.inventory.recipes.CrystallizerRecipes;
-import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
 import com.hbm.inventory.recipes.ShredderRecipes;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade;
@@ -211,7 +209,7 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 	}
 
 	private void buildDam() {
-		
+
 		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if(worldObj.getBlock(targetX + dir.offsetX, targetY + dir.offsetY, targetZ + dir.offsetZ).getMaterial().isLiquid()) worldObj.setBlock(targetX + dir.offsetX, targetY + dir.offsetY, targetZ + dir.offsetZ, ModBlocks.barricade);
 		}
@@ -253,17 +251,7 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 		ItemStack stack = new ItemStack(b, 1, meta);
 
 		if(stack != null && stack.getItem() != null) {
-			if(hasCrystallizer()) {
-
-				CrystallizerRecipe result = CrystallizerRecipes.getOutput(stack, Fluids.PEROXIDE);
-				if(result == null) result = CrystallizerRecipes.getOutput(stack, Fluids.SULFURIC_ACID);
-
-				if(result != null) {
-					worldObj.spawnEntityInWorld(new EntityItem(worldObj, targetX + 0.5, targetY + 0.5, targetZ + 0.5, result.output.copy()));
-					normal = false;
-				}
-
-			} else if(hasCentrifuge()) {
+			if(hasCentrifuge()) {
 
 				ItemStack[] result = CentrifugeRecipes.getOutput(stack);
 				if(result != null) {
@@ -497,20 +485,6 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 			if(slots[i] != null) {
 
 				if(slots[i].getItem() == ModItems.upgrade_centrifuge)
-					return true;
-			}
-		}
-
-		return false;
-	}
-
-	public boolean hasCrystallizer() {
-
-		for(int i = 1; i < 9; i++) {
-
-			if(slots[i] != null) {
-
-				if(slots[i].getItem() == ModItems.upgrade_crystallizer)
 					return true;
 			}
 		}

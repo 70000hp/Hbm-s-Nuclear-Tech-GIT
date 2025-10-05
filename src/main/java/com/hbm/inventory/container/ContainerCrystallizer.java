@@ -11,40 +11,29 @@ import api.hbm.energymk2.IBatteryItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerCrystallizer extends Container {
+public class ContainerCrystallizer extends ContainerBase {
 
-	private TileEntityMachineCrystallizer diFurnace;
 
-	public ContainerCrystallizer(InventoryPlayer invPlayer, TileEntityMachineCrystallizer tedf) {
-		diFurnace = tedf;
+	public ContainerCrystallizer(InventoryPlayer invPlayer, IInventory crys) {
+		super(invPlayer,crys);
 
 		//Input
-		this.addSlotToContainer(new Slot(tedf, 0, 62, 45));
+		this.addSlotToContainer(new Slot(crys, 0, 35, 45));
 		//Battery
-		this.addSlotToContainer(new Slot(tedf, 1, 152, 72));
+		this.addSlotToContainer(new Slot(crys, 1, 152, 72));
 		//Output
-		this.addSlotToContainer(new SlotCraftingOutput(invPlayer.player, tedf, 2, 113, 45));
-		//Fluid slots
-		this.addSlotToContainer(new Slot(tedf, 3, 17, 18));
-		this.addSlotToContainer(new SlotCraftingOutput(invPlayer.player, tedf, 4, 17, 54));
+		this.addSlotToContainer(new SlotCraftingOutput(invPlayer.player, crys, 2,89,45));
 		//Upgrades
-		this.addSlotToContainer(new SlotUpgrade(tedf, 5, 80, 18));
-		this.addSlotToContainer(new SlotUpgrade(tedf, 6, 98, 18));
+		this.addSlotToContainer(new SlotUpgrade(crys, 5, 53, 72));
+		this.addSlotToContainer(new SlotUpgrade(crys, 6, 71, 72));
 		//Fluid ID
-		this.addSlotToContainer(new Slot(tedf, 7, 35, 72));
+		this.addSlotToContainer(new Slot(crys, 7, 8, 72));
 
-		for(int i = 0; i < 3; i++) {
-			for(int j = 0; j < 9; j++) {
-				this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 8 + j * 18, 122 + i * 18));
-			}
-		}
-
-		for(int i = 0; i < 9; i++) {
-			this.addSlotToContainer(new Slot(invPlayer, i, 8 + i * 18, 180));
-		}
+		this.playerInv(invPlayer, 8, 122);
 	}
 
 	@Override
@@ -57,31 +46,24 @@ public class ContainerCrystallizer extends Container {
 			rStack = stack.copy();
 			SlotCraftingOutput.checkAchievements(player, stack);
 
-			if(index <= 7) {
+			if(index <= tile.getSizeInventory() - 1) {
 				if(!this.mergeItemStack(stack, 8, this.inventorySlots.size(), true)) {
 					return null;
 				}
 			} else {
-				
+
 				if(rStack.getItem() instanceof IBatteryItem || rStack.getItem() == ModItems.battery_creative) {
-					if(!this.mergeItemStack(stack, 1, 2, false))
-						return null;
-					
+					if(!this.mergeItemStack(stack, 1, 2, false)) return null;
 				} else if(rStack.getItem() instanceof IItemFluidIdentifier) {
-					if(!this.mergeItemStack(stack, 7, 8, false))
-						return null;
-					
+					if(!this.mergeItemStack(stack, 7, 8, false)) return null;
 				} else if(rStack.getItem() instanceof ItemMachineUpgrade) {
-					if(!this.mergeItemStack(stack, 5, 7, false))
-						return null;
-					
+					if(!this.mergeItemStack(stack, 5, 7, false)) return null;
 				} else
-					if(!this.mergeItemStack(stack, 0, 1, false))
-						return null;
+					if(!this.mergeItemStack(stack, 0, 1, false)) return null;
 			}
 
 			if(stack.stackSize == 0) {
-				slot.putStack((ItemStack) null);
+				slot.putStack(null);
 			} else {
 				slot.onSlotChanged();
 			}
@@ -90,8 +72,4 @@ public class ContainerCrystallizer extends Container {
 		return rStack;
 	}
 
-	@Override
-	public boolean canInteractWith(EntityPlayer player) {
-		return diFurnace.isUseableByPlayer(player);
-	}
 }

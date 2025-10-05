@@ -7,7 +7,6 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.recipes.CentrifugeRecipes;
 import com.hbm.inventory.recipes.CrystallizerRecipes;
 import com.hbm.inventory.recipes.ShredderRecipes;
-import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemToolAbility;
 import com.hbm.util.EnchantmentUtil;
@@ -23,7 +22,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.world.World;
 
 public interface IToolHarvestAbility extends IBaseAbility {
-	
+
 	public default void preHarvestAll(int level, World world, EntityPlayer player) { }
 	public default void postHarvestAll(int level, World world, EntityPlayer player) { }
 
@@ -256,41 +255,6 @@ public interface IToolHarvestAbility extends IBaseAbility {
 		}
 	};
 
-	public static final IToolHarvestAbility CRYSTALLIZER = new IToolHarvestAbility() {
-		@Override
-		public String getName() {
-			return "tool.ability.crystallizer";
-		}
-
-		@Override
-		public boolean isAllowed() {
-			return ToolConfig.abilityCrystallizer;
-		}
-
-		@Override
-		public int sortOrder() {
-			return SORT_ORDER_BASE + 6;
-		}
-
-		@Override
-		public void onHarvestBlock(int level, World world, int x, int y, int z, EntityPlayer player, Block block, int meta) {
-			// a band-aid on a gaping wound
-			if(block == Blocks.lit_redstone_ore)
-				block = Blocks.redstone_ore;
-
-			ItemStack stack = new ItemStack(block, 1, meta);
-			CrystallizerRecipe result = CrystallizerRecipes.getOutput(stack, Fluids.PEROXIDE);
-
-			boolean doesCrystallize = result != null;
-
-			harvestBlock(doesCrystallize, world, x, y, z, player);
-
-			if(doesCrystallize) {
-				world.spawnEntityInWorld(new EntityItem(world, ItemToolAbility.dropX + 0.5, ItemToolAbility.dropY + 0.5, ItemToolAbility.dropZ + 0.5, result.output.copy()));
-			}
-		}
-	};
-
 	public static final IToolHarvestAbility MERCURY = new IToolHarvestAbility() {
 		@Override
 		public String getName() {
@@ -331,7 +295,7 @@ public interface IToolHarvestAbility extends IBaseAbility {
 	};
 	// endregion handlers
 
-	static final IToolHarvestAbility[] abilities = { NONE, SILK, LUCK, SMELTER, SHREDDER, CENTRIFUGE, CRYSTALLIZER, MERCURY };
+	static final IToolHarvestAbility[] abilities = { NONE, SILK, LUCK, SMELTER, SHREDDER, CENTRIFUGE, MERCURY };
 
 	static IToolHarvestAbility getByName(String name) {
 		for(IToolHarvestAbility ability : abilities) {

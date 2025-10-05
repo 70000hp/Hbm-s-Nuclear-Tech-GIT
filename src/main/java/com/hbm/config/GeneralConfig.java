@@ -73,6 +73,8 @@ public class GeneralConfig {
 	public static int schrabRate = 20;
 	public static String[] preferredOutputMod = new String[] {RefStrings.MODID};
 
+	public static boolean enableArcadeHiddenItems = true;
+
 	public static void loadFromConfig(Configuration config) {
 
 		final String CATEGORY_GENERAL = CommonConfig.CATEGORY_GENERAL;
@@ -168,5 +170,10 @@ public class GeneralConfig {
 		schrabRate = CommonConfig.createConfigInt(config, CATEGORY_LBSM, "LBSM_schrabOreRate", "Changes the amount of uranium ore needed on average to create one schrabidium ore using nukes. Standard mode value is 100", 20);
 
 		if(enable528) enableLBSM = false;
+
+		final String CATEGORY_ARCADE = CommonConfig.CATEGORY_ARCADE;
+		enableArcadeHiddenItems = CommonConfig.createConfigBool(config, CATEGORY_ARCADE, "ARCADE_hiddenItems", "When enabled, restores the unused items from normal NTM that arcade hides for tidyness", true);
+
+
 	}
 }

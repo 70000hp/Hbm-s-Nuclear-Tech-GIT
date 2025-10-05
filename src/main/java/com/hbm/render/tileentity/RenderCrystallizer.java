@@ -40,12 +40,12 @@ public class RenderCrystallizer extends TileEntitySpecialRenderer implements IIt
 		GL11.glRotatef(crys.prevAngle + (crys.angle - crys.prevAngle) * inter, 0, 1, 0);
 		ResourceManager.crystallizer.renderPart("Spinner");
 		GL11.glPopMatrix();
-		
+
 		if(crys.prevAngle != crys.angle) {
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glDepthMask(false);
 			OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-			bindTexture(crys.tank.getTankType().getTexture());
+			bindTexture(crys.inputTank.getTankType().getTexture());
 			ResourceManager.crystallizer.renderPart("Fluid");
 			GL11.glDepthMask(true);
 			GL11.glDisable(GL11.GL_BLEND);

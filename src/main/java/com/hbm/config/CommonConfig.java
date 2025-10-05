@@ -8,7 +8,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 public class CommonConfig {
-	
+
 	public static final String CATEGORY_GENERAL = "01_general";
 	public static final String CATEGORY_ORES = "02_ores";
 	public static final String CATEGORY_NUKES = "03_nukes";
@@ -30,6 +30,8 @@ public class CommonConfig {
 
 	public static final String CATEGORY_528 = "528";
 	public static final String CATEGORY_LBSM = "LESS BULLSHIT MODE";
+	public static final String CATEGORY_ARCADE = "ARCADE";
+
 
 	public static int setDefZero(int value, int def) {
 
@@ -89,7 +91,7 @@ public class CommonConfig {
 
 	public static int parseStructureFlag(String flag) {
 		if(flag == null) flag = "";
-		
+
 		switch(flag.toLowerCase(Locale.US)) {
 		case "true":
 		case "on":

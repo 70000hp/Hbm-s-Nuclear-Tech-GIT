@@ -13,7 +13,6 @@ import com.hbm.inventory.recipes.ArcFurnaceRecipes.ArcFurnaceRecipe;
 import com.hbm.inventory.recipes.ArcWelderRecipes.ArcWelderRecipe;
 import com.hbm.inventory.recipes.BreederRecipes.BreederRecipe;
 import com.hbm.inventory.recipes.CrucibleRecipes.CrucibleRecipe;
-import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
 import com.hbm.inventory.recipes.ElectrolyserFluidRecipes.ElectrolysisRecipe;
 import com.hbm.inventory.recipes.ElectrolyserMetalRecipes.ElectrolysisMetalRecipe;
 import com.hbm.inventory.recipes.ExposureChamberRecipes.ExposureChamberRecipe;
@@ -109,10 +108,10 @@ public class CompatRecipeRegistry {
 		CentrifugeRecipes.recipes.put(input, copyFirst(outputs, 4));
 	}
 
-	public static void registerCrystallizer(AStack input, ItemStack output, int time, float productivity, FluidStack fluid) {
+	/*public static void registerCrystallizer(AStack input, ItemStack output, int time, float productivity, FluidStack fluid) {
 		CrystallizerRecipe recipe = new CrystallizerRecipe(output, time).prod(productivity);
 		CrystallizerRecipes.registerRecipe(input instanceof OreDictStack ? ((OreDictStack) input).name : input, recipe, fluid);
-	}
+	}*/
 
 	/** Fractions always use 100mB of input fluid per operation. None of the outputs can be null. */
 	public static void registerFraction(FluidType input, FluidStack[] output) {

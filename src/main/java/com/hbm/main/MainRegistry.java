@@ -516,7 +516,6 @@ public class MainRegistry {
 		BobmazonOfferFactory.init();
 
 		IMCHandler.registerHandler("blastfurnace", new IMCBlastFurnace());
-		IMCHandler.registerHandler("crystallizer", new IMCCrystallizer());
 		IMCHandler.registerHandler("centrifuge", new IMCCentrifuge());
 
 		if (Loader.isModLoaded("NotEnoughItems")){

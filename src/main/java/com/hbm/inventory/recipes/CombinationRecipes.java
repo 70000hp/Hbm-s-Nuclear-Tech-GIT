@@ -242,7 +242,7 @@ public class CombinationRecipes extends SerializableRecipe {
 	@Override
 	public void writeRecipe(Object recipe, JsonWriter writer) throws IOException {
 
-		PyroOvenRecipes.PyroOvenRecipe rec = (PyroOvenRecipes.PyroOvenRecipe) recipe;
+		CombinationRecipe rec = (CombinationRecipe) recipe;
 
 		if(rec.inputFluid != null) { writer.name("inputFluid"); this.writeFluidStack(rec.inputFluid, writer); }
 		if(rec.inputItem != null) { writer.name("inputItem"); this.writeAStack(rec.inputItem, writer); }

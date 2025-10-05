@@ -216,7 +216,7 @@ public class BobmazonArcadeOffers extends SerializableRecipe {
 		for (AStack stack : offer.cost) writeAStack(stack, writer);
 		writer.endArray();
 
-		writer.name("extraReq").value(offer.extraReq.ordinal());
+		//writer.name("extraReq").value(offer.extraReq.ordinal());
 	}
 
 	@Override

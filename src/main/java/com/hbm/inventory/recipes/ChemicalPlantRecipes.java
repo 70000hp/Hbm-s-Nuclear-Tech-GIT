@@ -15,9 +15,11 @@ import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.inventory.recipes.loader.GenericRecipes;
+import com.hbm.items.ItemEnums;
 import com.hbm.items.ItemEnums.EnumFuelAdditive;
 import com.hbm.items.ItemGenericPart.EnumPartType;
 import com.hbm.items.ModItems;
+import com.hbm.items.machine.ItemChemicalDye;
 import com.hbm.items.machine.ItemFluidIcon;
 
 import net.minecraft.init.Blocks;
@@ -257,32 +259,42 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 		/// EXPLOSIVES ///
 		this.register(new GenericRecipe("chem.cordite").setup(40, 100)
 				.inputItems(new OreDictStack(KNO.dust(), 2), new ComparableStack(ModItems.powder_sawdust, 2))
-				.inputFluids((GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSimpleChemsitry) ? new FluidStack(Fluids.HEATINGOIL, 200) : new FluidStack(Fluids.GAS, 200))
+				.inputFluids(new FluidStack(Fluids.GAS, 200))
 				.outputItems(new ItemStack(ModItems.cordite, 4)));
 
-		this.register(new GenericRecipe("chem.rocketfuel").setup(200, 100)
+		this.register(new GenericRecipe("chem.rocketfuel").setup(100, 200)
 				.inputItems(new ComparableStack(ModItems.solid_fuel, 2))
-				.inputFluids(new FluidStack(Fluids.PETROLEUM, 200, GeneralConfig.enable528 ? 1 : 0), new FluidStack(Fluids.NITRIC_ACID, 100))
+				.inputFluids(new FluidStack(Fluids.NITROGLYCERIN, 200, 1))
 				.outputItems(new ItemStack(ModItems.rocket_fuel, 4)));
 
 		this.register(new GenericRecipe("chem.dynamite").setup(50, 100)
 				.inputItems(new ComparableStack(Items.sugar), new OreDictStack(KNO.dust()), new OreDictStack(KEY_SAND))
-				.outputItems(new ItemStack(ModItems.ball_dynamite, 2)));
+				.outputItems(new ItemStack(ModItems.ball_dynamite, 4)));
 
 		this.register(new GenericRecipe("chem.tnt").setup(100, 1_000)
-				.inputItems(new OreDictStack(KNO.dust()))
-				.inputFluids(new FluidStack(Fluids.AROMATICS, 500, GeneralConfig.enable528 ? 1 : 0))
+				.inputFluids(new FluidStack(Fluids.AROMATICS, 500, 0), new FluidStack(Fluids.NITRIC_ACID, 100))
 				.outputItems(new ItemStack(ModItems.ball_tnt, 4)));
+
+		this.register(new GenericRecipe("chem.tntAlt").setup(100, 1_000)
+			.inputItems(new ComparableStack(ModBlocks.sand_quartz))
+			.inputFluids(new FluidStack(Fluids.NITROGLYCERIN, 1_000))
+			.outputItems(new ItemStack(ModItems.ball_tnt, 16)).setPools(GenericRecipes.POOL_PREFIX_ALT + "."));
 
 		this.register(new GenericRecipe("chem.tatb").setup(50, 5_000)
 				.inputItems(new ComparableStack(ModItems.ball_tnt))
-				.inputFluids(new FluidStack(Fluids.SOURGAS, 200, 1), new FluidStack(Fluids.NITRIC_ACID, 10))
+				.inputFluids(new FluidStack(Fluids.SOURGAS, 200, 1), new FluidStack(Fluids.NITRIC_ACID, 500))
 				.outputItems(new ItemStack(ModItems.ball_tatb)));
-
+		this.register(new GenericRecipe("chem.semtex").setup(100, 1_000)
+				.inputFluids(new FluidStack(Fluids.PETROLEUM, 1000, 1), new FluidStack(Fluids.NITRIC_ACID, 100))
+				.outputItems(new ItemStack(ModItems.ingot_semtex, 4)));
 		this.register(new GenericRecipe("chem.c4").setup(100, 1_000)
 				.inputItems(new OreDictStack(KNO.dust()))
-				.inputFluids(new FluidStack(Fluids.UNSATURATEDS, 500, GeneralConfig.enable528 ? 1 : 0))
+				.inputFluids(new FluidStack(Fluids.UNSATURATEDS, 1000, 1), new FluidStack(Fluids.NITRIC_ACID, 250))
 				.outputItems(new ItemStack(ModItems.ingot_c4, 4)));
+		this.register(new GenericRecipe("chem.corditeAlt").setup(40, 100)
+			.inputItems(new ComparableStack(ModItems.powder_sawdust, 1))
+			.inputFluids(new FluidStack(Fluids.NITROGLYCERIN, 200, 1))
+			.outputItems(new ItemStack(ModItems.cordite, 3)));
 
 		/// GLASS ///
 		this.register(new GenericRecipe("chem.laminate").setup(20, 100)
@@ -328,6 +340,92 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.inputItems(new ComparableStack(ModItems.powder_paleogenite), new OreDictStack(F.dust(), 8), new ComparableStack(ModItems.nugget_bismuth, 4))
 				.inputFluids(new FluidStack(Fluids.PEROXIDE, 1_000, 5))
 				.outputFluids(new FluidStack(Fluids.DEATH, 1_000, 0)));
+
+		/// UTILITY ///
+		this.register(new GenericRecipe("chem.clayBlock").setup(40, 200)
+			.inputItems(new OreDictStack(KEY_SAND))
+			.inputFluids(new FluidStack(Fluids.COLLOID, 1_000))
+			.outputItems(new ItemStack(Blocks.clay)));
+
+		this.register(new GenericRecipe("chem.slime").setup(120, 1_500)
+			.inputItems(new ComparableStack(Items.dye, 1, 15))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 50))
+			.outputItems(new ItemStack(Items.slime_ball, 4)));
+
+		this.register(new GenericRecipe("chem.slime2").setup(120, 1_500)
+			.inputItems(new ComparableStack(Items.bone))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 250))
+			.outputItems(new ItemStack(Items.slime_ball, 16)));
+
+		this.register(new GenericRecipe("chem.leather").setup(40, 1_500)
+			.inputItems(new ComparableStack(Items.rotten_flesh))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 250))
+			.outputItems(new ItemStack(Items.leather)));
+
+		String autoGem = "autoswitch.gems";
+
+		this.register(new GenericRecipe("chem.diamondPow").setup(60, 1_000)
+			.inputItems(new OreDictStack(DIAMOND.dust()))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 1_000))
+			.outputItems(new ItemStack(Items.diamond)).setGroup(autoGem, this));
+
+		this.register(new GenericRecipe("chem.emeraldPow").setup(60, 1_000)
+			.inputItems(new OreDictStack(EMERALD.dust()))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 200))
+			.outputItems(new ItemStack(Items.emerald)).setGroup(autoGem, this));
+
+		this.register(new GenericRecipe("chem.lapisPow").setup(60, 1_000)
+			.inputItems(new OreDictStack(LAPIS.dust()))
+			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 200))
+			.outputItems(new ItemStack(Items.dye, 1, 4)).setGroup(autoGem, this));
+
+		String autoDye = "autoswitch.dye";
+		FluidStack[] dyes = new FluidStack[] {new FluidStack(Fluids.WOODOIL, 100), new FluidStack(Fluids.FISHOIL, 100), new FluidStack(Fluids.LUBRICANT, 100)};
+		for(FluidStack dye : dyes) {
+			this.register(new GenericRecipe("chem.dyeBlack" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(COAL.dust()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.BLACK, 8)).setGroup(autoDye, this));
+			this.register(new GenericRecipe("chem.dyeWhite" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(AL.dust()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.WHITE, 12)).setGroup(autoDye, this));
+			this.register(new GenericRecipe("chem.dyeRed" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(IRON.dust()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.RED, 8)).setGroup(autoDye, this));
+			this.register(new GenericRecipe("chem.dyeYellow" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(S.dust()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.YELLOW, 8)).setGroup(autoDye, this));
+			this.register(new GenericRecipe("chem.dyeGreen" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(CU.dust()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.GREEN, 8)).setGroup(autoDye, this));
+			this.register(new GenericRecipe("chem.dyeBlue" + dye.type.getUnlocalizedName()).setup(40, 100)
+				.inputItems(new OreDictStack(CO.dustTiny()))
+				.inputFluids(dye)
+				.outputItems(DictFrame.fromOne(ModItems.chemical_dye, ItemChemicalDye.EnumChemDye.BLUE, 8)).setGroup(autoDye, this));
+		}
+			String autoWax = "autoswitch.dye";
+
+			this.register(new GenericRecipe("chem.waxCrude").setup(120, 1_000)
+				.inputItems(new ComparableStack(ModItems.oil_tar, 1, ItemEnums.EnumTarType.CRUDE))
+				.inputFluids(new FluidStack(Fluids.CHLORINE, 250))
+				.outputItems(DictFrame.fromOne(ModItems.oil_tar, ItemEnums.EnumTarType.WAX)).setGroup(autoWax, this));
+			this.register(new GenericRecipe("chem.waxCrack").setup(120, 1_000)
+				.inputItems(new ComparableStack(ModItems.oil_tar, 1, ItemEnums.EnumTarType.CRACK))
+				.inputFluids(new FluidStack(Fluids.CHLORINE, 250))
+				.outputItems(DictFrame.fromOne(ModItems.oil_tar, ItemEnums.EnumTarType.WAX)).setGroup(autoWax, this));
+			this.register(new GenericRecipe("chem.waxParaffin").setup(120, 1_000)
+				.inputItems(new ComparableStack(ModItems.oil_tar, 1, ItemEnums.EnumTarType.PARAFFIN))
+				.inputFluids(new FluidStack(Fluids.CHLORINE, 250))
+				.outputItems(DictFrame.fromOne(ModItems.oil_tar, ItemEnums.EnumTarType.WAX)).setGroup(autoWax, this));
+
+			this.register(new GenericRecipe("chem.E").setup(120, 1_000)
+				.inputItems(new ComparableStack(ModItems.oil_tar, 1, ItemEnums.EnumTarType.PARAFFIN))
+				.inputFluids(new FluidStack(Fluids.ESTRADIOL, 250))
+				.outputItems(new ItemStack(ModItems.pill_red)).setPools(GenericRecipes.POOL_PREFIX_ALT + ".E"));
 
 	}
 

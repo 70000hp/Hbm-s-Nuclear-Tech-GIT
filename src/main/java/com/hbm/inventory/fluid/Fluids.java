@@ -596,6 +596,7 @@ public class Fluids {
 
 		// LEGACY
 		ACID = PEROXIDE;
+		FluidsF.init();
 
 		for(FluidType custom : customFluids) metaOrder.add(custom);
 
@@ -777,7 +778,7 @@ public class Fluids {
 
 			writer.name("CUSTOM_DEMO").beginObject();
 			writer.name("name").value("Custom Fluid Demo");
-			writer.name("id").value(1000);
+			writer.name("id").value(999);
 			writer.name("color").value(0xff0000);
 			writer.name("tint").value(0xff0000);
 			writer.name("p").value(1).name("f").value(2).name("r").value(0);
