@@ -59,9 +59,6 @@ public class CrystallizerRecipes extends GenericRecipes<GenericRecipe> {
 	@Override
 	public void registerDefaults() {
 
-		final int mixingTime = 20;
-		FluidStack sulfur = new FluidStack(Fluids.SULFURIC_ACID, 500);
-
 		this.register(new GenericRecipe("crys.cement").setup(60, 1_000)
 			.inputItems(new ComparableStack(ModItems.powder_calcium))
 			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 500))
@@ -111,7 +108,8 @@ public class CrystallizerRecipes extends GenericRecipes<GenericRecipe> {
 		this.register(new GenericRecipe("crys.borax").setup(120, 3_000)
 			.inputItems(new OreDictStack(BORAX.dust()))
 			.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 500))
-			.outputFluids(new FluidStack(FluidsF.BORIC_ACID, 500)));
+			.outputItems(new ItemStack(ModItems.powder_sodium))
+			.outputFluids(new FluidStack(FluidsF.BORIC_ACID, 400)));
 
 		this.register(new GenericRecipe("crys.reinfStone").setup(30, 3_500)
 			.inputItems(new ComparableStack(Blocks.cobblestone))

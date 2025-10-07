@@ -19,6 +19,7 @@ import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.FluidsF;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ItemEnums;
 import com.hbm.items.ItemEnums.EnumAshType;
@@ -143,6 +144,10 @@ public class CombinationRecipes extends SerializableRecipe {
 		recipes.add(new CombinationRecipe()
 			.in(new OreDictStack(NA.dust()))
 			.out(new FluidStack(Fluids.SODIUM, 100)));
+		recipes.add(new CombinationRecipe()
+			.in(new FluidStack(FluidsF.BORIC_ACID, 100))
+			.in(new OreDictStack(KEY_SAND))
+			.out(new ItemStack(ModBlocks.glass_boron, 2)));
 
 		//utilities
 		recipes.add(new CombinationRecipe()

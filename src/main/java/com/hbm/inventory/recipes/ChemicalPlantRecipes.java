@@ -13,6 +13,7 @@ import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.FluidsF;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.items.ItemEnums;
@@ -340,6 +341,19 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.inputItems(new ComparableStack(ModItems.powder_paleogenite), new OreDictStack(F.dust(), 8), new ComparableStack(ModItems.nugget_bismuth, 4))
 				.inputFluids(new FluidStack(Fluids.PEROXIDE, 1_000, 5))
 				.outputFluids(new FluidStack(Fluids.DEATH, 1_000, 0)));
+
+		/// ORE PROC ///
+
+		this.register(new GenericRecipe("chem.boronAlumin").setup(20, 1_000)
+			.inputFluids(new FluidStack(FluidsF.BORIC_ACID, 200))
+			.inputItems(new OreDictStack(AL.dust()))
+			.outputItems(new ItemStack(ModItems.powder_boron_tiny, 6))
+			.outputFluids(new FluidStack(Fluids.SODIUM_ALUMINATE, 15)));
+		this.register(new GenericRecipe("chem.boronHydrogen").setup(20, 5_000)
+			.inputFluids(new FluidStack(FluidsF.BORIC_ACID, 200), new FluidStack(Fluids.HYDROGEN, 1_000))
+			.outputItems(new ItemStack(ModItems.powder_boron_tiny, 3))
+			.outputFluids(new FluidStack(Fluids.WATER, 500)));
+
 
 		/// UTILITY ///
 		this.register(new GenericRecipe("chem.clayBlock").setup(40, 200)

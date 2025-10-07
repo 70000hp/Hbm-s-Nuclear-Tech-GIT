@@ -1,4 +1,5 @@
 achievement.acidizer.desc=oof ow my skin
+achievement.acidizer.desc=oof ow my skin
 achievement.acidizer=Acidic
 achievement.assembly.desc=Wait, it's already 1 am?
 achievement.assembly=The Factory Grows
@@ -587,7 +588,11 @@ chem.reoil=Reclaimed Oil
 chem.gasoline=Gasoline
 chem.tarsand=Bitumen from Tar Sand
 chem.meatprocessing=Glyphid Meat Processing
-chem.birkeland=Nitric Acid from Air
+chem.birkeland=Nitric Acid via Birkeland-Eyde
+chem.boronAlumin=Boron Production (Aluminothermic)
+chem.boronHydrogen=Boron Production (Hydrogen Reduction)
+chem.tntAlt=Boosted TNT Production
+
 
 chem.ARSENIC=Arsenic Extraction
 chem.ASPHALT=Asphalt Production
