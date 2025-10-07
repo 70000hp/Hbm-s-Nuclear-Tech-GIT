@@ -1,26 +1,16 @@
-## Added
-* N I 4 N I
-  * It's that one gun from that one game, you throw coins and your shots bounce around
-  * Needs no introduction
-  * Can be upgraded with nickels or gold doubloons for more pocket change to yeet
-  * Found in airdrop supply crates, about 10x rarer than a double barrel shotgun
-* More structures
-  * I haven't even looked at them so it's a surprise for everyone
-* PWR printer
-  * Using it on a PWR controller will cause the game to generate images of each layer of the reactor
-
 ## Changed
-* Updated ukrainian, chinese and russian localization, including QMAW
-* Some previously hardcoded lang strings are now affected by translations
-* Due to severe issues with ticking order as well as a crash caused by certain tiles that uses threaded packets, Torcherino accelerator torches no longer affect NTM machines
-* RBMK control rod colors and auto control rod settings are now copiable
-* Murky wings no longer have slowfall, and using shift+space cancels the momentum
-* Murky wings are now slow by default and speed up when sprinting
-* The arc furnace can now be used with AE2 buses, which was previously not possible due to the unique stacksize limitations
+* Updated russian and chinese localiazation
+* VNT type explosions now track affected block positions when the explosion events fire, this should ensure compatibility with mods that rely on that
+  * For example, this should make ForgeCreeperHeal work with most of NTM's explosions
+* Obliterated standard fluid IDs
+  * The multi ID is now a lot cheaper
+  * For convenience in the creative tab, fluid IDs are now listed with all fluids pre-defined, just like how the old IDs were available
+  * The multi ID now changes metadata based on the selected fluid type, allowing it to be usable for crafting pre-defined pipes
+* The multi ID fluid selector now displays fluid traits in addition to the name when hovering over an icon
+* Added more values to the data table returned by RBMK consoles via OC integration
 
 ## Fixed
-* Fixed conveyor grabber dropping items off at an offset when placing them on a conveyor belt due to a client desync
-* Fixed occasional crash caused by using the settings tool on the autoloader
-* Fixed QMAW not correctly working with other languages
-* Fixed QMAW loading breaking entirely due to file encoding
-* Fixed PWR fuel rod textures being 18x18 instead of 16x16
+* Fixed the T-51b set not having radiation resistance
+* Potentially fixed a crash on thermos-derived servers involving the flow control pumps
+* Fixed crash caused when another tile entity replaces an RBMK component due to an unchecked cast
+* Fixed constant cascading chunk gen caused by meteorites and flower patches
