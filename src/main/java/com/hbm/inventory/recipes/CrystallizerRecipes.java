@@ -7,7 +7,7 @@ import java.util.List;
 import static com.hbm.inventory.OreDictManager.*;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.config.GeneralConfig;
+
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon.AStack;
@@ -270,5 +270,5 @@ public class CrystallizerRecipes extends GenericRecipes<GenericRecipe> {
 
 		return recipes;
 	}
-
+	
 }

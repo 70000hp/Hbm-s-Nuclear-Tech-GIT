@@ -16,11 +16,13 @@ import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.gui.GUIWeaponTable;
 import com.hbm.items.IEquipReceiver;
 import com.hbm.items.IKeybindReceiver;
+import com.hbm.items.ModItems;
 import com.hbm.items.armor.ArmorTrenchmaster;
+import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.hud.IHUDComponent;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mags.MagazineInfinite;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.PacketDispatcher;
@@ -60,6 +62,9 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD, I
 
 	public static List<Item> secrets = new ArrayList();
 	public List<ComparableStack> recognizedMods = new ArrayList();
+	
+	public ItemStack defaultAmmo;
+	public boolean isDefaultExpensive = false;
 
 	public static final DecimalFormatSymbols SYMBOLS_US = new DecimalFormatSymbols(Locale.US);
 	public static final DecimalFormat FORMAT_DMG = new DecimalFormat("#.##", SYMBOLS_US);
@@ -115,7 +120,7 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD, I
 	public GunConfig getConfig(ItemStack stack, int index) {
 		GunConfig cfg = configs_DNA[index];
 		if(stack == null) return cfg;
-		return WeaponModManager.eval(cfg, stack, O_GUNCONFIG + index, this, index);
+		return XWeaponModManager.eval(cfg, stack, O_GUNCONFIG + index, this, index);
 	}
 
 	public int getConfigCount() {
@@ -149,6 +154,16 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD, I
 		COOLDOWN,	//forced delay, but with option for refire
 		RELOADING,	//forced delay after which a reload action happens, may be canceled (TBI)
 		JAMMED,		//forced delay due to jamming
+	}
+	
+	public ItemGunBaseNT setDefaultAmmo(EnumAmmo ammo, int amount) {
+		this.defaultAmmo = new ItemStack(ModItems.ammo_standard, amount, ammo.ordinal());
+		return this;
+	}
+	
+	public ItemGunBaseNT setDefaultAmmoExpensive(EnumAmmo ammo, int amount) {
+		this.isDefaultExpensive = true;
+		return setDefaultAmmo(ammo, amount);
 	}
 
 	public ItemGunBaseNT setNameMutator(Function<ItemStack, String> lambda) {
@@ -193,7 +208,7 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IItemHUD, I
 				list.add(I18nUtil.resolveKey("gui.weapon.condition") + ": " + dura + "%");
 			}
 
-			for(ItemStack upgrade : WeaponModManager.getUpgradeItems(stack, i)) {
+			for(ItemStack upgrade : XWeaponModManager.getUpgradeItems(stack, i)) {
 				list.add(EnumChatFormatting.YELLOW + upgrade.getDisplayName());
 			}
 		}

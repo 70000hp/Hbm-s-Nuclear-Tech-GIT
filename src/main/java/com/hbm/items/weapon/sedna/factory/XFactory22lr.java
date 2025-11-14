@@ -16,7 +16,7 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.particle.SpentCasing;
 import com.hbm.particle.SpentCasing.CasingType;
@@ -54,12 +54,12 @@ public class XFactory22lr {
 						.setupStandardFire().recoil(LAMBDA_RECOIL_AM180))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_AM180_ANIMS).orchestra(Orchestras.ORCHESTRA_AM180)
-				).setNameMutator(LAMBDA_NAME_AM180)
+				).setDefaultAmmo(EnumAmmo.P22_SP, 35).setNameMutator(LAMBDA_NAME_AM180)
 				.setUnlocalizedName("gun_am180");
 	}
 
 	public static Function<ItemStack, String> LAMBDA_NAME_AM180 = (stack) -> {
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SILENCER)) return stack.getUnlocalizedName() + "_silenced";
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SILENCER)) return stack.getUnlocalizedName() + "_silenced";
 		return null;
 	};
 

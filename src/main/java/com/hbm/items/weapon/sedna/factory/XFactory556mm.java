@@ -19,7 +19,7 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
 import com.hbm.main.ResourceManager;
@@ -81,7 +81,7 @@ public class XFactory556mm {
 						.setupStandardFire().recoil(LAMBDA_RECOIL_G3))
 				.setupStandardConfiguration().ps(Lego.LAMBDA_STANDARD_CLICK_SECONDARY)
 				.anim(LAMBDA_G3_ANIMS).orchestra(Orchestras.ORCHESTRA_G3)
-				).setNameMutator(LAMBDA_NAME_G3).setUnlocalizedName("gun_g3");
+				).setDefaultAmmo(EnumAmmo.R556_SP, 30).setNameMutator(LAMBDA_NAME_G3).setUnlocalizedName("gun_g3");
 		ModItems.gun_g3_zebra = new ItemGunBaseNT(WeaponQuality.B_SIDE, new GunConfig()
 				.dura(6_000).draw(10).inspect(33).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE).scopeTexture(scope)
 				.rec(new Receiver(0)
@@ -91,7 +91,7 @@ public class XFactory556mm {
 						.setupStandardFire().recoil(LAMBDA_RECOIL_ZEBRA))
 				.setupStandardConfiguration().ps(Lego.LAMBDA_STANDARD_CLICK_SECONDARY)
 				.anim(LAMBDA_G3_ANIMS).orchestra(Orchestras.ORCHESTRA_G3)
-				).setNameMutator(LAMBDA_NAME_G3).setUnlocalizedName("gun_g3_zebra");
+				).setDefaultAmmo(EnumAmmo.R556_JHP, 30).setNameMutator(LAMBDA_NAME_G3).setUnlocalizedName("gun_g3_zebra");
 
 		ModItems.gun_stg77 = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(3_000).draw(10).inspect(125).crosshair(Crosshair.CIRCLE).scopeTexture(scope).smoke(LAMBDA_SMOKE)
@@ -103,16 +103,16 @@ public class XFactory556mm {
 				.pp(Lego.LAMBDA_STANDARD_CLICK_PRIMARY).ps(Lego.LAMBDA_STANDARD_CLICK_PRIMARY).pr(Lego.LAMBDA_STANDARD_RELOAD).pt(Lego.LAMBDA_TOGGLE_AIM)
 				.decider(LAMBDA_STG77_DECIDER)
 				.anim(LAMBDA_STG77_ANIMS).orchestra(Orchestras.ORCHESTRA_STG77)
-				).setUnlocalizedName("gun_stg77");
+				).setDefaultAmmo(EnumAmmo.R556_FMJ, 30).setUnlocalizedName("gun_stg77");
 	}
 
 	public static Function<ItemStack, String> LAMBDA_NAME_G3 = (stack) -> {
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SILENCER) &&
-				WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_NO_STOCK) &&
-				WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_FURNITURE_BLACK) &&
-				WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SCOPE)) return stack.getUnlocalizedName() + "_infiltrator";
-		if(!WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_NO_STOCK) &&
-				WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_FURNITURE_GREEN)) return stack.getUnlocalizedName() + "_a3";
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SILENCER) &&
+				XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_NO_STOCK) &&
+				XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_FURNITURE_BLACK) &&
+				XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE)) return stack.getUnlocalizedName() + "_infiltrator";
+		if(!XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_NO_STOCK) &&
+				XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_FURNITURE_GREEN)) return stack.getUnlocalizedName() + "_a3";
 		return null;
 	};
 
@@ -146,7 +146,7 @@ public class XFactory556mm {
 				.addBus("EQUIP", new BusAnimationSequence().addPos(45, 0, 0, 0).addPos(0, 0, 0, 500, IType.SIN_FULL));
 		case CYCLE: return new BusAnimation()
 				.addBus("BOLT", new BusAnimationSequence().addPos(0, 0, 0, 20).addPos(0, 0, -4.5, 40).addPos(0, 0, 0, 40))
-				.addBus("RECOIL", new BusAnimationSequence().addPos(0, 0, (ItemGunBaseNT.getIsAiming(stack) || !WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_NO_STOCK)) ? -0.25 : -0.75, 25, IType.SIN_DOWN).addPos(0, 0, 0, 75, IType.SIN_FULL));
+				.addBus("RECOIL", new BusAnimationSequence().addPos(0, 0, (ItemGunBaseNT.getIsAiming(stack) || !XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_NO_STOCK)) ? -0.25 : -0.75, 25, IType.SIN_DOWN).addPos(0, 0, 0, 75, IType.SIN_FULL));
 		case CYCLE_DRY: return new BusAnimation()
 				.addBus("BOLT", new BusAnimationSequence().addPos(0, 0, 0, 250).addPos(0, 0, -0.3125, 100).hold(25).addPos(0, 0, -2.75, 130).hold(50).addPos(0, 0, -2.4375, 50).addPos(0, 0, 0, 85))
 				.addBus("PLUG", new BusAnimationSequence().addPos(0, 0, 0, 250).hold(125).addPos(0, 0, -2.4375, 130).hold(100).addPos(0, 0, 0, 85))

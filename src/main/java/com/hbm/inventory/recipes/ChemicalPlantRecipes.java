@@ -14,6 +14,7 @@ import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.FluidsF;
+import com.hbm.blocks.generic.BlockNTMSand.EnumSandType;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.items.ItemEnums;
@@ -295,7 +296,7 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputItems(new ItemStack(ModItems.ball_tnt, 4)));
 
 		this.register(new GenericRecipe("chem.tntAlt").setup(100, 1_000)
-			.inputItems(new ComparableStack(ModBlocks.sand_quartz))
+			.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, BlockNTMSand.EnumSandType.QUARTZ))
 			.inputFluids(new FluidStack(Fluids.NITROGLYCERIN, 1_000))
 			.outputItems(new ItemStack(ModItems.ball_tnt, 16)).setPools(GenericRecipes.POOL_PREFIX_ALT + "."));
 

@@ -5,6 +5,7 @@ import static com.hbm.inventory.OreDictManager.*;
 import java.util.ArrayList;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockNTMSand.EnumSandType;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
@@ -33,11 +34,31 @@ public class PUREXRecipes extends GenericRecipes<GenericRecipe> {
 	@Override
 	public void registerDefaults() {
 
+		long pilePower = 100;
 		long zirnoxPower = 1_000;
 		long platePower = 1_500;
 		long pwrPower = 2_500;
 		long watzPower = 10_000;
 		long vitrification = 1_000;
+		
+		//CP-1
+		String autoPile = "autoswitch.pile";
+		this.register(new GenericRecipe("purex.pilepu").setup(40, pilePower).setNameWrapper("purex.recycle").setGroup(autoPile, this)
+				.inputItems(new ComparableStack(ModItems.pile_rod_plutonium))
+				.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 100))
+				.outputItems(new ItemStack(ModItems.billet_pu_mix, 2),
+						new ItemStack(ModItems.billet_uranium, 1),
+						new ItemStack(ModItems.plate_iron, 2))
+				.setIconToFirstIngredient());
+
+		this.register(new GenericRecipe("purex.pilepu239").setup(40, pilePower).setNameWrapper("purex.recycle").setGroup(autoPile, this)
+				.inputItems(new ComparableStack(ModItems.pile_rod_pu239))
+				.inputFluids(new FluidStack(Fluids.SULFURIC_ACID, 100))
+				.outputItems(new ItemStack(ModItems.billet_pu239, 1),
+						new ItemStack(ModItems.billet_pu_mix, 1),
+						new ItemStack(ModItems.billet_uranium, 1),
+						new ItemStack(ModItems.plate_iron, 2))
+				.setIconToFirstIngredient());
 
 		// ZIRNOX
 		String autoZirnox = "autoswitch.zirnox";
@@ -460,17 +481,17 @@ public class PUREXRecipes extends GenericRecipes<GenericRecipe> {
 
 		/// Vitrification
 		this.register(new GenericRecipe("purex.vitliquid").setup(100, vitrification)
-				.inputItems(new ComparableStack(ModBlocks.sand_lead))
+				.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, EnumSandType.LEAD))
 				.inputFluids(new FluidStack(Fluids.WASTEFLUID, 1_000))
 				.outputItems(new ItemStack(ModItems.nuclear_waste_vitrified)));
 		
 		this.register(new GenericRecipe("purex.vitgaseous").setup(100, vitrification)
-				.inputItems(new ComparableStack(ModBlocks.sand_lead))
+				.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, EnumSandType.LEAD))
 				.inputFluids(new FluidStack(Fluids.WASTEGAS, 1_000))
 				.outputItems(new ItemStack(ModItems.nuclear_waste_vitrified)));
 		
 		this.register(new GenericRecipe("purex.vitsolid").setup(300, vitrification)
-				.inputItems(new ComparableStack(ModBlocks.sand_lead), new ComparableStack(ModItems.nuclear_waste, 4))
+				.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, EnumSandType.LEAD), new ComparableStack(ModItems.nuclear_waste, 4))
 				.outputItems(new ItemStack(ModItems.nuclear_waste_vitrified, 4)));
 		
 		// Schrabidium

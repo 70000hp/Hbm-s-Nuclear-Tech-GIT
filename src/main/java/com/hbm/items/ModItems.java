@@ -591,6 +591,8 @@ public class ModItems {
 	public static Item casing;
 
 	public static Item cable_drum;
+	public static Item wrench;
+
 	public static Item shell;
 	public static Item pipe;
 	public static Item fins_flat;
@@ -1484,6 +1486,7 @@ public class ModItems {
 	public static Item gun_n_i_4_n_i;
 
 	public static Item gun_charge_thrower;
+	public static Item gun_drill;
 
 	public static Item ammo_standard;
 	public static Item ammo_secret;
@@ -1963,7 +1966,6 @@ public class ModItems {
 
 	public static Item crowbar;
 
-	public static Item wrench;
 	public static Item wrench_flipped;
 	public static Item memespoon;
 
@@ -2226,14 +2228,11 @@ public class ModItems {
 	public static Item orange6;
 	public static Item orange7;
 	public static Item orange8;
+
 	public static Item nothing;
+	public static Item broken_item;
 
 	public static Item achievement_icon;
-	public static Item bob_metalworks;
-	public static Item bob_assembly;
-	public static Item bob_chemistry;
-	public static Item bob_oil;
-	public static Item bob_nuclear;
 
 	public static Item mysteryshovel;
 	public static Item memory;
@@ -2805,6 +2804,7 @@ public class ModItems {
 		arcade_parts = new ItemArcadeComponent().setUnlocalizedName("arcade_parts").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":arcade_parts");
 
 		cable_drum = new ItemWiring().setUnlocalizedName("wiring_red_copper").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":wiring_red_copper");
+		wrench = new ItemWrench(MainRegistry.tMatSteel).setUnlocalizedName("wrench").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":wrench");
 
 		pellet_rtg_depleted = new ItemRTGPelletDepleted().setContainerItem(plate_iron).setUnlocalizedName("pellet_rtg_depleted").setCreativeTab(MainRegistry.controlTab);
 
@@ -3844,7 +3844,7 @@ public class ModItems {
 		glyphid_meat_grilled = new ItemLemon(8, 0.75F, true).setPotionEffect(Potion.damageBoost.id, 180, 1, 1F).setUnlocalizedName("glyphid_meat_grilled").setCreativeTab(MainRegistry.consumableTab).setTextureName(RefStrings.MODID + ":glyphid_meat_grilled");
 		egg_glyphid = new Item().setUnlocalizedName("egg_glyphid").setCreativeTab(MainRegistry.consumableTab).setTextureName(RefStrings.MODID + ":egg_glyphid");
 
-		defuser = new ItemTooling(ToolType.DEFUSER, 100).setUnlocalizedName("defuser").setMaxStackSize(1).setFull3D().setCreativeTab(MainRegistry.nukeTab).setTextureName(RefStrings.MODID + ":defuser");
+		defuser = new ItemDefuser(ToolType.DEFUSER, 100).setUnlocalizedName("defuser").setMaxStackSize(1).setFull3D().setCreativeTab(MainRegistry.nukeTab).setTextureName(RefStrings.MODID + ":defuser");
 		reacher = new Item().setUnlocalizedName("reacher").setMaxStackSize(1).setFull3D().setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":reacher");
 		bismuth_tool = new ItemAmatExtractor().setUnlocalizedName("bismuth_tool").setMaxStackSize(1).setFull3D().setCreativeTab(null).setTextureName(RefStrings.MODID + ":bismuth_tool");
 		meltdown_tool = new ItemDyatlov().setUnlocalizedName("meltdown_tool").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":meltdown_tool");
@@ -4553,15 +4553,15 @@ public class ModItems {
 				.addAbility(IWeaponAbility.STUN, 2).setUnlocalizedName("elec_sword").setTextureName(RefStrings.MODID + ":elec_sword_anim");
 
 		elec_pickaxe = new ItemToolAbilityPower(6F, 0, MainRegistry.tMatElec, EnumToolType.PICKAXE, 500000, 1000, 100)
-				.addAbility(IToolAreaAbility.HAMMER, 1)
-				.addAbility(IToolAreaAbility.HAMMER_FLAT, 1)
+				.addAbility(IToolAreaAbility.HAMMER, 0)
+				.addAbility(IToolAreaAbility.HAMMER_FLAT, 0)
 				.addAbility(IToolAreaAbility.RECURSION, 2)
 				.addAbility(IToolHarvestAbility.SILK, 0)
 				.addAbility(IToolHarvestAbility.LUCK, 1).setUnlocalizedName("elec_pickaxe").setTextureName(RefStrings.MODID + ":elec_drill_anim");
 
 		elec_axe = new ItemToolAbilityPower(10F, 0, MainRegistry.tMatElec, EnumToolType.AXE, 500000, 1000, 100)
-				.addAbility(IToolAreaAbility.HAMMER, 1)
-				.addAbility(IToolAreaAbility.HAMMER_FLAT, 1)
+				.addAbility(IToolAreaAbility.HAMMER, 0)
+				.addAbility(IToolAreaAbility.HAMMER_FLAT, 0)
 				.addAbility(IToolAreaAbility.RECURSION, 2)
 				.addAbility(IToolHarvestAbility.SILK, 0)
 				.addAbility(IToolHarvestAbility.LUCK, 1)
@@ -4569,8 +4569,8 @@ public class ModItems {
 				.addAbility(IWeaponAbility.BEHEADER, 0).setShears().setUnlocalizedName("elec_axe").setTextureName(RefStrings.MODID + ":elec_chainsaw_anim");
 
 		elec_shovel = new ItemToolAbilityPower(5F, 0, MainRegistry.tMatElec, EnumToolType.SHOVEL, 500000, 1000, 100)
-				.addAbility(IToolAreaAbility.HAMMER, 1)
-				.addAbility(IToolAreaAbility.HAMMER_FLAT, 1)
+				.addAbility(IToolAreaAbility.HAMMER, 0)
+				.addAbility(IToolAreaAbility.HAMMER_FLAT, 0)
 				.addAbility(IToolAreaAbility.RECURSION, 2)
 				.addAbility(IToolHarvestAbility.SILK, 0)
 				.addAbility(IToolHarvestAbility.LUCK, 1).setUnlocalizedName("elec_shovel").setTextureName(RefStrings.MODID + ":elec_shovel_anim");
@@ -4681,7 +4681,7 @@ public class ModItems {
 				.addAbility(IToolHarvestAbility.LUCK, 1)
 				.addAbility(IToolAreaAbility.HAMMER, 1)
 				.addAbility(IToolAreaAbility.HAMMER_FLAT, 1)
-				.addAbility(IToolAreaAbility.RECURSION, 2).setUnlocalizedName("drax").setTextureName(RefStrings.MODID + ":drax");
+				.addAbility(IToolAreaAbility.RECURSION, 2).setUnlocalizedName("drax").setCreativeTab(null).setTextureName(RefStrings.MODID + ":drax");
 		drax_mk2 = new ItemToolAbilityPower(15F, -0.05, MainRegistry.tMatElec, EnumToolType.MINER, 1000000000, 250000, 7500)
 				.addAbility(IToolHarvestAbility.SMELTER, 0)
 				.addAbility(IToolHarvestAbility.SHREDDER, 0)
@@ -4689,7 +4689,7 @@ public class ModItems {
 				.addAbility(IToolHarvestAbility.LUCK, 2)
 				.addAbility(IToolAreaAbility.HAMMER, 2)
 				.addAbility(IToolAreaAbility.HAMMER_FLAT, 2)
-				.addAbility(IToolAreaAbility.RECURSION, 4).setUnlocalizedName("drax_mk2").setTextureName(RefStrings.MODID + ":drax_mk2");
+				.addAbility(IToolAreaAbility.RECURSION, 4).setUnlocalizedName("drax_mk2").setCreativeTab(null).setTextureName(RefStrings.MODID + ":drax_mk2");
 		drax_mk3 = new ItemToolAbilityPower(20F, -0.05, MainRegistry.tMatElec, EnumToolType.MINER, 2500000000L, 500000, 10000)
 				.addAbility(IToolHarvestAbility.SMELTER, 0)
 				.addAbility(IToolHarvestAbility.SHREDDER, 0)
@@ -4698,7 +4698,7 @@ public class ModItems {
 				.addAbility(IToolHarvestAbility.LUCK, 3)
 				.addAbility(IToolAreaAbility.HAMMER, 3)
 				.addAbility(IToolAreaAbility.HAMMER_FLAT, 3)
-				.addAbility(IToolAreaAbility.RECURSION, 5).setUnlocalizedName("drax_mk3").setTextureName(RefStrings.MODID + ":drax_mk3");
+				.addAbility(IToolAreaAbility.RECURSION, 5).setUnlocalizedName("drax_mk3").setCreativeTab(null).setTextureName(RefStrings.MODID + ":drax_mk3");
 
 		ToolMaterial matBismuth = EnumHelper.addToolMaterial("HBM_BISMUTH", 4, 0, 50F, 0.0F, 200).setRepairItem(new ItemStack(ModItems.ingot_bismuth));
 		bismuth_pickaxe = new ItemToolAbility(15F, 0, matBismuth, EnumToolType.MINER)
@@ -4863,7 +4863,6 @@ public class ModItems {
 		matchstick = new ItemMatch().setUnlocalizedName("matchstick").setCreativeTab(CreativeTabs.tabTools).setFull3D().setTextureName(RefStrings.MODID + ":matchstick");
 		balefire_and_steel = new ItemBalefireMatch().setUnlocalizedName("balefire_and_steel").setCreativeTab(CreativeTabs.tabTools).setFull3D().setTextureName(RefStrings.MODID + ":balefire_and_steel");
 		crowbar = new ModSword(MainRegistry.tMatSteel).setUnlocalizedName("crowbar").setFull3D().setTextureName(RefStrings.MODID + ":crowbar");
-		wrench = new WeaponSpecial(MainRegistry.tMatSteel).setUnlocalizedName("wrench").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":wrench");
 		wrench_flipped = new WeaponSpecial(MainRegistry.tMatElec).setUnlocalizedName("wrench_flipped").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":wrench_flipped");
 		memespoon = new WeaponSpecial(MainRegistry.tMatSteel).setUnlocalizedName("memespoon").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":memespoon");
 		wood_gavel = new WeaponSpecial(ToolMaterial.WOOD).setUnlocalizedName("wood_gavel").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":wood_gavel");
@@ -4966,15 +4965,11 @@ public class ModItems {
 		orange6 = new Item().setUnlocalizedName("orange6").setTextureName(RefStrings.MODID + ":orange6");
 		orange7 = new Item().setUnlocalizedName("orange7").setTextureName(RefStrings.MODID + ":orange7");
 		orange8 = new Item().setUnlocalizedName("orange8").setTextureName(RefStrings.MODID + ":orange8");
-		nothing = new Item().setUnlocalizedName("nothing").setTextureName(RefStrings.MODID + ":nothing");
 
+		nothing = new Item().setUnlocalizedName("nothing").setTextureName(RefStrings.MODID + ":nothing");
+		broken_item = new BrokenItem().setUnlocalizedName("broken_item").setTextureName(RefStrings.MODID + ":broken_item");
 
 		achievement_icon = new ItemEnumMulti(ItemEnums.EnumAchievementType.class, true, true).setUnlocalizedName("achievement_icon");
-		bob_metalworks = new Item().setUnlocalizedName("bob_metalworks").setTextureName(RefStrings.MODID + ":bob_metalworks");
-		bob_assembly = new Item().setUnlocalizedName("bob_assembly").setTextureName(RefStrings.MODID + ":bob_assembly");
-		bob_chemistry = new Item().setUnlocalizedName("bob_chemistry").setTextureName(RefStrings.MODID + ":bob_chemistry");
-		bob_oil = new Item().setUnlocalizedName("bob_oil").setTextureName(RefStrings.MODID + ":bob_oil");
-		bob_nuclear = new Item().setUnlocalizedName("bob_nuclear").setTextureName(RefStrings.MODID + ":bob_nuclear");
 
 		mysteryshovel = new ItemMS().setUnlocalizedName("mysteryshovel").setFull3D().setMaxStackSize(1).setTextureName(RefStrings.MODID + ":cursed_shovel");
 		memory = new ItemBattery(Long.MAX_VALUE / 100L, 100000000000000L, 100000000000000L).setUnlocalizedName("memory").setMaxStackSize(1).setTextureName(RefStrings.MODID + ":mo8_anim");
@@ -6425,6 +6420,7 @@ public class ModItems {
 
 		GameRegistry.registerItem(gun_fireext, gun_fireext.getUnlocalizedName());
 		GameRegistry.registerItem(gun_charge_thrower, gun_charge_thrower.getUnlocalizedName());
+		GameRegistry.registerItem(gun_drill, gun_drill.getUnlocalizedName());
 
 		GameRegistry.registerItem(ammo_standard, ammo_standard.getUnlocalizedName());
 		GameRegistry.registerItem(ammo_secret, ammo_secret.getUnlocalizedName());
@@ -7175,16 +7171,14 @@ public class ModItems {
 		GameRegistry.registerItem(orange6, orange6.getUnlocalizedName());
 		GameRegistry.registerItem(orange7, orange7.getUnlocalizedName());
 		GameRegistry.registerItem(orange8, orange8.getUnlocalizedName());
-		GameRegistry.registerItem(nothing, nothing.getUnlocalizedName());
 		GameRegistry.registerItem(achievement_icon, achievement_icon.getUnlocalizedName());
-		GameRegistry.registerItem(bob_metalworks, bob_metalworks.getUnlocalizedName());
-		GameRegistry.registerItem(bob_assembly, bob_assembly.getUnlocalizedName());
-		GameRegistry.registerItem(bob_chemistry, bob_chemistry.getUnlocalizedName());
-		GameRegistry.registerItem(bob_oil, bob_oil.getUnlocalizedName());
-		GameRegistry.registerItem(bob_nuclear, bob_nuclear.getUnlocalizedName());
+
 		GameRegistry.registerItem(mysteryshovel, mysteryshovel.getUnlocalizedName());
 		GameRegistry.registerItem(memory, memory.getUnlocalizedName());
 		GameRegistry.registerItem(conveyor_wand, conveyor_wand.getUnlocalizedName());
+
+		GameRegistry.registerItem(nothing, nothing.getUnlocalizedName());
+		GameRegistry.registerItem(broken_item, broken_item.getUnlocalizedName());
 	}
 
 	public static void addRemap(String unloc, Item item, Enum sub) {

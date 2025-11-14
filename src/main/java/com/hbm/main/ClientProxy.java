@@ -75,6 +75,7 @@ import com.hbm.tileentity.bomb.*;
 import com.hbm.tileentity.deco.*;
 import com.hbm.tileentity.machine.*;
 import com.hbm.tileentity.machine.albion.*;
+import com.hbm.tileentity.machine.fusion.*;
 import com.hbm.tileentity.machine.oil.*;
 import com.hbm.tileentity.machine.rbmk.*;
 import com.hbm.tileentity.machine.storage.*;
@@ -386,6 +387,7 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPylonMedium.class, new RenderPylonMedium());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPylonLarge.class, new RenderPylonLarge());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySubstation.class, new RenderSubstation());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPipeAnchor.class, new RenderPipeAnchor());
 		//chargers
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCharger.class, new RenderCharger());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRefueler.class, new RenderRefueler());
@@ -421,6 +423,13 @@ public class ClientProxy extends ServerProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMachinePlasmaHeater.class, new RenderPlasmaHeater());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityICF.class, new RenderICF());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityICFController.class, new RenderICFController());
+		//Fusion
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionTorusStruct.class, new RenderFusionTorusMultiblock());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionTorus.class, new RenderFusionTorus());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionKlystron.class, new RenderFusionKlystron());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionBreeder.class, new RenderFusionBreeder());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionCollector.class, new RenderFusionCollector());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFusionBoiler.class, new RenderFusionBoiler());
 		//Watz
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWatz.class, new RenderWatz());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityWatzPump.class, new RenderWatzPump());
@@ -1196,7 +1205,8 @@ public class ClientProxy extends ServerProxy {
 				if("blockdust".equals(data.getString("mode"))) {
 
 					Block b = Block.getBlockById(data.getInteger("block"));
-					fx = new net.minecraft.client.particle.EntityBlockDustFX(world, x, y, z, mX, mY + 0.2, mZ, b, 0);
+					int m = data.getByte("meta");
+					fx = new net.minecraft.client.particle.EntityBlockDustFX(world, x, y, z, mX, mY + 0.2, mZ, b, m);
 					ReflectionHelper.setPrivateValue(EntityFX.class, fx, 50 + rand.nextInt(50), "particleMaxAge", "field_70547_e");
 				}
 
