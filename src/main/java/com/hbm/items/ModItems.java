@@ -590,7 +590,7 @@ public class ModItems {
 
 	public static Item casing;
 
-	public static Item wiring_red_copper;
+	public static Item cable_drum;
 	public static Item shell;
 	public static Item pipe;
 	public static Item fins_flat;
@@ -2804,7 +2804,7 @@ public class ModItems {
 		casing = new ItemEnumMulti(ItemEnums.EnumCasingType.class, true, true).setUnlocalizedName("casing").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":casing");
 		arcade_parts = new ItemArcadeComponent().setUnlocalizedName("arcade_parts").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":arcade_parts");
 
-		wiring_red_copper = new ItemWiring().setUnlocalizedName("wiring_red_copper").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":wiring_red_copper");
+		cable_drum = new ItemWiring().setUnlocalizedName("wiring_red_copper").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":wiring_red_copper");
 
 		pellet_rtg_depleted = new ItemRTGPelletDepleted().setContainerItem(plate_iron).setUnlocalizedName("pellet_rtg_depleted").setCreativeTab(MainRegistry.controlTab);
 
@@ -5611,7 +5611,7 @@ public class ModItems {
 		GameRegistry.registerItem(assembly_nuke, assembly_nuke.getUnlocalizedName());
 
 		//Wiring
-		GameRegistry.registerItem(wiring_red_copper, wiring_red_copper.getUnlocalizedName());
+		GameRegistry.registerItem(cable_drum, cable_drum.getUnlocalizedName());
 
 		//Flame War in a Box
 		GameRegistry.registerItem(flame_pony, flame_pony.getUnlocalizedName());

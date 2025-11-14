@@ -267,9 +267,10 @@ public class CompatRecipeRegistry {
 		if(output == null && fluid == null) return;
 		ArcFurnaceRecipes.recipeList.add(new Pair(input, new ArcFurnaceRecipe().solid(output).fluid(fluid)));
 	}
+	/*
 	public static void registerBobmazon(ItemStack output, AStack[] input, int requirement) {
 		BobmazonArcadeOffers.recipes.add(new BobmazonArcadeOffers.ArcadeOffer(output, BobmazonArcadeOffers.Requirement.values()[requirement], input));
-	}
+	}*/
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////

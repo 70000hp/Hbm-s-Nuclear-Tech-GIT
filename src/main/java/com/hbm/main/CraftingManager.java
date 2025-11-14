@@ -146,7 +146,6 @@ public class CraftingManager {
 		addRecipeAuto(new ItemStack(ModItems.gas_empty, 2), new Object[] { "S ", "AA", "AA", 'A', STEEL.plate(), 'S', CU.plate() });
 		addShapelessAuto(new ItemStack(ModBlocks.block_waste_painted, 1), new Object[] { KEY_YELLOW, ModBlocks.block_waste });
 
-
 		addRecipeAuto(new ItemStack(ModItems.ingot_aluminium, 1), new Object[] { "###", "###", "###", '#', AL.wireFine() });
 		addRecipeAuto(new ItemStack(ModItems.ingot_copper, 1), new Object[] { "###", "###", "###", '#', CU.wireFine() });
 		addRecipeAuto(new ItemStack(ModItems.ingot_tungsten, 1), new Object[] { "###", "###", "###", '#', W.wireFine() });
@@ -580,7 +579,7 @@ public class CraftingManager {
 		addRecipeAuto(new ItemStack(ModItems.battery_sc_lead), new Object[] { "NBN", "PCP", "NBN", 'N', TA.nugget(), 'B', PB209.billet(), 'P', ANY_PLASTIC.ingot(), 'C', ModItems.battery_sc_gold });
 		addRecipeAuto(new ItemStack(ModItems.battery_sc_americium), new Object[] { "NBN", "PCP", "NBN", 'N', TA.nugget(), 'B', AM241.billet(), 'P', ANY_PLASTIC.ingot(), 'C', ModItems.battery_sc_lead });
 
-		addRecipeAuto(new ItemStack(ModItems.wiring_red_copper, 1), new Object[] { "PPP", "PIP", "PPP", 'P', STEEL.plate(), 'I', STEEL.ingot() });
+		addRecipeAuto(new ItemStack(ModItems.cable_drum, 1), new Object[] { "PPP", "PIP", "PPP", 'P', STEEL.plate(), 'I', STEEL.ingot() });
 
 		addRecipeAuto(new ItemStack(ModItems.jetpack_tank, 1), new Object[] { " S ", "BKB", " S ", 'S', STEEL.plate(), 'B', STEEL.bolt(), 'K', Fluids.KEROSENE.getDict(1000) });
 		addShapelessAuto(new ItemStack(ModItems.gun_kit_1, 1), new Object[] { ANY_RUBBER.ingot(), Fluids.WOODOIL.getDict(1_000), IRON.ingot() });
@@ -698,7 +697,7 @@ public class CraftingManager {
 		for(int i = 1; i < Fluids.getAll().length; ++i) {
 			ItemStack id = new ItemStack(ModItems.fluid_identifier_multi, 1, i);
 			ItemFluidIDMulti.setType(id, Fluids.fromID(i), true);
-			
+
 			addShapelessAuto(new ItemStack(ModItems.fluid_duct, 1, i), new Object[] { new ItemStack(ModBlocks.fluid_duct_neo, 1), id });
 
 			addShapelessAuto(new ItemStack(ModItems.fluid_duct, 8, i),

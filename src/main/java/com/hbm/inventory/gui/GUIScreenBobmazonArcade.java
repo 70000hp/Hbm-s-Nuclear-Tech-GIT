@@ -1,12 +1,14 @@
 package com.hbm.inventory.gui;
 
-import com.hbm.inventory.recipes.BobmazonArcadeOffers.*;
+import com.hbm.inventory.recipes.BobmazonArcadeOffers;
+import com.hbm.inventory.recipes.BobmazonArcadeOffers.ArcadeOffer;
 import com.hbm.items.ModItems;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.toserver.ItemBobmazonArcadePacket;
-import com.hbm.packet.toserver.ItemBobmazonPacket;
+import com.hbm.packet.toserver.NBTItemControlPacket;
+import cpw.mods.fml.common.Mod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
@@ -14,7 +16,10 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +29,6 @@ import org.lwjgl.opengl.GL12;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class GUIScreenBobmazonArcade extends GuiScreen {
 
@@ -34,13 +38,24 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 	protected int guiLeft;
 	protected int guiTop;
 	int currentPage = 0;
-	List<ArcadeOffer> offers;
+	List<String> offers = new ArrayList<>();
 	List<FolderButton> buttons = new ArrayList<FolderButton>();
 	private final EntityPlayer player;
+	public ItemStack stack;
 
-	public GUIScreenBobmazonArcade(EntityPlayer player, List<ArcadeOffer> offers) {
+	public GUIScreenBobmazonArcade(EntityPlayer player) {
 		this.player = player;
-		this.offers = offers;
+		if(player.getHeldItem().getItem() == ModItems.bobmazon_arcade && player.getHeldItem().hasTagCompound()) {
+			stack = player.getHeldItem();
+			if(stack.stackTagCompound.hasKey("selections")){
+				NBTTagList list = stack.stackTagCompound.getTagList("selections", 10);
+				if(list.tagCount() > 0)
+					for (Object obj : list.tagList){
+						NBTTagCompound tag = (NBTTagCompound) obj;
+						offers.add(tag.getString("selection"));
+					}
+			}
+		}
 	}
 
 	int getPageCount() {
@@ -86,6 +101,11 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 			buttons.add(new FolderButton(guiLeft + 25 - 18, guiTop + 26 + (27 * 3), 1, "Previous"));
 		if(currentPage != getPageCount())
 			buttons.add(new FolderButton(guiLeft + 25 + (27 * 4) + 18 + 41, guiTop + 26 + (27 * 3), 2, "Next"));
+
+		buttons.add(new FolderButton(guiLeft + 64, guiTop + 199, 4, "Buy All/Right Click To CLear"));
+
+		buttons.add(new FolderButton(guiLeft + 133, guiTop + 199, 3, "Browse Offers"));
+
 	}
 
 	@Override
@@ -93,7 +113,7 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 		try {
 			for(FolderButton b : buttons)
 				if(b.isMouseOnButton(i, j))
-					b.executeAction();
+					b.executeAction(this, k);
 		} catch(Exception ex) {
 			updateButtons();
 		}
@@ -112,7 +132,7 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 
 			int x = guiLeft + 34;
 			int y = guiTop + 53 + (54 * (int) Math.floor(d)) - currentPage * 3 * 54;
-			ArcadeOffer offer = offers.get(d);
+			ArcadeOffer offer = BobmazonArcadeOffers.searchMap.get(offers.get(d));
 
 			for(int i = 0; i < offer.cost.length; i++) {
 				if (x + i * 18 < mouseX && x + i * 18 + 18 > mouseX && y < mouseY && y + 18 > mouseY) {
@@ -132,9 +152,10 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 		for(FolderButton b : buttons)
 			b.drawIcon(b.isMouseOnButton(mouseX, mouseY));
 
-		for(int d = currentPage * 3; d < Math.min(currentPage * 3 + 3, offers.size()); d++) {
-			drawRequirement(offers.get(d), guiLeft + 34, guiTop + 53 + (54 * (int) Math.floor(d)) - currentPage * 3 * 54);
-		}
+		if(!offers.isEmpty())
+			for(int d = currentPage * 3; d < Math.min(currentPage * 3 + 3, offers.size()); d++) {
+				drawRequirement(offers.get(d), guiLeft + 34, guiTop + 53 + (54 * (int) Math.floor(d)) - currentPage * 3 * 54);
+			}
 	}
 
 	@Override
@@ -144,8 +165,9 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 		}
 	}
 
-	protected void drawRequirement(ArcadeOffer offer, int x, int y) {
-		ItemStack product = offer.product;
+	protected void drawRequirement(String offer, int x, int y) {
+		ArcadeOffer arcadeOffer = BobmazonArcadeOffers.searchMap.get(offer);
+		ItemStack product = arcadeOffer.product;
 
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderHelper.enableGUIStandardItemLighting();
@@ -153,9 +175,9 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-		this.drawTexturedModalRect(x + 19, y - 12, 176 + 41, 62, 39, 8);
-		this.drawTexturedModalRect(x + 19, y - 12, 176 + 41, 54, 4, 8);
-		for(int i = 1; i < offer.cost.length; i++)
+		this.drawTexturedModalRect(x + 19, y - 12, 176 + 41, 90, 39, 8);
+		this.drawTexturedModalRect(x + 19, y - 12, 176 + 41, 98, 4, 8);
+		for(int i = 1; i < arcadeOffer.cost.length; i++)
 			this.drawTexturedModalRect(x + i * 18, y, 34, 53, 18, 18);
 
 		String count = "";
@@ -169,12 +191,11 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 		GL11.glPopMatrix();
 
 		GL11.glEnable(GL11.GL_LIGHTING);
-		for(int i = 0; i < offer.cost.length; i++) {
-			ItemStack stack = offer.cost[i].extractForCyclingDisplay(20);
+		for(int i = 0; i < arcadeOffer.cost.length; i++) {
+			ItemStack stack = arcadeOffer.cost[i].extractForCyclingDisplay(20);
 
 			itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), stack, x + 1 + i * 18, y + 1);
 			itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), stack, x + 1 + i * 18, y + 1, stack.stackSize > 1 ? (stack.stackSize + "") : null);
-
 		}
 
 	}
@@ -183,10 +204,10 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 
 		int xPos;
 		int yPos;
-		// 0: regular, 1: prev, 2: next
+		// 0: regular, 1: prev, 2: next, 3: order all (shopping cart), 4: search
 		int type;
 		String info;
-		ArcadeOffer offer;
+		String offer;
 
 		public FolderButton(int x, int y, int t, String i) {
 			xPos = x;
@@ -195,7 +216,7 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 			info = i;
 		}
 
-		public FolderButton(int x, int y, ArcadeOffer offer) {
+		public FolderButton(int x, int y, String offer) {
 			xPos = x;
 			yPos = y;
 			type = 0;
@@ -211,7 +232,11 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 
 		public void drawButton(boolean b) {
 			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-			drawTexturedModalRect(xPos, yPos, b ? 176 + 41 + 18 : 176 + 41, type == 1 ? 18 : (type == 2 ? 36 : 0), 18, 18);
+
+			if(type < 3)
+				drawTexturedModalRect(xPos, yPos, b ? 176 + 41 + 18 : 176 + 41, type == 1 ? 18 : (type == 2 ? 18 * 2 : 0), 18, 18);
+			else
+				drawTexturedModalRect(xPos, yPos, b ? 176 + 41 + 18 : 176 + 41, type == 3 ? 18 * 3: (type == 4 ? 18 * 4: 0), 18, 18);
 		}
 
 		public void drawIcon(boolean b) {
@@ -220,7 +245,7 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 				if(offer != null) {
 					RenderHelper.enableGUIStandardItemLighting();
-					ItemStack stack = offer.product;
+					ItemStack stack = BobmazonArcadeOffers.searchMap.get(offer).product;
 
 					itemRender.renderItemAndEffectIntoGUI(fontRendererObj, mc.getTextureManager(), stack, xPos + 1, yPos + 1);
 					itemRender.renderItemOverlayIntoGUI(fontRendererObj, mc.getTextureManager(), stack, xPos + 1, yPos + 1, stack.stackSize > 1 ? (stack.stackSize + "") : null);
@@ -233,23 +258,63 @@ public class GUIScreenBobmazonArcade extends GuiScreen {
 			if(info == null || info.isEmpty())
 				return;
 
-			func_146283_a(Arrays.asList(new String[] { info }), x, y);
+			func_146283_a(Arrays.asList(info), x, y);
 		}
 
-		public void executeAction() {
+		public void executeAction(GUIScreenBobmazonArcade instance, int keyTyped) {
 			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
-			if(type == 0) {
-				PacketDispatcher.wrapper.sendToServer(new ItemBobmazonArcadePacket(player, offer));
-			} else if(type == 1) {
-				if(currentPage > 0)
-					currentPage--;
-				updateButtons();
-			} else if(type == 2) {
-				if(currentPage < getPageCount())
-					currentPage++;
-				updateButtons();
+
+			switch (type){
+				case 1 -> {
+					if(currentPage > 0)
+						currentPage--;
+					updateButtons();
+				}
+				case 2 -> {
+					if(currentPage < getPageCount())
+						currentPage++;
+					updateButtons();
+				}
+				case 3 -> {
+					GUIScreenOfferSelector.openSelector(new ArrayList<>(), 0, null, instance);
+				}
+				case 4 -> {
+					if(keyTyped == 0) {
+						for (String offer1 : offers) {
+							PacketDispatcher.wrapper.sendToServer(new ItemBobmazonArcadePacket(player, BobmazonArcadeOffers.searchMap.get(offer1)));
+						}
+					} else {
+						offers.clear();
+						updateButtons();
+						refreshRecipes((ArrayList<String>) offers, true);
+					}
+
+
+				}
+				default ->{
+					if(keyTyped == 0)
+						PacketDispatcher.wrapper.sendToServer(new ItemBobmazonArcadePacket(player, BobmazonArcadeOffers.searchMap.get(offer)));
+					else {
+						offers.remove(offer);
+						updateButtons();
+					}
+				}
 			}
 		}
+	}
+
+	public void refreshRecipes(ArrayList<String> selections, boolean purgeRecipes){
+		if(purgeRecipes) offers.clear();
+		offers.addAll(selections);
+		NBTTagList selectionsnbt = new NBTTagList();
+		for (String str : offers) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setString("selection", str);
+			selectionsnbt.appendTag(nbt);
+		}
+		NBTTagCompound selectionList = new NBTTagCompound();
+		selectionList.setTag("selections", selectionsnbt);
+		PacketDispatcher.wrapper.sendToServer(new NBTItemControlPacket(selectionList));
 	}
 
 	@Override

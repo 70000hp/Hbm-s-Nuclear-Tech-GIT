@@ -141,9 +141,9 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputItems(new ItemStack(ModBlocks.concrete_smooth, 16)));
 
 		this.register(new GenericRecipe("chem.concreteasbestos").setup(100, 100)
-				.inputItems(new ComparableStack(ModItems.powder_cement, 4), new OreDictStack(ASBESTOS.ingot(), (GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSimpleChemsitry) ? 1 : 4), new OreDictStack(KEY_SAND, 8))
-				.inputFluids(new FluidStack(Fluids.WATER, 2_000))
-				.outputItems(new ItemStack(ModBlocks.concrete_asbestos, 16)));
+				.inputItems(new OreDictStack(ASBESTOS.ingot(), 1))
+				.inputFluids(new FluidStack(Fluids.CONCRETE, 32_000), new FluidStack(Fluids.SODIUM, 500))
+				.outputItems(new ItemStack(ModBlocks.concrete_asbestos, 8)));
 
 		this.register(new GenericRecipe("chem.ducrete").setup(150, 100)
 				.inputItems(new ComparableStack(ModItems.powder_cement, 4), new OreDictStack(FERRO.ingot()), new OreDictStack(KEY_SAND, 8))
@@ -151,7 +151,7 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputItems(new ItemStack(ModBlocks.ducrete_smooth, 8)));
 
 		this.register(new GenericRecipe("chem.liquidconk").setup(100, 100)
-				.inputItems(new ComparableStack(ModItems.powder_cement, 1), new ComparableStack(Blocks.gravel, 8), new OreDictStack(KEY_SAND, 8))
+				.inputItems(new ComparableStack(ModItems.powder_cement, 1), new ComparableStack(Blocks.gravel, 4), new OreDictStack(KEY_SAND, 4))
 				.inputFluids(new FluidStack(Fluids.WATER, 2_000))
 				.outputFluids(new FluidStack(Fluids.CONCRETE, 16_000)));
 
@@ -206,7 +206,7 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputFluids(new FluidStack(Fluids.ENDERJUICE, 100)));
 
 		this.register(new GenericRecipe("chem.meatprocessing").setupNamed(200, 200).setIcon(ModItems.glyphid_meat)
-				.inputItems(new OreDictStack(KEY_GLYPHID_MEAT, 3))
+				.inputItems(new OreDictStack(KEY_GLYPHID_MEAT, 2))
 				.inputFluids(new FluidStack(Fluids.WATER, 1_000))
 				.outputItems(new ItemStack(ModItems.sulfur, 4), new ItemStack(ModItems.niter, 3))
 				.outputFluids(new FluidStack(Fluids.SALIENT, 250)));

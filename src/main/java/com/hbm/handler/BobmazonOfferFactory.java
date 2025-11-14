@@ -26,9 +26,9 @@ public class BobmazonOfferFactory {
 
 	public static List<Offer> standard = new ArrayList();
 	public static List<Offer> special = new ArrayList();
-	
+
 	public static void init() {
-		
+
 		standard.clear();
 		special.clear();
 
@@ -106,7 +106,7 @@ public class BobmazonOfferFactory {
 		special.add(new Offer(new ItemStack(ModItems.mysteryshovel, 1), Requirement.HIDDEN, 16));
 		special.add(new Offer(new ItemStack(ModBlocks.ntm_dirt, 1), Requirement.HIDDEN, 16));
 		special.add(new Offer(new ItemStack(ModItems.euphemium_kit, 1), Requirement.HIDDEN, 64));
-		
+
 		special.add(new Offer(ItemKitCustom.create("Fusion Man", "For the nuclear physicist on the go", 0xff00ff, 0x800080,
 				new ItemStack(ModBlocks.iter),
 				new ItemStack(ModBlocks.plasma_heater),
@@ -124,14 +124,14 @@ public class BobmazonOfferFactory {
 				new ItemStack(ModBlocks.substation, 4),
 				new ItemStack(ModBlocks.red_pylon, 16),
 				new ItemStack(ModBlocks.red_connector, 64),
-				new ItemStack(ModItems.wiring_red_copper, 1),
+				new ItemStack(ModItems.cable_drum, 1),
 				new ItemStack(ModBlocks.machine_chungus, 1),
 				new ItemStack(ModBlocks.machine_large_turbine, 3),
 				new ItemStack(ModItems.template_folder, 1),
 				new ItemStack(Items.paper, 64),
 				new ItemStack(Items.dye, 64)
 				), Requirement.HIDDEN, 64));
-		
+
 		special.add(new Offer(ItemKitCustom.create("Maid's Cleaning Utensils", "For the hard to reach spots", 0x00ff00, 0x008000,
 				new ItemStack(ModItems.gun_m2),
 				new ItemStack(ModItems.ammo_standard, 64, EnumAmmo.BMG50_DU.ordinal()),
@@ -146,14 +146,14 @@ public class BobmazonOfferFactory {
 				new ItemStack(ModItems.ammo_standard, 64, EnumAmmo.G12_EXPLOSIVE.ordinal()),
 				new ItemStack(ModItems.ammo_standard, 64, EnumAmmo.G12_EXPLOSIVE.ordinal())
 				), Requirement.HIDDEN, 64));
-		
+
 		special.add(new Offer(ItemKitNBT.create(
 				new ItemStack(ModItems.rod_of_discord).setStackDisplayName("Cock Joke"),
 				ModItems.canned_conserve.stackFromEnum(64, EnumFoodType.JIZZ).setStackDisplayName("Class A Horse Semen"),
 				new ItemStack(ModItems.pipe_lead).setStackDisplayName("Get Nutted, Dumbass"),
 				new ItemStack(ModItems.gem_alexandrite)
 				).setStackDisplayName("The Nut Bucket"), Requirement.HIDDEN, 64));
-		
+
 		special.add(new Offer(ItemKitNBT.create(
 				new ItemStack(ModItems.rpa_helmet),
 				new ItemStack(ModItems.rpa_plate),
@@ -165,14 +165,14 @@ public class BobmazonOfferFactory {
 				new ItemStack(ModItems.ammo_standard, 64, EnumAmmo.CAPACITOR_OVERCHARGE.ordinal())
 				).setStackDisplayName("Frenchie's Reward"), Requirement.HIDDEN, 32));
 	}
-	
+
 	public static List<Offer> getOffers(ItemStack stack) {
-		
+
 		if(stack != null) {
 			if(stack.getItem() == ModItems.bobmazon) return standard;
 			if(stack.getItem() == ModItems.bobmazon_hidden) return special;
 		}
-		
+
 		return null;
 	}
 

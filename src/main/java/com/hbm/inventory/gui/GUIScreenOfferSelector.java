@@ -1,20 +1,8 @@
 package com.hbm.inventory.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import com.hbm.interfaces.IControlReceiver;
-import com.hbm.inventory.recipes.loader.GenericRecipe;
-import com.hbm.inventory.recipes.loader.GenericRecipes;
+import com.hbm.inventory.recipes.BobmazonArcadeOffers;
+import com.hbm.inventory.recipes.BobmazonArcadeOffers.ArcadeOffer;
 import com.hbm.lib.RefStrings;
-import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.toserver.NBTControlPacket;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -24,13 +12,19 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
-public class GUIScreenRecipeSelector extends GuiScreen {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class GUIScreenOfferSelector extends GuiScreen {
 
 	protected static final ResourceLocation texture = new ResourceLocation(RefStrings.MODID + ":textures/gui/processing/gui_recipe_selector.png");
 
@@ -40,32 +34,25 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 	protected int guiLeft;
 	protected int guiTop;
 	// search crap
-	protected GenericRecipes recipeSet;
-	protected List<GenericRecipe> recipes = new ArrayList();
+	protected List<BobmazonArcadeOffers.ArcadeOffer> recipes = new ArrayList();
 	protected GuiTextField search;
 	protected int pageIndex;
 	protected int size;
-	protected String selection;
-	public static final String NULL_SELECTION = "null";
+	protected ArrayList<String> selections;
 	// callback
 	protected int index;
-	protected IControlReceiver tile;
-	protected GuiScreen previousScreen;
+	protected GUIScreenBobmazonArcade previousScreen;
 	protected String installedPool;
 
-	public static void openSelector(GenericRecipes recipeSet, IControlReceiver tile, String selection, int index, String installedPool, GuiScreen previousScreen) {
-		FMLCommonHandler.instance().showGuiScreen(new GUIScreenRecipeSelector(recipeSet, tile, selection, index, installedPool, previousScreen));
+	public static void openSelector(ArrayList<String> selections, int index, String installedPool, GUIScreenBobmazonArcade previousScreen) {
+		FMLCommonHandler.instance().showGuiScreen(new GUIScreenOfferSelector(selections, index, installedPool, previousScreen));
 	}
 
-	public GUIScreenRecipeSelector(GenericRecipes recipeSet, IControlReceiver tile, String selection, int index, String installedPool, GuiScreen previousScreen) {
-		this.recipeSet = recipeSet;
-		this.tile = tile;
-		this.selection = selection;
+	public GUIScreenOfferSelector(ArrayList<String> selections, int index, String installedPool, GUIScreenBobmazonArcade previousScreen) {
+		this.selections = selections;
 		this.index = index;
 		this.installedPool = installedPool;
 		this.previousScreen = previousScreen;
-		if(this.selection == null) this.selection = NULL_SELECTION;
-
 		regenerateRecipes();
 	}
 
@@ -84,16 +71,12 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 	}
 
 	private void regenerateRecipes() {
-
 		this.recipes.clear();
-
-		for(Object o : recipeSet.recipeOrderedList) {
-			GenericRecipe recipe = (GenericRecipe) o;
-			if(!recipe.isPooled() || (this.installedPool != null && recipe.isPartOfPool(installedPool))) this.recipes.add(recipe);
-		}
+		this.recipes.addAll(BobmazonArcadeOffers.recipes);
 
 		resetPaging();
 	}
+	//todo make all this shit name based again
 
 	private void search(String search) {
 		this.recipes.clear();
@@ -101,10 +84,9 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 		if(search.isEmpty()) {
 			regenerateRecipes();
 		} else {
-			for(Object o : recipeSet.recipeOrderedList) {
-				GenericRecipe recipe = (GenericRecipe) o;
-				if(recipe.matchesSearch(search)) {
-					if(!recipe.isPooled() || (this.installedPool != null && recipe.isPartOfPool(installedPool))) this.recipes.add(recipe);
+			for(ArcadeOffer o : BobmazonArcadeOffers.recipes) {
+				if(o.name.toLowerCase(Locale.US).contains(search.toLowerCase(Locale.US))) {
+					this.recipes.add(o);
 				}
 			}
 
@@ -135,16 +117,15 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 				int iy = 17 + 18 * (ind / 8);
 
 				if(guiLeft + ix <= mouseX && guiLeft + ix + 18 > mouseX && guiTop + iy < mouseY && guiTop + iy + 18 >= mouseY) {
-					GenericRecipe recipe = recipes.get(i);
+					ArcadeOffer recipe = recipes.get(i);
 					this.func_146283_a(recipe.print(), mouseX, mouseY);
-
 				}
 			}
 		}
 
 		if(guiLeft + 151 <= mouseX && guiLeft + 151 + 18 > mouseX && guiTop + 71 < mouseY && guiTop + 71 + 18 >= mouseY) {
-			if(this.selection != null && this.recipeSet.recipeNameMap.containsKey(selection)) {
-				GenericRecipe recipe = (GenericRecipe) this.recipeSet.recipeNameMap.get(selection);
+			if(!selections.isEmpty() && BobmazonArcadeOffers.searchMap.containsKey(selections.get(selections.size() - 1))) {
+				ArcadeOffer recipe = BobmazonArcadeOffers.searchMap.get(selections.get(selections.size() - 1));
 				this.func_146283_a(recipe.print(), mouseX, mouseY);
 			}
 		}
@@ -207,23 +188,24 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 		for(int i = pageIndex * 8; i < pageIndex * 8 + 40; i++) {
 			if(i >= recipes.size()) break;
 			int ind = i - pageIndex * 8;
-			GenericRecipe recipe = recipes.get(i);
-			if(recipe.getInternalName().equals(this.selection)) this.drawTexturedModalRect(guiLeft + 7 + 18 * (ind % 8), guiTop + 17 + 18 * (ind / 8), 192, 0, 18, 18);
+			ArcadeOffer recipe = recipes.get(i);
+			for (String selection : selections)
+				if(recipe.name.equals(selection)) this.drawTexturedModalRect(guiLeft + 7 + 18 * (ind % 8), guiTop + 17 + 18 * (ind / 8), 192, 0, 18, 18);
 		}
 
 		for(int i = pageIndex * 8; i < pageIndex * 8 + 40; i++) {
 			if(i >= recipes.size()) break;
 
 			int ind = i - pageIndex * 8;
-			GenericRecipe recipe = recipes.get(i);
+			ArcadeOffer recipe = recipes.get(i);
 
-			this.renderItem(recipe.getIcon(), 8 + 18 * (ind % 8), 18 + 18 * (ind / 8));
+			this.renderItem(recipe.product, 8 + 18 * (ind % 8), 18 + 18 * (ind / 8));
 			this.mc.getTextureManager().bindTexture(texture);
 		}
 
-		if(this.selection != null && this.recipeSet.recipeNameMap.containsKey(selection)) {
-			GenericRecipe recipe = (GenericRecipe) this.recipeSet.recipeNameMap.get(selection);
-			this.renderItem(recipe.getIcon(), 152, 72);
+		if(!selections.isEmpty() && BobmazonArcadeOffers.searchMap.containsKey(selections.get(selections.size() - 1))) {
+			ArcadeOffer recipe = BobmazonArcadeOffers.searchMap.get(selections.get(selections.size() - 1));
+			this.renderItem(recipe.product, 152, 72);
 		}
 	}
 
@@ -279,24 +261,19 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 
 			if(guiLeft + ix <= x && guiLeft + ix + 18 > x && guiTop + iy < y && guiTop + iy + 18 >= y) {
 
-				String newSelection = ((GenericRecipe) recipes.get(i)).getInternalName();
+				String newSelection = ((ArcadeOffer) recipes.get(i)).name;
 
-				if(!newSelection.equals(selection))
-					this.selection = newSelection;
-				else
-					this.selection = NULL_SELECTION;
-
-				click();
+				if(!selections.contains(newSelection))
+					selections.add(newSelection);
 				return;
 			}
 		}
 
 		if(guiLeft + 151 <= x && guiLeft + 151 + 18 > x && guiTop + 71 < y && guiTop + 71 + 18 >= y) {
-			if(!NULL_SELECTION.equals(this.selection)) {
-				this.selection = this.NULL_SELECTION;
-				click();
-				return;
-			}
+			selections.remove(selections.size() - 1);
+			click();
+			return;
+
 		}
 
 		if(guiLeft + 152 <= x && guiLeft + 152 + 16 > x && guiTop + 90 < y && guiTop + 90 + 16 >= y) {
@@ -306,13 +283,10 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 
 	@Override
 	public void onGuiClosed() {
+		if(!selections.isEmpty()) {
+			previousScreen.refreshRecipes(selections, false);
+		}
 		Keyboard.enableRepeatEvents(false);
-
-		NBTTagCompound data = new NBTTagCompound();
-		data.setInteger("index", this.index);
-		data.setString("selection", this.selection);
-		TileEntity te = (TileEntity) tile;
-		PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, te.xCoord, te.yCoord, te.zCoord));
 	}
 
 	@Override
