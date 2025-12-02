@@ -16,6 +16,7 @@ import com.hbm.inventory.recipes.CrucibleRecipes.CrucibleRecipe;
 import com.hbm.inventory.recipes.ElectrolyserFluidRecipes.ElectrolysisRecipe;
 import com.hbm.inventory.recipes.ElectrolyserMetalRecipes.ElectrolysisMetalRecipe;
 import com.hbm.inventory.recipes.ExposureChamberRecipes.ExposureChamberRecipe;
+import com.hbm.inventory.recipes.OutgasserRecipes.OutgasserRecipe;
 import com.hbm.inventory.recipes.ParticleAcceleratorRecipes.ParticleAcceleratorRecipe;
 import com.hbm.inventory.recipes.PedestalRecipes.PedestalExtraCondition;
 import com.hbm.inventory.recipes.PedestalRecipes.PedestalRecipe;
@@ -181,8 +182,14 @@ public class CompatRecipeRegistry {
 
 	//TBI mixer
 
-	public static void registerOutgasser(AStack input, ItemStack output, FluidStack fluid) {
-		OutgasserRecipes.recipes.put(input, new Pair(output, fluid));
+	@Deprecated public static void registerOutgasser(AStack input, ItemStack output, FluidStack fluid) {
+		OutgasserRecipes.recipes.put(input, new OutgasserRecipe(output, fluid));
+	}
+
+	public static void registerOutgasser(AStack input, ItemStack output, FluidStack fluid, boolean fusionOnly) {
+		OutgasserRecipe recipe = new OutgasserRecipe(output, fluid);
+		if(fusionOnly) recipe.fusionOnly();
+		OutgasserRecipes.recipes.put(input, recipe);
 	}
 
 	public static void registerCompressor(FluidStack input, FluidStack output, int time) {
@@ -217,6 +224,14 @@ public class CompatRecipeRegistry {
 	/** Particles will always perform 8 recipes */
 	public static void registerExposureChamber(AStack particle, AStack input, ItemStack output) {
 		ExposureChamberRecipes.recipes.add(new ExposureChamberRecipe(particle, input, output));
+	}
+
+	public static void registerFusionReactor(String name, int time, long power, long klystron, long plasma, double neutrons, FluidStack[] inputs, ItemStack outputItem, FluidStack outputFluid) {
+		FusionRecipe recipe = (FusionRecipe) new FusionRecipe(name).setInputEnergy(klystron).setOutputEnergy(klystron).setup(time, power);
+		if(inputs != null) recipe.inputFluids(copyFirst(inputs, 3));
+		if(outputItem != null) recipe.outputItems(outputItem);
+		if(outputFluid != null) recipe.outputFluids(outputFluid);
+		FusionRecipes.INSTANCE.register(recipe);
 	}
 
 	/** Input needs two AStacks, output can take 1-2 ItemStacks. If the same recipe with different
@@ -271,7 +286,6 @@ public class CompatRecipeRegistry {
 	public static void registerBobmazon(ItemStack output, AStack[] input, int requirement) {
 		BobmazonArcadeOffers.recipes.add(new BobmazonArcadeOffers.ArcadeOffer(output, BobmazonArcadeOffers.Requirement.values()[requirement], input));
 	}*/
-
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 

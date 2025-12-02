@@ -245,10 +245,10 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.inputFluids(new FluidStack(Fluids.AIR, 8_000), new FluidStack(Fluids.WATER, 2_000))
 				.outputFluids(new FluidStack(Fluids.NITRIC_ACID, 1_000)).setPools(GenericRecipes.POOL_PREFIX_ALT + ".birkeland"));
 
-		this.register(new GenericRecipe("chem.schrabidic").setup(100, 5_000)
+		this.register(new GenericRecipe("chem.schrabidic").setup(60, 5_000)
 				.inputItems(new ComparableStack(ModItems.pellet_charged))
-				.inputFluids(new FluidStack(Fluids.SAS3, 8000), new FluidStack(Fluids.PEROXIDE, 6000))
-				.outputFluids(new FluidStack(Fluids.SCHRABIDIC, 16000)));
+				.inputFluids(new FluidStack(Fluids.SAS3, 2000), new FluidStack(Fluids.PEROXIDE, 2000))
+				.outputFluids(new FluidStack(Fluids.SCHRABIDIC, 2000)));
 
 		this.register(new GenericRecipe("chem.schrabidate").setup(150, 5_000)
 				.inputItems(new OreDictStack(IRON.dust()))
@@ -296,7 +296,7 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.outputItems(new ItemStack(ModItems.ball_tnt, 4)));
 
 		this.register(new GenericRecipe("chem.tntAlt").setup(100, 1_000)
-			.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, BlockNTMSand.EnumSandType.QUARTZ))
+			.inputItems(new ComparableStack(ModBlocks.sand_mix, 1, EnumSandType.QUARTZ))
 			.inputFluids(new FluidStack(Fluids.NITROGLYCERIN, 1_000))
 			.outputItems(new ItemStack(ModItems.ball_tnt, 16)).setPools(GenericRecipes.POOL_PREFIX_ALT + "."));
 
@@ -354,6 +354,11 @@ public class ChemicalPlantRecipes extends GenericRecipes<GenericRecipe> {
 				.inputFluids(new FluidStack(Fluids.KEROSENE, 6_000))
 				.outputItems(new ItemStack(ModItems.powder_balefire))
 				.outputFluids(new FluidStack(Fluids.BALEFIRE, 8_000)));
+
+		this.register(new GenericRecipe("chem.dhc").setup(400, 500).setIcon(ModItems.fluid_icon, Fluids.DHC.getID())
+				.inputFluids(new FluidStack(Fluids.DEUTERIUM, 500), new FluidStack(Fluids.REFORMGAS, 250), new FluidStack(Fluids.SYNGAS, 250))
+				.outputFluids(new FluidStack(Fluids.DHC, 500)));
+
 
 		/// OSMIRIDIUM ///
 		this.register(new GenericRecipe("chem.osmiridiumdeath").setup(240, 1_000)

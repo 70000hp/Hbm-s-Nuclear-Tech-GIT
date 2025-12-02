@@ -72,6 +72,7 @@ public abstract class SerializableRecipe {
 		recipeHandlers.add(new FuelPoolRecipes());
 		recipeHandlers.add(new MixerRecipes());
 		recipeHandlers.add(new OutgasserRecipes());
+		recipeHandlers.add(new FluidBreederRecipes());
 		recipeHandlers.add(new CompressorRecipes());
 		recipeHandlers.add(new ElectrolyserFluidRecipes());
 		recipeHandlers.add(new ElectrolyserMetalRecipes());
@@ -90,7 +91,8 @@ public abstract class SerializableRecipe {
 		recipeHandlers.add(AssemblyMachineRecipes.INSTANCE);
 		recipeHandlers.add(ChemicalPlantRecipes.INSTANCE);
 		recipeHandlers.add(PUREXRecipes.INSTANCE);
-		recipeHandlers.add(CrystallizerRecipes.INSTANCE);
+		recipeHandlers.add(FusionRecipes.INSTANCE);
+		recipeHandlers.add(PrecAssRecipes.INSTANCE);
 
 		recipeHandlers.add(new MatDistribution());
 		recipeHandlers.add(new CustomMachineRecipes());

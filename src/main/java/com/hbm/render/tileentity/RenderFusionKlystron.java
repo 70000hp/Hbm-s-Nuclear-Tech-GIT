@@ -6,6 +6,7 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.item.ItemRenderBase;
+import com.hbm.tileentity.machine.fusion.TileEntityFusionKlystron;
 
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
@@ -28,12 +29,22 @@ public class RenderFusionKlystron extends TileEntitySpecialRenderer implements I
 		case 5: GL11.glRotatef(0, 0F, 1F, 0F); break;
 		}
 		
+		TileEntityFusionKlystron klystron = (TileEntityFusionKlystron) tile;
+		
 		GL11.glTranslated(-1, 0, 0);
 		
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		bindTexture(ResourceManager.fusion_klystron_tex);
-		ResourceManager.fusion_klystron.renderAll();
+		ResourceManager.fusion_klystron.renderPart("Klystron");
+		
+		GL11.glPushMatrix();
+		float rot = klystron.prevFan + (klystron.fan - klystron.prevFan) * interp;
+		GL11.glTranslated(0, 2.5, 0);
+		GL11.glRotated(rot, 1, 0, 0);
+		GL11.glTranslated(0, -2.5, 0);
+		ResourceManager.fusion_klystron.renderPart("Rotor");
 		GL11.glShadeModel(GL11.GL_FLAT);
+		GL11.glPopMatrix();
 		
 		GL11.glPopMatrix();
 	}
@@ -56,7 +67,12 @@ public class RenderFusionKlystron extends TileEntitySpecialRenderer implements I
 				GL11.glRotatef(90, 0F, 1F, 0F);
 				GL11.glShadeModel(GL11.GL_SMOOTH);
 				bindTexture(ResourceManager.fusion_klystron_tex);
-				ResourceManager.fusion_klystron.renderAll();
+				ResourceManager.fusion_klystron.renderPart("Klystron");
+				double rot = (System.currentTimeMillis() / 10) % 360D;
+				GL11.glTranslated(0, 2.5, 0);
+				GL11.glRotated(rot, 1, 0, 0);
+				GL11.glTranslated(0, -2.5, 0);
+				ResourceManager.fusion_klystron.renderPart("Rotor");
 				GL11.glShadeModel(GL11.GL_FLAT);
 			}};
 	}
