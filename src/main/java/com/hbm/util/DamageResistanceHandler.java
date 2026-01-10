@@ -122,9 +122,9 @@ public class DamageResistanceHandler {
 		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.25F));
 
 		itemStats.put(ModItems.jackt, new ResistanceStats()
-				.addCategory(CATEGORY_PHYSICAL, 5F, 0.5F));
+				.addCategory(CATEGORY_PHYSICAL, 1F, 0.25F));
 		itemStats.put(ModItems.jackt2, new ResistanceStats()
-				.addCategory(CATEGORY_PHYSICAL, 5F, 0.5F));
+				.addCategory(CATEGORY_PHYSICAL, 3F, 0.35F));
 
 		registerSet(ModItems.steel_helmet, ModItems.steel_plate, ModItems.steel_legs, ModItems.steel_boots, new ResistanceStats());
 		registerSet(ModItems.titanium_helmet, ModItems.titanium_plate, ModItems.titanium_legs, ModItems.titanium_boots, new ResistanceStats());
@@ -160,6 +160,12 @@ public class DamageResistanceHandler {
 				.addCategory(CATEGORY_EXPLOSION, 2F, 0.15F)
 				.setOther(0F, 0.1F));
 		registerSet(ModItems.t45_helmet, ModItems.t45_plate, ModItems.t45_legs, ModItems.t45_boots, new ResistanceStats()
+				.addCategory(CATEGORY_PHYSICAL, 2F, 0.15F)
+				.addCategory(CATEGORY_FIRE, 0.5F, 0.35F)
+				.addCategory(CATEGORY_EXPLOSION, 5F, 0.25F)
+				.addExact(DamageSource.fall.damageType, 0F, 1F)
+				.setOther(0F, 0.1F));
+		registerSet(ModItems.t51_helmet, ModItems.t51_plate, ModItems.t51_legs, ModItems.t51_boots, new ResistanceStats()
 				.addCategory(CATEGORY_PHYSICAL, 2F, 0.15F)
 				.addCategory(CATEGORY_FIRE, 0.5F, 0.35F)
 				.addCategory(CATEGORY_EXPLOSION, 5F, 0.25F)

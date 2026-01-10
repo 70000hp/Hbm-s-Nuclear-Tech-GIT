@@ -3,7 +3,6 @@ package com.hbm.tileentity.machine.storage;
 import com.hbm.inventory.container.ContainerMassStorage;
 import com.hbm.inventory.gui.GUIMassStorage;
 import com.hbm.items.ModItems;
-import com.hbm.tileentity.IBufPacketReceiver;
 import com.hbm.tileentity.IControlReceiverFilter;
 
 import com.hbm.util.BufferUtil;
@@ -21,7 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPacketReceiver, IControlReceiverFilter, IRORValueProvider, IRORInteractive {
+public class TileEntityMassStorage extends TileEntityCrateBase implements IControlReceiverFilter, IRORValueProvider, IRORInteractive {
 
 	private int stack = 0;
 	public boolean output = false;
@@ -92,7 +91,7 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 				}
 			}
 
-			networkPackNT(15);
+			networkPackNT(32); // TE render distance
 		}
 	}
 
@@ -101,13 +100,10 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 	}
 
 	public boolean quickInsert(ItemStack stack) {
-		if (!canInsert(stack))
-			return false;
-		
-		int remaining = getCapacity() - getStockpile();
+		if(!canInsert(stack)) return false;
 
-		if (remaining < stack.stackSize)
-			return false;
+		int remaining = getCapacity() - getStockpile();
+		if(remaining < stack.stackSize) return false;
 
 		this.stack += stack.stackSize;
 		stack.stackSize = 0;
@@ -117,15 +113,12 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 	}
 
 	public ItemStack quickExtract() {
-		if (!output) {
-			return null;
-		}
+		if(!output) return null;
 
 		int amount = getType().getMaxStackSize();
 
-		if (getStockpile() < amount)
-			return null;
-		
+		if(getStockpile() < amount) return null;
+
 		ItemStack result = slots[1].copy();
 		result.stackSize = amount;
 		this.stack -= amount;
@@ -135,21 +128,20 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 	}
 
 	// Note: the following three methods are used for AE2 integration, and aren't meant to be called in any other context by default
-	
+
 	public int getTotalStockpile() {
 		ItemStack type = getType();
-		if (type == null)
-			return 0;
+		if(type == null) return 0;
 
 		int result = getStockpile();
 
 		ItemStack inStack = slots[0];
-        if (inStack != null && ItemStackUtil.areStacksCompatible(type, inStack)) {
-            result += inStack.stackSize;
-        }
+		if(inStack != null && ItemStackUtil.areStacksCompatible(type, inStack)) {
+			result += inStack.stackSize;
+		}
 
 		ItemStack outStack = slots[2];
-		if (outStack != null && ItemStackUtil.areStacksCompatible(type, outStack)) {
+		if(outStack != null && ItemStackUtil.areStacksCompatible(type, outStack)) {
 			result += outStack.stackSize;
 		}
 
@@ -170,9 +162,7 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 
 	private int changeTotalStockpile(int amount, boolean actually, int sign) {
 		ItemStack type = getType();
-
-		if (type == null)
-			return amount;
+		if(type == null) return amount;
 
 		int stockpileAvail = sign > 0 ? getCapacity() - getStockpile() : getStockpile();
 
@@ -183,57 +173,57 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 			}
 			amount -= depositStockpile;
 		}
-		
+
 		int inputAvail = 0;
 		ItemStack inStack = slots[0];
-        if (inStack != null && ItemStackUtil.areStacksCompatible(type, inStack)) {
+		if(inStack != null && ItemStackUtil.areStacksCompatible(type, inStack)) {
 			inputAvail = sign > 0 ? inStack.getMaxStackSize() - inStack.stackSize : inStack.stackSize;
-		} else if (inStack == null) {
+		} else if(inStack == null) {
 			inputAvail = sign > 0 ? type.getMaxStackSize() : 0;
 		}
 
-		if (amount > 0 && inputAvail > 0) {
+		if(amount > 0 && inputAvail > 0) {
 			int depositInput = Math.min(amount, inputAvail);
-			if (actually) {
-				if (slots[0] == null) {  // Only possible with sign == +1
+			if(actually) {
+				if(slots[0] == null) { // Only possible with sign == +1
 					slots[0] = slots[1].copy();
 					slots[0].stackSize = 0;
 				}
 				slots[0].stackSize += sign * depositInput;
-				if (slots[0].stackSize == 0) {
+				if(slots[0].stackSize == 0) {
 					slots[0] = null;
 				}
 			}
 			amount -= depositInput;
 		}
-		
+
 		int outputAvail = 0;
 		ItemStack outStack = slots[2];
-		if (outStack != null && ItemStackUtil.areStacksCompatible(type, outStack)) {
+		if(outStack != null && ItemStackUtil.areStacksCompatible(type, outStack)) {
 			outputAvail = sign > 0 ? outStack.getMaxStackSize() - outStack.stackSize : outStack.stackSize;
-		} else if (outStack == null) {
+		} else if(outStack == null) {
 			outputAvail = sign > 0 ? type.getMaxStackSize() : 0;
 		}
 
-		if (amount > 0 && outputAvail > 0) {
+		if(amount > 0 && outputAvail > 0) {
 			int depositOutput = Math.min(amount, outputAvail);
-			if (actually) {
-				if (slots[2] == null) {  // Only possible with sign == +1
+			if(actually) {
+				if(slots[2] == null) { // Only possible with sign == +1
 					slots[2] = slots[1].copy();
 					slots[2].stackSize = 0;
 				}
 				slots[2].stackSize += sign * depositOutput;
-				if (slots[2].stackSize == 0) {
+				if(slots[2].stackSize == 0) {
 					slots[2] = null;
 				}
 			}
 			amount -= depositOutput;
 		}
 
-		if (actually) {
+		if(actually) {
 			this.markDirty();
 		}
-		
+
 		return amount;
 	}
 
@@ -302,6 +292,11 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 		nbt.setBoolean("output", output);
 		nbt.setInteger("capacity", capacity);
 		nbt.setByte("redstone", (byte) redstone);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public double getMaxRenderDistanceSquared() {
+		return 1024.0D; // only render mass storage info 32 blocks away, for performance
 	}
 
 	@Override
@@ -398,12 +393,12 @@ public class TileEntityMassStorage extends TileEntityCrateBase implements IBufPa
 
 	@Override
 	public String runRORFunction(String name, String[] params) {
-		
+
 		if((PREFIX_FUNCTION + "toggleoutput").equals(name)) {
 			this.output = !this.output;
 			this.markDirty();
 		}
-		
+
 		return null;
 	}
 }

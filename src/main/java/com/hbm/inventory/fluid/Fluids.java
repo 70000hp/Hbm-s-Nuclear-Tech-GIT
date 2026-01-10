@@ -190,6 +190,7 @@ public class Fluids {
 	public static FluidType BAUXITE_SOLUTION;
 	public static FluidType ALUMINA;
 	public static FluidType CONCRETE;
+	public static FluidType DHC;
 
 	/* Lagacy names for compatibility purposes */
 	@Deprecated public static FluidType ACID;	//JAOPCA uses this, apparently
@@ -262,8 +263,8 @@ public class Fluids {
 		ULTRAHOTSTEAM =			new FluidType("ULTRAHOTSTEAM",		0xE39393, 4, 0, 0, EnumSymbol.NONE).setTemp(600).addTraits(GASEOUS, UNSIPHONABLE);
 		COOLANT =				new FluidType("COOLANT",			0xd8fcff, 1, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
 		LAVA =					new FluidType("LAVA",				0xFF3300, 4, 0, 0, EnumSymbol.NOWATER).setTemp(1200).addTraits(LIQUID, VISCOUS);
-		DEUTERIUM =				new FluidType("DEUTERIUM",			0x0000FF, 3, 4, 0, EnumSymbol.NONE).addTraits(new FT_Flammable(5_000), new FT_Combustible(FuelGrade.HIGH, 10_000), GASEOUS);
-		TRITIUM =				new FluidType("TRITIUM",			0x000099, 3, 4, 0, EnumSymbol.RADIATION).addTraits(new FT_Flammable(5_000), new FT_Combustible(FuelGrade.HIGH, 10_000), GASEOUS, new FT_VentRadiation(0.001F));
+		DEUTERIUM =				new FluidType("DEUTERIUM",			0x0000FF, 3, 4, 0, EnumSymbol.NONE).addContainers(new CD_Gastank(0x0000FF, 0xFFFFFF)).addTraits(new FT_Flammable(5_000), new FT_Combustible(FuelGrade.HIGH, 10_000), GASEOUS);
+		TRITIUM =				new FluidType("TRITIUM",			0x000099, 3, 4, 0, EnumSymbol.RADIATION).addContainers(new CD_Gastank(0x000099, 0xE9FFAA)).addTraits(new FT_Flammable(5_000), new FT_Combustible(FuelGrade.HIGH, 10_000), GASEOUS, new FT_VentRadiation(0.001F));
 		OIL =					new FluidType("OIL",				0x020202, 2, 1, 0, EnumSymbol.NONE).addContainers(new CD_Canister(0x424242)).addTraits(new FT_Flammable(10_000), LIQUID, VISCOUS, P_OIL);
 		HOTOIL =				new FluidType("HOTOIL",				0x300900, 2, 3, 0, EnumSymbol.NONE).setTemp(350).addTraits(LIQUID, VISCOUS, P_OIL);
 		HEAVYOIL =				new FluidType("HEAVYOIL",			0x141312, 2, 1, 0, EnumSymbol.NONE).addContainers(new CD_Canister(0x513F39)).addTraits(new FT_Flammable(50_000), new FT_Combustible(FuelGrade.LOW, 25_000), LIQUID, VISCOUS, P_OIL);
@@ -377,7 +378,7 @@ public class Fluids {
 		SMOKE =					new FluidType("SMOKE",				0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS, NOID, NOCON);
 		SMOKE_LEADED =			new FluidType("SMOKE_LEADED",		0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS, NOID, NOCON);
 		SMOKE_POISON =			new FluidType("SMOKE_POISON",		0x808080, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS, NOID, NOCON);
-		HELIUM4 =				new FluidType("HELIUM4",			0xE54B0A, 0, 0, 0, EnumSymbol.ASPHYXIANT).addTraits(GASEOUS);
+		HELIUM4 =				new FluidType("HELIUM4",			0xE54B0A, 0, 0, 0, EnumSymbol.ASPHYXIANT).addTraits(GASEOUS).addContainers(new CD_Gastank(0xFD631F, 0xffff00));
 		HEAVYWATER_HOT =		new FluidType("HEAVYWATER_HOT",		0x4D007B, 1, 0, 0, EnumSymbol.NONE).setTemp(600).addTraits(LIQUID, VISCOUS);
 		SODIUM =				new FluidType("SODIUM",				0xCCD4D5, 1, 2, 3, EnumSymbol.NONE).setTemp(400).addTraits(LIQUID, VISCOUS);
 		SODIUM_HOT =			new FluidType("SODIUM_HOT",			0xE2ADC1, 1, 2, 3, EnumSymbol.NONE).setTemp(1200).addTraits(LIQUID, VISCOUS);
@@ -406,7 +407,8 @@ public class Fluids {
 		BAUXITE_SOLUTION =		new FluidType("BAUXITE_SOLUTION",	0xE2560F, 3, 0, 3, EnumSymbol.ACID).addTraits(new FT_Corrosive(40), LIQUID, VISCOUS);
 		ALUMINA =				new FluidType("ALUMINA",			0xDDFFFF, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
 		AIR =					new FluidType("AIR",				0xE7EAEB, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
-		CONCRETE =				new FluidType(152, "CONCRETE",		0xA2A2A2, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
+		CONCRETE =				new FluidType("CONCRETE",			0xA2A2A2, 0, 0, 0, EnumSymbol.NONE).addTraits(LIQUID);
+		DHC =					new FluidType(153, "DHC",			0xD2AFFF, 0, 0, 0, EnumSymbol.NONE).addTraits(GASEOUS);
 
 		// ^ ^ ^ ^ ^ ^ ^ ^
 		//ADD NEW FLUIDS HERE
@@ -415,6 +417,8 @@ public class Fluids {
 		File customTypes = new File(folder.getAbsolutePath() + File.separatorChar + "hbmFluidTypes.json");
 		if(!customTypes.exists()) initDefaultFluids(customTypes);
 		readCustomFluids(customTypes);
+
+		for(IFluidRegisterListener listener : additionalListeners) listener.onFluidsLoad();
 
 		//AND DON'T FORGET THE META DOWN HERE
 		// V V V V V V V V
@@ -521,6 +525,7 @@ public class Fluids {
 		metaOrder.add(FISHOIL);
 		metaOrder.add(SUNFLOWEROIL);
 		metaOrder.add(NITAN);
+		metaOrder.add(DHC);
 		metaOrder.add(BALEFIRE);
 		//processing fluids
 		metaOrder.add(SALIENT);
@@ -598,6 +603,7 @@ public class Fluids {
 		ACID = PEROXIDE;
 
 		for(FluidType custom : customFluids) metaOrder.add(custom);
+		for(FluidType custom : foreignFluids) metaOrder.add(custom);
 
 		CHLORINE.addTraits(new FT_Toxin().addEntry(new ToxinDirectDamage(ModDamageSource.cloud, 2F, 20, HazardClass.GAS_LUNG, false)));
 		PHOSGENE.addTraits(new FT_Toxin().addEntry(new ToxinDirectDamage(ModDamageSource.cloud, 4F, 20, HazardClass.GAS_LUNG, false)));
@@ -666,7 +672,6 @@ public class Fluids {
 		if(idMapping.size() != metaOrder.size()) {
 			throw new IllegalStateException("A severe error has occoured during NTM's fluid registering process! The MetaOrder and Mappings are inconsistent! Mapping size: " + idMapping.size()+ " / MetaOrder size: " + metaOrder.size());
 		}
-
 
 		/// FINAL ///
 
@@ -814,7 +819,9 @@ public class Fluids {
 				String texture = obj.get("texture").getAsString();
 				int temperature = obj.get("temperature").getAsInt();
 
-				FluidType type = new FluidType(name, color, p, f, r, symbol, texture, tint, id, displayName).setTemp(temperature);
+				FluidType type = fluidMigration.get(name);
+				if(type == null) type = new FluidType(name, color, p, f, r, symbol, texture, tint, id, displayName).setTemp(temperature);
+				else type.setupCustom(name, color, p, f, r, symbol, texture, tint, id, displayName).setTemp(temperature);
 				customFluids.add(type);
 			}
 
@@ -878,13 +885,16 @@ public class Fluids {
 			ex.printStackTrace();
 		}
 	}
+	
+	public static HashMap<String, FluidType> fluidMigration = new HashMap(); // since reloading would create new fluid instances, and those break existing machines
 
 	public static void reloadFluids(){
 		File folder = MainRegistry.configHbmDir;
 		File customTypes = new File(folder.getAbsolutePath() + File.separatorChar + "hbmFluidTypes.json");
 		if(!customTypes.exists()) initDefaultFluids(customTypes);
 
-		for(FluidType type : customFluids){
+		for(FluidType type : customFluids) {
+			fluidMigration.put(type.getName(), type);
 			idMapping.remove(type.getID());
 			registerOrder.remove(type);
 			nameMapping.remove(type.getName());
@@ -892,7 +902,8 @@ public class Fluids {
 		}
 		customFluids.clear();
 
-		for(FluidType type : foreignFluids){
+		for(FluidType type : foreignFluids) {
+			fluidMigration.put(type.getName(), type);
 			idMapping.remove(type.getID());
 			registerOrder.remove(type);
 			nameMapping.remove(type.getName());
@@ -912,6 +923,7 @@ public class Fluids {
 		}
 
 		for(IFluidRegisterListener listener : additionalListeners) listener.onFluidsLoad();
+		for(FluidType custom : foreignFluids) metaOrder.add(custom);
 	}
 	private static void registerCalculatedFuel(FluidType type, double base, double combustMult, FuelGrade grade) {
 

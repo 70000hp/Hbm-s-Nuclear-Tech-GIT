@@ -75,7 +75,7 @@ public class ItemMold extends Item {
 		registerMold(new MoldShape(		11, L, "plates", MaterialShapes.PLATE, 9));
 		registerMold(new MoldShape(		21, L, "wires_dense", MaterialShapes.DENSEWIRE, 9));
 		registerMold(new MoldBlock(		12, L, "block", MaterialShapes.BLOCK));
-		registerMold(new MoldSingle(	13, L, "pipes", new ItemStack(ModItems.pipes_steel), Mats.MAT_STEEL, MaterialShapes.BLOCK.q(3)));
+		//registerMold(new MoldSingle(	13, L, "pipes", new ItemStack(ModItems.pipes_steel), Mats.MAT_STEEL, MaterialShapes.BLOCK.q(3)));
 
 		registerMold(new MoldMulti(		16, S, "c9", MaterialShapes.PLATE.q(1, 4),
 				Mats.MAT_GUNMETAL,		DictFrame.fromOne(ModItems.casing, EnumCasingType.SMALL),
@@ -187,7 +187,9 @@ public class ItemMold extends Item {
 				if(!ores.isEmpty()) {
 					//prioritize NTM items
 					for(ItemStack ore : ores) {
-						if(Item.itemRegistry.getNameForObject(ore.getItem()).startsWith(RefStrings.MODID)) {
+						String registry = Item.itemRegistry.getNameForObject(ore.getItem());
+						if(registry.startsWith(RefStrings.MODID)) {
+							if(registry.contains("fragment")) continue; // deprioritize fragments
 							ItemStack copy = ore.copy();
 							copy.stackSize = this.amount;
 							return copy;
