@@ -85,7 +85,6 @@ public abstract class SerializableRecipe {
 		//AFTER Assembler
 		recipeHandlers.add(new AnvilRecipes());
 		recipeHandlers.add(new PedestalRecipes());
-		recipeHandlers.add(new BobmazonArcadeOffers());
 
 		//GENERIC
 		recipeHandlers.add(AssemblyMachineRecipes.INSTANCE);
@@ -93,6 +92,7 @@ public abstract class SerializableRecipe {
 		recipeHandlers.add(PUREXRecipes.INSTANCE);
 		recipeHandlers.add(FusionRecipes.INSTANCE);
 		recipeHandlers.add(PrecAssRecipes.INSTANCE);
+		recipeHandlers.add(CrystallizerRecipes.INSTANCE);
 
 		recipeHandlers.add(new MatDistribution());
 		recipeHandlers.add(new CustomMachineRecipes());

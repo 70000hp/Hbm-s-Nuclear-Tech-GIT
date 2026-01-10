@@ -189,24 +189,6 @@ public class CrystallizerRecipes extends GenericRecipes<GenericRecipe> {
 			registerRecipe(new ComparableStack(ModItems.ore_nitrocrystalline, 1, i),	new CrystallizerRecipe(new ItemStack(ModItems.ore_seared, 1, i), oreTime), hiperf);*/
 		}
 
-		for(BedrockOreType type : BedrockOreType.values()) {
-			this.register(new GenericRecipe("crys." + BedrockOreGrade.BASE.name() + type.name()).setup(200, 2_000)
-				.inputItems(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.BASE, type)))
-				.inputFluids(new FluidStack(Fluids.WATER, 1_000))
-				.outputItems(ItemBedrockOreNew.make(BedrockOreGrade.BASE_WASHED, type)));
-
-			this.register(new GenericRecipe("crys." + BedrockOreGrade.BASE_ROASTED.name() + type.name()).setup(200, 2_000)
-				.inputItems(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.BASE_ROASTED, type)))
-				.inputFluids(new FluidStack(Fluids.WATER, 1_000))
-				.outputItems(ItemBedrockOreNew.make(BedrockOreGrade.BASE_WASHED, type)));
-
-			this.register(new GenericRecipe("crys." + BedrockOreGrade.PRIMARY.name() + type.name()).setup(200, 2_000)
-				.inputItems(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY, type)))
-				.inputFluids(new FluidStack(Fluids.WATER, 1_000))
-				.outputItems(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_SULFURIC, type)));
-
-		}
-
 		/// COMPAT CERTUS QUARTZ ///
 		List<ItemStack> quartz = OreDictionary.getOres("crystalCertusQuartz");
 		if(quartz != null && !quartz.isEmpty()) {
@@ -270,5 +252,5 @@ public class CrystallizerRecipes extends GenericRecipes<GenericRecipe> {
 
 		return recipes;
 	}
-	
+
 }
