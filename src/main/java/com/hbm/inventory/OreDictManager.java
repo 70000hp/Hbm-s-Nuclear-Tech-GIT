@@ -259,11 +259,6 @@ public class OreDictManager {
 	 * RARE METALS
 	 */
 	public static final DictFrame AUSTRALIUM = new DictFrame("Australium");
-	public static final DictFrame REIIUM = new DictFrame("Reiium");
-	public static final DictFrame WEIDANIUM = new DictFrame("Weidanium");
-	public static final DictFrame UNOBTAINIUM = new DictFrame("Unobtainium");
-	public static final DictFrame VERTICIUM = new DictFrame("Verticium");
-	public static final DictFrame DAFFERGON = new DictFrame("Daffergon");
 	/*
 	 * RARE EARTHS
 	 */
@@ -466,11 +461,6 @@ public class OreDictManager {
 		 * RARE METALS
 		 */
 		AUSTRALIUM	.nugget(nugget_australium)	.billet(billet_australium)	.ingot(ingot_australium)	.dust(powder_australium)	.block(block_australium)	.ore(ore_australium);
-		REIIUM		.block(block_reiium);
-		WEIDANIUM	.block(block_weidanium);
-		UNOBTAINIUM	.block(block_unobtainium);
-		VERTICIUM	.block(block_verticium);
-		DAFFERGON	.block(block_daffergon);
 
 		/*
 		 * RARE EARTHS
@@ -658,11 +648,11 @@ public class OreDictManager {
 		for(NTMMaterial mat : Mats.orderedList) {
 			if(mat.autogen.contains(MaterialShapes.FRAGMENT)) {
 				String name = mat.names[0];
-				if(!OreDictionary.getOres(MaterialShapes.DUST.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.DUST.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.GEM.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.GEM.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.INGOT.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.INGOT.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.BILLET.name() + name).isEmpty()) MineralRecipes.addBilletFragment(OreDictionary.getOres(MaterialShapes.BILLET.name() + name).get(0), mat.make(ModItems.bedrock_ore_fragment));
+				if(!OreDictionary.getOres(MaterialShapes.DUST.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.DUST.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.GEM.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.GEM.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.INGOT.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.INGOT.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.BILLET.name() + name).isEmpty()) MineralRecipes.addBilletFragment(OreDictionary.getOres(MaterialShapes.BILLET.name() + name).get(0).copy(), mat.make(ModItems.bedrock_ore_fragment));
 				else MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), new ItemStack(ModItems.nothing));
 			}
 		}
@@ -775,9 +765,6 @@ public class OreDictManager {
 		public String stock() {			return STOCK.name()				+ mats[0]; }
 		public String grip() {			return GRIP.name()				+ mats[0]; }
 		public String[] all(MaterialShapes shape) {				return appendToAll(shape.prefixes); }
-
-		/** Returns cast (triple) plates if 528 mode is enabled or normal plates if not */
-		public String plate528() { return GeneralConfig.enable528 ? plateCast() : plate(); }
 
 		private String[] appendToAll(String... prefix) {
 

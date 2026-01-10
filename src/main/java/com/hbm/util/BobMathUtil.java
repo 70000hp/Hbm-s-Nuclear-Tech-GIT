@@ -184,7 +184,7 @@ public class BobMathUtil {
 	 * @param amount
 	 * @return the number as a string with thousand group commas
 	 */
-	public static String format(int amount) {
+	public static String format(Number amount) {
 		return String.format(Locale.US, "%,d", amount);
 	}
 

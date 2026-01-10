@@ -13,6 +13,7 @@ import com.hbm.items.special.ItemByproduct.EnumByproduct;
 import com.hbm.main.CraftingManager;
 
 import static com.hbm.inventory.OreDictManager.*;
+import static com.hbm.inventory.material.Mats.*;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
@@ -53,6 +54,8 @@ public class MineralRecipes {
 		add1To9Pair(ModBlocks.block_cadmium, ModItems.ingot_cadmium);
 		add1To9Pair(ModBlocks.block_tcalloy, ModItems.ingot_tcalloy);
 		add1To9Pair(ModBlocks.block_cdalloy, ModItems.ingot_cdalloy);
+		
+		add1To9Pair(new ItemStack(ModBlocks.block_slag), new ItemStack(ModItems.ingot_raw, 9, MAT_SLAG.id));
 		
 		for(int i = 0; i < EnumCokeType.values().length; i++) {
 			add1To9PairSameMeta(Item.getItemFromBlock(ModBlocks.block_coke), ModItems.coke, i);
@@ -422,6 +425,7 @@ public class MineralRecipes {
 		GameRegistry.addRecipe(new ItemStack(ModItems.egg_balefire_shard, 9), new Object[] { "#", '#', ModItems.egg_balefire });
 		GameRegistry.addRecipe(new ItemStack(ModItems.nitra, 1), new Object[] { "##", "##", '#', ModItems.nitra_small });
 		GameRegistry.addRecipe(new ItemStack(ModItems.nitra_small, 4), new Object[] { "#", '#', ModItems.nitra });
+		GameRegistry.addRecipe(new ItemStack(ModItems.ammo_container, 1, 1), new Object[] { "##", "##", '#', ModItems.nitra });
 		GameRegistry.addRecipe(new ItemStack(ModBlocks.glass_polarized, 4), new Object[] { "##", "##", '#', DictFrame.fromOne(ModItems.part_generic, EnumPartType.GLASS_POLARIZED) });
 		add1To9Pair(ModItems.powder_paleogenite, ModItems.powder_paleogenite_tiny);
 		add1To9Pair(ModItems.ingot_osmiridium, ModItems.nugget_osmiridium);
@@ -477,6 +481,11 @@ public class MineralRecipes {
 	public static void add1To9Pair(Block one, Item nine) {
 		add1To9(new ItemStack(one), new ItemStack(nine, 9));
 		add9To1(new ItemStack(nine), new ItemStack(one));
+	}
+
+	public static void add1To9Pair(ItemStack one, ItemStack nine) {
+		add1To9(one, nine);
+		add9To1(nine, one);
 	}
 	
 	public static void add1To9PairSameMeta(Item one, Item nine, int meta) {

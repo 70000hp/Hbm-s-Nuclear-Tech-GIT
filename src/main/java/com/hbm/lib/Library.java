@@ -237,7 +237,6 @@ public class Library {
 		if(power > maxPower) return maxPower;
 		
 		if(slots[index] != null && slots[index].getItem() == ModItems.battery_creative) return 0;
-		if(slots[index] != null && slots[index].getItem() == ModItems.fusion_core_infinite) return 0;
 
 		if(slots[index] != null && slots[index].getItem() instanceof IBatteryItem) {
 
@@ -245,7 +244,7 @@ public class Library {
 
 			long batMax = battery.getMaxCharge(slots[index]);
 			long batCharge = battery.getCharge(slots[index]);
-			long batRate = battery.getChargeRate();
+			long batRate = battery.getChargeRate(slots[index]);
 			long toCharge = Math.min(Math.min(power, batRate), batMax - batCharge);
 
 			power -= toCharge;
@@ -259,14 +258,13 @@ public class Library {
 	public static long chargeTEFromItems(ItemStack[] slots, int index, long power, long maxPower) {
 
 		if(slots[index] != null && slots[index].getItem() == ModItems.battery_creative) return maxPower;
-		if(slots[index] != null && slots[index].getItem() == ModItems.fusion_core_infinite) return maxPower;
 
 		if(slots[index] != null && slots[index].getItem() instanceof IBatteryItem) {
 
 			IBatteryItem battery = (IBatteryItem) slots[index].getItem();
 
 			long batCharge = battery.getCharge(slots[index]);
-			long batRate = battery.getDischargeRate();
+			long batRate = battery.getDischargeRate(slots[index]);
 			long toDischarge = Math.min(Math.min((maxPower - power), batRate), batCharge);
 
 			battery.dischargeBattery(slots[index], toDischarge);
