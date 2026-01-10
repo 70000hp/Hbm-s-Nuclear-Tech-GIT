@@ -20,7 +20,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemDrillbit;
 import com.hbm.items.machine.ItemDrillbit.EnumDrillType;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
-import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.lib.Library;
 import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
@@ -334,7 +334,7 @@ public class TileEntityMachineExcavator extends TileEntityMachineBase implements
 			stacks.add(stack);
 
 			if(stack.getItem() == ModItems.bedrock_ore_base) {
-				ItemBedrockOreBase.setOreAmount(stack, pos.getX(), pos.getZ(), 1D + this.getInstalledDrill().fortune * 0.1D);
+				ItemBedrockFormationBase.setOreAmount(stack, pos.getX(), pos.getZ(), 1D + this.getInstalledDrill().fortune * 0.1D);
 			}
 
 			ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - 10);

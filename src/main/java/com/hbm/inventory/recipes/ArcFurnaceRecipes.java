@@ -63,8 +63,8 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 
 		register(new ComparableStack(ModBlocks.sand_mix, 1, EnumSandType.QUARTZ), new ArcFurnaceRecipe().solid(new ItemStack(ModBlocks.glass_quartz)));
 		register(new OreDictStack(BORAX.dust()), new ArcFurnaceRecipe().solid(new ItemStack(ModItems.powder_boron_tiny, 3)).fluid(new MaterialStack(Mats.MAT_BORON, MaterialShapes.NUGGET.q(3))));
-		
-		for(BedrockOreType type : BedrockOreType.values()) {
+
+		/*for(BedrockOreType type : BedrockOreType.values()) {
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_BYPRODUCT, type)), new ArcFurnaceRecipe().solid(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_ARC, type, 2)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_ROASTED, type)), new ArcFurnaceRecipe().solid(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_ARC, type, 4)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_BYPRODUCT, type)), new ArcFurnaceRecipe().solid(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_ARC, type, 2)));
@@ -75,13 +75,13 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_FIRST, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.primary1, 5), ItemBedrockOreNew.toFluid(type.primary2, 2)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_SECOND, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.primary1, 2), ItemBedrockOreNew.toFluid(type.primary2, 5)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.primary1, 1), ItemBedrockOreNew.toFluid(type.primary2, 1)));
-			
+
 			int i3 = 3;
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_WASHED, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.byproductAcid1, i3), ItemBedrockOreNew.toFluid(type.byproductAcid2, i3), ItemBedrockOreNew.toFluid(type.byproductAcid3, i3)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_WASHED, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.byproductSolvent1, i3), ItemBedrockOreNew.toFluid(type.byproductSolvent2, i3), ItemBedrockOreNew.toFluid(type.byproductSolvent3, i3)));
 			register(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.RAD_WASHED, type)), new ArcFurnaceRecipe().fluidNull(ItemBedrockOreNew.toFluid(type.byproductRad1, i3), ItemBedrockOreNew.toFluid(type.byproductRad2, i3), ItemBedrockOreNew.toFluid(type.byproductRad3, i3)));
-		}
-		
+		}*/
+
 		// Autogen for simple single type items
 		for(NTMMaterial material : Mats.orderedList) {
 			int in = material.convIn;
@@ -101,7 +101,7 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 				}
 			}
 		}
-		
+
 		// Autogen for custom smeltables
 		for(Entry<String, List<MaterialStack>> entry : Mats.materialOreEntries.entrySet()) {
 			OreDictStack dict = new OreDictStack(entry.getKey());
@@ -110,17 +110,17 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 		for(Entry<ComparableStack, List<MaterialStack>> entry : Mats.materialEntries.entrySet()) {
 			addCustomSmeltable(entry.getKey(), entry.getValue());
 		}
-		
+
 		// Autogen for furnace recipes
 		registerFurnaceSmeltables();
 	}
-	
+
 	public static void registerFurnaceSmeltables() {
 		for(Object o : FurnaceRecipes.smelting().getSmeltingList().entrySet()) {
 			Entry entry = (Entry) o;
 			ItemStack input = (ItemStack) entry.getKey();
 			ItemStack output = (ItemStack) entry.getValue();
-			
+
 			if(input != null && output != null) {
 				ComparableStack comp = new ComparableStack(input);
 				if(OreDictManager.arcSmeltable.contains(comp) || OreDictManager.arcSmeltable.contains(new ComparableStack(output))) {
@@ -131,7 +131,7 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 			}
 		}
 	}
-	
+
 	public static void register(AStack input, ArcFurnaceRecipe output) {
 		List<ItemStack> inputs = input.extractForNEI();
 		for(ItemStack stack : inputs) {
@@ -148,7 +148,7 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 			if(output.fluidOutput != null) occupiedLiquid.add(compStack);
 		}
 	}
-	
+
 	private static void addCustomSmeltable(AStack astack, List<MaterialStack> mats) {
 		List<MaterialStack> smeltables = new ArrayList();
 		for(MaterialStack mat : mats) {
@@ -161,11 +161,11 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 		recipe.fluid(smeltables.toArray(new MaterialStack[0]));
 		register(astack, recipe);
 	}
-	
+
 	public static ArcFurnaceRecipe getOutput(ItemStack stack, boolean liquid) {
-		
+
 		if(stack == null || stack.getItem() == null) return null;
-		
+
 		if(stack.getItem() == ModItems.scraps && liquid) {
 			NTMMaterial mat = Mats.matById.get(stack.getItemDamage());
 			if(mat == null) return null;
@@ -174,11 +174,11 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 				return new ArcFurnaceRecipe().fluid(mats);
 			}
 		}
-		
+
 		ComparableStack cacheKey = new ComparableStack(stack).makeSingular();
 		if(!liquid && fastCacheSolid.containsKey(cacheKey)) return fastCacheSolid.get(cacheKey);
 		if(liquid && fastCacheLiquid.containsKey(cacheKey)) return fastCacheLiquid.get(cacheKey);
-		
+
 		for(Pair<AStack, ArcFurnaceRecipe> entry : recipeList) {
 			if(entry.getKey().matchesRecipe(stack, true)) {
 				ArcFurnaceRecipe rec = entry.getValue();
@@ -189,10 +189,10 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 				}
 			}
 		}
-		
+
 		if(!liquid) fastCacheSolid.put(cacheKey, null);
 		if(liquid) fastCacheLiquid.put(cacheKey, null);
-		
+
 		return null;
 	}
 
@@ -244,13 +244,13 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 	public void readRecipe(JsonElement recipe) {
 		JsonObject rec = (JsonObject) recipe;
 		ArcFurnaceRecipe arc = new ArcFurnaceRecipe();
-		
+
 		AStack input = this.readAStack(rec.get("input").getAsJsonArray());
-		
+
 		if(rec.has("solid")) {
 			arc.solid(this.readItemStack(rec.get("solid").getAsJsonArray()));
 		}
-		
+
 		if(rec.has("fluid")) {
 			JsonArray fluids = rec.get("fluid").getAsJsonArray();
 			List<MaterialStack> mats = new ArrayList();
@@ -265,7 +265,7 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 				arc.fluid(mats.toArray(new MaterialStack[0]));
 			}
 		}
-		
+
 		register(input, arc);
 	}
 
@@ -275,12 +275,12 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 
 		writer.name("input");
 		this.writeAStack(rec.getKey(), writer);
-		
+
 		if(rec.getValue().solidOutput != null) {
 			writer.name("solid");
 			this.writeItemStack(rec.getValue().solidOutput, writer);
 		}
-		
+
 		if(rec.getValue().fluidOutput != null) {
 			writer.name("fluid").beginArray();
 			writer.setIndent("");
@@ -298,19 +298,19 @@ public class ArcFurnaceRecipes extends SerializableRecipe {
 
 		public MaterialStack[] fluidOutput;
 		public ItemStack solidOutput;
-		
+
 		public ArcFurnaceRecipe fluid(MaterialStack... outputs) {
 			this.fluidOutput = outputs;
 			return this;
 		}
-		
+
 		public ArcFurnaceRecipe fluidNull(MaterialStack... outputs) {
 			List<MaterialStack> mat = new ArrayList();
 			for(MaterialStack stack : outputs) if(stack != null) mat.add(stack);
 			if(!mat.isEmpty()) this.fluidOutput = mat.toArray(new MaterialStack[0]);
 			return this;
 		}
-		
+
 		public ArcFurnaceRecipe solid(ItemStack output) {
 			this.solidOutput = output;
 			return this;

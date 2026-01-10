@@ -13,7 +13,7 @@ import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIOreSlopper;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
-import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.items.special.ItemBedrockOreNew;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
@@ -129,7 +129,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 					progress -= 1F;
 
 					for(BedrockOreType type : BedrockOreType.values()) {
-						ores[type.ordinal()] += (ItemBedrockOreBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
+						ores[type.ordinal()] += (ItemBedrockFormationBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
 					}
 
 					this.decrStackSize(2, 1);

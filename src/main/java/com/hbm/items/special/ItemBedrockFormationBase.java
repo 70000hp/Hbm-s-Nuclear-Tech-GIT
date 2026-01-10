@@ -19,8 +19,9 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
-public class ItemBedrockOreBase extends Item {
-	
+import static com.hbm.items.special.ItemBedrockOreNew.BedrockOreType.*;
+public class ItemBedrockFormationBase extends Item {
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
@@ -35,7 +36,7 @@ public class ItemBedrockOreBase extends Item {
 		NBTTagCompound data = stack.getTagCompound();
 		return data.getDouble(type.suffix);
 	}
-	
+
 	public static void setOreAmount(ItemStack stack, int x, int z, double mult) {
 		if(!stack.hasTagCompound()) stack.stackTagCompound = new NBTTagCompound();
 		NBTTagCompound data = stack.getTagCompound();
@@ -44,10 +45,10 @@ public class ItemBedrockOreBase extends Item {
 			data.setDouble(type.suffix, getOreLevel(x, z, type) * mult);
 		}
 	}
-	
+
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
-		
+
 		for(BedrockOreType type : BedrockOreType.values()) {
 			double amount = this.getOreAmount(stack, type);
 			String typeName = StatCollector.translateToLocalFormatted("item.bedrock_ore.type." + type.suffix + ".name");
@@ -57,14 +58,32 @@ public class ItemBedrockOreBase extends Item {
 
 	private static NoiseGeneratorPerlin[] ores = new NoiseGeneratorPerlin[BedrockOreType.values().length];
 	private static NoiseGeneratorPerlin level;
-	
+
 	public static double getOreLevel(int x, int z, BedrockOreType type) {
-		
+
 		if(level == null) level = new NoiseGeneratorPerlin(new Random(2114043), 4);
 		if(ores[type.ordinal()] == null) ores[type.ordinal()] = new NoiseGeneratorPerlin(new Random(2082127 + type.ordinal()), 4);
-		
+
 		double scale = 0.01D;
-		
+
 		return MathHelper.clamp_double(Math.abs(level.func_151601_a(x * scale, z * scale) * ores[type.ordinal()].func_151601_a(x * scale, z * scale)) * 0.05, 0, 2);
+	}
+
+	public enum BedrockFormationType {
+		//												primary									sulfuric															solvent																		radsolvent
+		LATERITE(	 0xFFFFFF, "form.laterite", HEMATITE, BAUXITE),
+		SULFIDE(	 0xFFFFFF, "form.sulfide",  CHALCOPYRITE, GALENA),
+		SKARN(       0x868686, "form.skarn",    WOLFRAMITE, PITCHBLENDE);
+
+		public final int color;
+		public final String suffix;
+		public final ItemBedrockOreNew.BedrockOreType[] traits;
+
+		private BedrockFormationType(int color, String suffix, ItemBedrockOreNew.BedrockOreType... traits) {
+			this.color = color;
+			this.suffix = suffix;
+			this.traits = traits;
+
+		}
 	}
 }
