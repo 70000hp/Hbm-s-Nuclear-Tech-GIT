@@ -54,7 +54,7 @@ public class ItemBedrockOreNew extends Item {
 				BedrockOreType type = BedrockOreType.values()[i];
 				for(int j = 0; j < type.traits.length; j++) {
 					BedrockOreGrade grade = BedrockOreGrade.values()[j];
-					String placeholderName = RefStrings.MODID + ":bedrock_ore_" + grade.prefix + "_" + type.suffix + "-" + (i * BedrockOreType.values().length + j);
+					String placeholderName = RefStrings.MODID + ":bedrock_ore_new_" + grade.prefix + "_" + type.suffix + "-" + (i * BedrockOreType.values().length + j);
 					TextureAtlasSpriteMutatable mutableIcon = new TextureAtlasSpriteMutatable(placeholderName, new RGBMutatorInterpolatedComponentRemap(0xFFFFFF, 0x505050, type.light, type.dark));
 					map.setTextureEntry(placeholderName, mutableIcon);
 					this.icons[i * BedrockOreType.values().length + j] = mutableIcon;
@@ -204,7 +204,7 @@ public class ItemBedrockOreNew extends Item {
 
 	public static final int none = 0xFFFFFF;
 	public static final int roasted = 0xCFCFCF;
-	public static final int arc = 0xC3A2A2;
+	public static final int leached = 0xC3A2A2;
 	public static final int washed = 0xDBE2CB;
 
 	public enum ProcessingTrait {
@@ -222,7 +222,7 @@ public class ItemBedrockOreNew extends Item {
 		FINE(none, "fine", CENTRIFUGE),
 		FROTHED(none, "frothed", FROTH),
 		ROASTED(roasted, "roasted", "fine", ROAST),
-		LEACHED(washed, "leached", "fine", LEACH),
+		LEACHED(leached, "leached", "fine", LEACH),
 		CONCENTRATE(washed, "concentrate", MISC),
 		SPECIAL(washed, "special", MISC);
 						//endpoint for primary, recycling
