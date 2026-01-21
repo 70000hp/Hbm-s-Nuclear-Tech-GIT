@@ -30,6 +30,8 @@ import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.DoorDecl;
 import com.hbm.tileentity.machine.storage.TileEntityFileCabinet;
+import com.hbm.util.Compat;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -615,15 +617,7 @@ public class ModBlocks {
 
 	public static Block tesla;
 
-	public static Block sat_mapper;
-	public static Block sat_scanner;
-	public static Block sat_radar;
-	public static Block sat_laser;
-	public static Block sat_foeq;
-	public static Block sat_resonator;
-
 	public static Block sat_dock;
-
 	public static Block soyuz_capsule;
 	public static Block crate_supply;
 
@@ -1172,10 +1166,11 @@ public class ModBlocks {
 	public static Block gas_explosive;
 	public static Block vacuum;
 
-	public static Block absorber;
-	public static Block absorber_red;
-	public static Block absorber_green;
-	public static Block absorber_pink;
+	@Deprecated public static Block absorber;
+	@Deprecated public static Block absorber_red;
+	@Deprecated public static Block absorber_green;
+	@Deprecated public static Block absorber_pink;
+	public static Block rad_absorber;
 	public static Block decon;
 
 	public static Block mud_block;
@@ -2121,13 +2116,6 @@ public class ModBlocks {
 		launch_table = new LaunchTable(Material.iron).setBlockName("launch_table").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.missileTab).setBlockTextureName(RefStrings.MODID + ":launch_table");
 		soyuz_launcher = new SoyuzLauncher(Material.iron).setBlockName("soyuz_launcher").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.missileTab).setBlockTextureName(RefStrings.MODID + ":soyuz_launcher");
 
-		sat_mapper = new DecoBlock(Material.iron).setBlockName("sat_mapper").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_mapper");
-		sat_radar = new DecoBlock(Material.iron).setBlockName("sat_radar").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_radar");
-		sat_scanner = new DecoBlock(Material.iron).setBlockName("sat_scanner").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_scanner");
-		sat_laser = new DecoBlock(Material.iron).setBlockName("sat_laser").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_laser");
-		sat_foeq = new DecoBlock(Material.iron).setBlockName("sat_foeq").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_foeq");
-		sat_resonator = new DecoBlock(Material.iron).setBlockName("sat_resonator").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":sat_resonator");
-
 		sat_dock = new MachineSatDock(Material.iron).setBlockName("sat_dock").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.missileTab).setBlockTextureName(RefStrings.MODID + ":sat_dock");
 		soyuz_capsule = new SoyuzCapsule(Material.iron).setBlockName("soyuz_capsule").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.missileTab).setBlockTextureName(RefStrings.MODID + ":soyuz_capsule");
 		crate_supply = new BlockSupplyCrate(Material.wood).setBlockName("crate_supply").setStepSound(Block.soundTypeWood).setHardness(1.0F).setResistance(2.5F).setCreativeTab(MainRegistry.missileTab).setBlockTextureName(RefStrings.MODID + ":crate_can");
@@ -2333,13 +2321,15 @@ public class ModBlocks {
 		gas_explosive = new BlockGasExplosive().setBlockName("gas_explosive").setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":gas_explosive");
 		vacuum = new BlockVacuum().setBlockName("vacuum").setResistance(1000000F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":vacuum");
 
-		absorber = new BlockAbsorber(Material.iron, 2.5F).setBlockName("absorber").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":absorber");
-		absorber_red = new BlockAbsorber(Material.iron, 10F).setBlockName("absorber_red").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":absorber_red");
-		absorber_green = new BlockAbsorber(Material.iron, 100F).setBlockName("absorber_green").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":absorber_green");
-		absorber_pink = new BlockAbsorber(Material.iron, 10000F).setBlockName("absorber_pink").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":absorber_pink");
+		absorber = new BlockGeneric(Material.iron).setBlockName("absorber").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":block_deprecated");
+		absorber_red = new BlockGeneric(Material.iron).setBlockName("absorber_red").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":block_deprecated");
+		absorber_green = new BlockGeneric(Material.iron).setBlockName("absorber_green").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":block_deprecated");
+		absorber_pink = new BlockGeneric(Material.iron).setBlockName("absorber_pink").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":block_deprecated");
+
+		rad_absorber = new BlockAbsorber(Material.iron).setBlockName("rad_absorber").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab);
 		decon = new BlockDecon(Material.iron).setBlockName("decon").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":decon_side");
 
-		if (Loader.isModLoaded("OpenComputers")) {
+		if(Loader.isModLoaded("OpenComputers")) {
 			oc_cable_paintable = new BlockOpenComputersCablePaintable().setBlockName("oc_cable_paintable").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab);
 		}
 
@@ -3369,6 +3359,7 @@ public class ModBlocks {
 		GameRegistry.registerBlock(absorber_red, absorber_red.getUnlocalizedName());
 		GameRegistry.registerBlock(absorber_green, absorber_green.getUnlocalizedName());
 		GameRegistry.registerBlock(absorber_pink, absorber_pink.getUnlocalizedName());
+		GameRegistry.registerBlock(rad_absorber, ItemBlockBase.class, rad_absorber.getUnlocalizedName());
 		GameRegistry.registerBlock(decon, decon.getUnlocalizedName());
 
 		//Solar Tower Blocks
@@ -3466,14 +3457,6 @@ public class ModBlocks {
 		//Guide
 		GameRegistry.registerBlock(book_guide, book_guide.getUnlocalizedName());
 
-		//Sat Blocks
-		GameRegistry.registerBlock(sat_mapper, sat_mapper.getUnlocalizedName());
-		GameRegistry.registerBlock(sat_scanner, sat_scanner.getUnlocalizedName());
-		GameRegistry.registerBlock(sat_radar, sat_radar.getUnlocalizedName());
-		GameRegistry.registerBlock(sat_laser, sat_laser.getUnlocalizedName());
-		GameRegistry.registerBlock(sat_foeq, sat_foeq.getUnlocalizedName());
-		GameRegistry.registerBlock(sat_resonator, sat_resonator.getUnlocalizedName());
-
 		//Rails
 		GameRegistry.registerBlock(rail_wood, ItemBlockBase.class, rail_wood.getUnlocalizedName());
 		GameRegistry.registerBlock(rail_narrow, ItemBlockBase.class, rail_narrow.getUnlocalizedName());
@@ -3543,7 +3526,7 @@ public class ModBlocks {
 		GameRegistry.registerBlock(vacuum, vacuum.getUnlocalizedName());
 
 		// OC Compat Items
-		if (Loader.isModLoaded("OpenComputers")) {
+		if(Loader.isModLoaded(Compat.MOD_OC)) {
 			register(oc_cable_paintable);
 		}
 
@@ -3608,15 +3591,15 @@ public class ModBlocks {
 	}
 
 	// Is this block a special structure handling block, so we can ignore it for blacklist selection, etc.
-    public static boolean isStructureBlock(Block block, boolean includeAir) {
-        if(block == null) return false;
-        if(block == wand_air) return includeAir;
+	public static boolean isStructureBlock(Block block, boolean includeAir) {
+		if(block == null) return false;
+		if(block == wand_air) return includeAir;
 		if(block == wand_structure) return true;
-        if(block == wand_jigsaw) return true;
-        if(block == wand_logic) return true;
-        if(block == wand_tandem) return true;
-        if(block == wand_loot) return true;
-        return false;
-    }
+		if(block == wand_jigsaw) return true;
+		if(block == wand_logic) return true;
+		if(block == wand_tandem) return true;
+		if(block == wand_loot) return true;
+		return false;
+	}
 
 }
