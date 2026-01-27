@@ -1,18 +1,36 @@
 ## Changed
-* Material autogen now creates redstone in ingot form, allowing smaller than block quantities to be cast
-* Removed the ancient ZPE blocks
-* Drone hitboxes are now way smaller, which should cause them to get stuck when flying less
-* The new FENSU now keeps its charge and installed muffler when broken
-* Battery sockets are now compatible with comparator output
+* Updated russian localization
+* Rad absorbers now use metadata, existing blocks will be converted automatically
+* Fissure bombs that go off in crater biomes now create fissures with metadata 1 which creates radioactive volcanic lava
+  * If a crater biome is created on top of an existing fissure, it will keep producing normal volcanic lava
+* Simplified the battery socket's client packets, reducing CPU load
+* Muzzle flashes on guns now work in third person mode, including on other players and on NPCs, making it more apparent when you're being fired at
+  * This includes non-standard special effects like the .44 gap flash and the .35-800 ejector plume
+* Removed the old unused satellite deco blocks, freeing up 6 block IDs
+* Crucibles that smelt metal with no template set will no place the metal in the recipe stack instead of the waste stack, this should make it easier to get a recipe to work in the many, many cases where people add the template after smelting the material
+* Battery sockets and the FENSU now support the copy tool
+* Removed unused displaylist support from the model loader
+  * DLs have been long phased out in favor of VBOs anyway
+* Rebranded canned horse slime
+  * Now with extra bone marrow
+* Updated the deuterium tower's model
+* Updated most blast door visuals
+* RBMKs now have QMAW pages
+* Updated the model on the heavy magnetic storage container
+* Increased the power draw on the osmiridium welding recipe
+* Bullet casings now make sounds when falling to the ground
+* Most ammo types now have QMAW pages, including information on whether or not they are a war crime
 
-## Fixed
-* Fixed the FEnSU, cyclotron and reliant robin missile being uncraftable due to stacksize limitations
-  * The system for detecting impossible recipe has been improved, instead of a fixed 64 item limit, it now uses the actual limit of the item (or 64 for ore dictionary inputs)
-* Fixed yet another issue regarding addon fluids breaking on recipe reload
-* Fixed YET ANOTHER issue regarding crates, AGAIN
-* Fixed a rare issue where the fusion reactor could have negative fuel
-* Fixed battery socket priority tooltip offset
-* Fixed enchantability on many armor sets being incorrect
-  * Most power armors are intended to not be enchantable at all
-* Fixed crash caused by the balefire bomb
-* Fixed JSON gun reload animations becoming faster and faster with the trenchmaster set
+# Fixed
+* Potentially fixed yet another issue regarding crates
+* Fixed battery socket `fillpercent` RoR function always assuming a max power of 1
+* Fixed issue where multiblock ports would generate many OpenComputers component entries
+* Fixed RBMK automatic control rods having incorrect settings when using the copy tool
+* Fixed battery sockets producing junk debug data in the logs
+* Fixed an issue where the charging station would crash when trying to charge certain items
+* Fixed the DFC's core component not dropping its contents when mined
+* Fixed audio problems with guns
+* Fixed third person muzzleflash on the miniguns clipping the barrel
+* Fixed arc furnace IO slots stacking items with incompatible NBT
+* Fixed a bounding box issue with casing particles, causing them to slide sideways on the first tick, making trajectories weird
+* Fixed some turrets not using the more modern casing spawner system which allows casings to have a smoke trail
