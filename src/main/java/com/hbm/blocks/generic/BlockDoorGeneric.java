@@ -3,13 +3,14 @@ package com.hbm.blocks.generic;
 import java.util.List;
 
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.MultiblockHandlerXR;
 import com.hbm.interfaces.IBomb;
-import com.hbm.items.special.ItemDoorSkin;
 import com.hbm.tileentity.DoorDecl;
 import com.hbm.tileentity.TileEntityDoorGeneric;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.Rotation;
 
+import api.hbm.block.IToolable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -23,7 +24,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class BlockDoorGeneric extends BlockDummyable implements IBomb {
+public class BlockDoorGeneric extends BlockDummyable implements IBomb, IToolable {
 
 	public DoorDecl type;
 	
@@ -34,8 +35,7 @@ public class BlockDoorGeneric extends BlockDummyable implements IBomb {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta){
-		if(meta >= 12)
-			return new TileEntityDoorGeneric();
+		if(meta >= 12) return new TileEntityDoorGeneric();
 		return null;
 	}
 
@@ -69,19 +69,28 @@ public class BlockDoorGeneric extends BlockDummyable implements IBomb {
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer playerIn, int side, float hitX, float hitY, float hitZ){
 		if(!world.isRemote && !playerIn.isSneaking()) {
 			int[] pos1 = findCore(world, x, y, z);
-			if(pos1 == null)
-				return false;
+			if(pos1 == null) return false;
 			TileEntityDoorGeneric door = (TileEntityDoorGeneric) world.getTileEntity(pos1[0], pos1[1], pos1[2]);
 
 			if(door != null) {
-				if(playerIn.getHeldItem() != null && playerIn.getHeldItem().getItem() instanceof ItemDoorSkin) {
-					return door.setSkinIndex((byte) playerIn.getHeldItem().getItemDamage());
-				} else {
-					return door.tryToggle(playerIn);
-				}
+				return door.tryToggle(playerIn);
 			}
 		}
 		return !playerIn.isSneaking();
+	}
+
+	@Override
+	public boolean onScrew(World world, EntityPlayer player, int x, int y, int z, int side, float fX, float fY, float fZ, ToolType tool) {
+		if(tool != ToolType.SCREWDRIVER || !player.isSneaking()) return false;
+		
+		int[] pos1 = findCore(world, x, y, z);
+		if(pos1 == null) return false;
+		TileEntityDoorGeneric door = (TileEntityDoorGeneric) world.getTileEntity(pos1[0], pos1[1], pos1[2]);
+		
+		if(door == null || !door.getDoorType().hasSkins()) return false;
+		if(world.isRemote) return true;
+		door.cycleSkinIndex();
+		return true;
 	}
 	
 	@Override
@@ -159,7 +168,6 @@ public class BlockDoorGeneric extends BlockDummyable implements IBomb {
 	@Override
 	public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
 		return getBoundingBox(world, x, y, z, false);
-		//return AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
 	}
 	
 	public AxisAlignedBB getBoundingBox(World world, int x, int y, int z, boolean forCollision) {
@@ -182,5 +190,25 @@ public class BlockDoorGeneric extends BlockDummyable implements IBomb {
 		case 5: return AxisAlignedBB.getBoundingBox(x + box.minZ, y + box.minY, z + 1 - box.maxX, x + box.maxZ, y + box.maxY, z + 1 - box.minX);
 		}
 		return AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
+	}
+
+	@Override
+	public boolean checkRequirement(World world, int x, int y, int z, ForgeDirection dir, int o) {
+		if(!MultiblockHandlerXR.checkSpace(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, getDimensions(), x, y, z, dir)) return false;
+		
+		if(type.getExtraDimensions() != null) for(int[] dims : type.getExtraDimensions()) {
+			if(!MultiblockHandlerXR.checkSpace(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, dims, x, y, z, dir)) return false;
+		}
+		
+		return true;
+	}
+
+	@Override
+	public void fillSpace(World world, int x, int y, int z, ForgeDirection dir, int o) {
+		MultiblockHandlerXR.fillSpace(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, getDimensions(), this, dir);
+		
+		if(type.getExtraDimensions() != null) for(int[] dims : type.getExtraDimensions()) {
+			MultiblockHandlerXR.fillSpace(world, x + dir.offsetX * o, y + dir.offsetY * o, z + dir.offsetZ * o, dims, this, dir);
+		}
 	}
 }
