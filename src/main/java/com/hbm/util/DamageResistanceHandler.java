@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
+import com.hbm.entity.mob.EntityCreeperNuclear;
 import com.hbm.items.ModItems;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.Tuple.Quartet;
@@ -118,13 +119,14 @@ public class DamageResistanceHandler {
 	}
 	
 	public static void initDefaults() {
-		
+
 		entityStats.put(EntityCreeper.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 2F, 0.25F));
+		entityStats.put(EntityCreeperNuclear.class, new ResistanceStats().addCategory(CATEGORY_EXPLOSION, 5F, 0.35F));
 
 		itemStats.put(ModItems.jackt, new ResistanceStats()
-				.addCategory(CATEGORY_PHYSICAL, 1F, 0.25F));
+				.addCategory(CATEGORY_PHYSICAL, 1F, 0.20F));
 		itemStats.put(ModItems.jackt2, new ResistanceStats()
-				.addCategory(CATEGORY_PHYSICAL, 3F, 0.35F));
+				.addCategory(CATEGORY_PHYSICAL, 2F, 0.25F));
 
 		registerSet(ModItems.steel_helmet, ModItems.steel_plate, ModItems.steel_legs, ModItems.steel_boots, new ResistanceStats());
 		registerSet(ModItems.titanium_helmet, ModItems.titanium_plate, ModItems.titanium_legs, ModItems.titanium_boots, new ResistanceStats());
@@ -159,12 +161,6 @@ public class DamageResistanceHandler {
 				.addCategory(CATEGORY_FIRE, 0.5F, 0.5F)
 				.addCategory(CATEGORY_EXPLOSION, 2F, 0.15F)
 				.setOther(0F, 0.1F));
-		registerSet(ModItems.t45_helmet, ModItems.t45_plate, ModItems.t45_legs, ModItems.t45_boots, new ResistanceStats()
-				.addCategory(CATEGORY_PHYSICAL, 2F, 0.15F)
-				.addCategory(CATEGORY_FIRE, 0.5F, 0.35F)
-				.addCategory(CATEGORY_EXPLOSION, 5F, 0.25F)
-				.addExact(DamageSource.fall.damageType, 0F, 1F)
-				.setOther(0F, 0.1F));
 		registerSet(ModItems.t51_helmet, ModItems.t51_plate, ModItems.t51_legs, ModItems.t51_boots, new ResistanceStats()
 				.addCategory(CATEGORY_PHYSICAL, 2F, 0.15F)
 				.addCategory(CATEGORY_FIRE, 0.5F, 0.35F)
@@ -190,6 +186,13 @@ public class DamageResistanceHandler {
 				.addCategory(CATEGORY_ENERGY, 25F, 0.75F)
 				.addExact(DamageSource.fall.damageType, 0F, 1F)
 				.setOther(15F, 0.3F));
+		registerSet(ModItems.ncrpa_helmet, ModItems.ncrpa_plate, ModItems.ncrpa_legs, ModItems.ncrpa_boots, new ResistanceStats()
+				.addCategory(CATEGORY_PHYSICAL, 25F, 0.65F)
+				.addCategory(CATEGORY_FIRE, 10F, 0.9F)
+				.addCategory(CATEGORY_EXPLOSION, 15F, 0.25F)
+				.addCategory(CATEGORY_ENERGY, 10F, 0.5F)
+				.addExact(DamageSource.fall.damageType, 0F, 1F)
+				.setOther(15F, 0.25F));
 		ResistanceStats bj = new ResistanceStats()
 				.addCategory(CATEGORY_PHYSICAL, 5F, 0.5F)
 				.addCategory(CATEGORY_FIRE, 2.5F, 0.5F)

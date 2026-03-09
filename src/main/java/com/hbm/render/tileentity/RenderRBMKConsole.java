@@ -60,8 +60,21 @@ public class RenderRBMKConsole extends TileEntitySpecialRenderer {
 			double kx = -0.3725D;
 			double ky = -(i / 15) * 0.125 + 3.625;
 			double kz = -(i % 15) * 0.125 + 0.125D * 7;
+
+			if(col.data.hasKey("color") && col.data.getByte("color") >= 0) {
+				byte color = col.data.getByte("color");
+				if(color == 0) tess.setColorOpaque_I(0xFF0000);
+				if(color == 1) tess.setColorOpaque_I(0xFFFF00);
+				if(color == 2) tess.setColorOpaque_I(0x008000);
+				if(color == 3) tess.setColorOpaque_I(0x0000FF);
+				if(color == 4) tess.setColorOpaque_I(0x8000FF);
+			} else {
+				double heat = col.data.getDouble("heat") / col.data.getDouble("maxHeat");
+				double color = 0.65D + (i % 2) * 0.05D;
+				tess.setColorOpaque_F((float) (color + ((1 - color) * heat)), (float) color, (float) color);
+			}
 			
-			drawColumn(tess, kx, ky, kz, (float)(0.65D + (i % 2) * 0.05D), col.data.getDouble("heat") / col.data.getDouble("maxHeat"));
+			drawColumn(tess, kx, ky, kz, 0, 0);
 			
 			switch(col.type) {
 			case FUEL:
@@ -123,7 +136,6 @@ public class RenderRBMKConsole extends TileEntitySpecialRenderer {
 		
 		double width = 0.0625D * 0.75;
 		
-		tess.setColorOpaque_F((float) (color + ((1 - color) * heat)), color, color);
 		tess.addVertex(x, y + width, z - width);
 		tess.addVertex(x, y + width, z + width);
 		tess.addVertex(x, y - width, z + width);

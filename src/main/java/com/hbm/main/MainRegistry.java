@@ -727,6 +727,15 @@ public class MainRegistry {
 		/// IGNORE ///
 		for(int i = 1; i <= 8; i++) ignoreMappings.add("hbm:item.gasflame" + i);
 
+
+		/// REMAP ///
+		remapItems.put("hbm:item.gadget_explosive8", ModItems.early_explosive_lenses);
+		remapItems.put("hbm:item.man_explosive8", ModItems.explosive_lenses);
+		remapItems.put("hbm:item.briquette_lignite", ModItems.briquette);
+		remapItems.put("hbm:item.antiknock", ModItems.fuel_additive);
+		remapItems.put("hbm:item.kit_toolbox_empty", ModItems.toolbox);
+		remapItems.put("hbm:item.kit_toolbox", ModItems.legacy_toolbox);
+
 		for(MissingMapping mapping : event.get()) {
 
 			// ignore all ammo prefixes because those are from the time we threw out all the ammo items
