@@ -18,7 +18,8 @@ public class ItemPoolsSingle {
 	public static final String POOL_VAULT_UNBREAKABLE = "POOL_VAULT_UNBREAKABLE";
 	public static final String POOL_METEORITE_TREASURE = "POOL_METEORITE_TREASURE";
 	public static final String POOL_BLUEPRINTS = "POOL_BLUEPRINTS";
-	
+
+
 	public static void init() {
 
 		new ItemPool(POOL_VAULT_RUSTY) {{
@@ -38,7 +39,7 @@ public class ItemPoolsSingle {
 					weighted(Items.diamond, 0, 1, 2, 1)
 			};
 		}};
-		
+
 		new ItemPool(POOL_VAULT_STANDARD) {{
 			this.pool = new WeightedRandomChestContent[] {
 					weighted(ModItems.ingot_desh, 0, 2, 6, 1),
@@ -54,7 +55,7 @@ public class ItemPoolsSingle {
 					weighted(ModItems.circuit, EnumCircuitType.CHIP.ordinal(), 2, 6, 1)
 			};
 		}};
-		
+
 		new ItemPool(POOL_VAULT_REINFORCED) {{
 			this.pool = new WeightedRandomChestContent[] {
 					weighted(ModItems.ingot_desh, 0, 6, 16, 1),
@@ -71,7 +72,7 @@ public class ItemPoolsSingle {
 					weighted(ModItems.circuit, EnumCircuitType.BASIC.ordinal(), 6, 12, 1)
 			};
 		}};
-		
+
 		new ItemPool(POOL_VAULT_UNBREAKABLE) {{
 			this.pool = new WeightedRandomChestContent[] {
 					weighted(ModItems.ammo_container, 0, 3, 6, 1),
@@ -82,7 +83,7 @@ public class ItemPoolsSingle {
 					weighted(ModItems.circuit, EnumCircuitType.ADVANCED.ordinal(), 6, 12, 1)
 			};
 		}};
-		
+
 		new ItemPool(POOL_METEORITE_TREASURE) {{
 			this.pool = new WeightedRandomChestContent[] {
 					weighted(ModItems.cobalt_pickaxe, 0, 1, 1, 10),
@@ -106,12 +107,20 @@ public class ItemPoolsSingle {
 					weighted(ModItems.blueprint_folder, 1, 1, 1, 1)
 			};
 		}};
-		
+
 		new ItemPool(POOL_BLUEPRINTS) {{
 			this.pool = new WeightedRandomChestContent[] {
 					weighted(ModItems.blueprint_folder, 0, 1, 1, 10),
 					weighted(ModItems.blueprint_folder, 1, 1, 1, 5),
 					weighted(ModItems.blueprint_folder, 0, 1, 1, 1),
+			};
+		}};
+
+		new ItemPool(POOL_BLUEPRINTS) {{
+			this.pool = new WeightedRandomChestContent[] {
+				weighted(ModItems.blueprint_folder, 0, 1, 1, 10),
+				weighted(ModItems.blueprint_folder, 1, 1, 1, 5),
+				weighted(ModItems.blueprint_folder, 0, 1, 1, 1),
 			};
 		}};
 	}
