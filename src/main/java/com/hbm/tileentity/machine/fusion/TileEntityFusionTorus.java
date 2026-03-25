@@ -12,6 +12,7 @@ import com.hbm.inventory.recipes.FusionRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.module.machine.ModuleMachineFusion;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
@@ -169,6 +170,9 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 
 			boolean ignition = recipe != null ? recipe.ignitionTemp <= this.klystronEnergy : true;
 
+			float r = 0F;
+			float g = 0F;
+			float b = 0F;
 			this.plasmaEnergy = 0;
 			this.fuelConsumption = 0;
 			this.fusionModule.preUpdate(factor, collectors * 0.5D);
@@ -178,6 +182,9 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 			if(didProcess && recipe != null) {
 				this.plasmaEnergy = (long) Math.ceil(recipe.outputTemp * factor);
 				this.fuelConsumption = factor;
+				r = recipe.r;
+				g = recipe.g;
+				b = recipe.b;
 			}
 
 			double outputIntensity = this.getOuputIntensity(receiverCount);
@@ -192,7 +199,7 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 
 						if(entry.getKey() instanceof IFusionPowerReceiver) {
 							long powerReceived = (long) Math.ceil(this.plasmaEnergy * outputIntensity);
-							((IFusionPowerReceiver) entry.getKey()).receiveFusionPower(powerReceived, outputFlux);
+							((IFusionPowerReceiver) entry.getKey()).receiveFusionPower(powerReceived, outputFlux, r, g, b);
 						}
 					}
 				}
@@ -225,7 +232,7 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 				float speed = this.magnetSpeed / 30F;
 
 				if(audio == null) {
-					audio = MainRegistry.proxy.getLoopedSound("hbm:block.fusionReactorRunning", xCoord + 0.5F, yCoord + 2.5F, zCoord + 0.5F, getVolume(speed), 30F, speed, 20);
+					audio = MainRegistry.proxy.getLoopedSound(NTMSounds.FUSION_REACTOR_LOOP, xCoord + 0.5F, yCoord + 2.5F, zCoord + 0.5F, getVolume(speed), 30F, speed, 20);
 					audio.startSound();
 				} else {
 					audio.updateVolume(getVolume(speed));
