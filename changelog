@@ -1,25 +1,37 @@
-## Added
-* Plasma forge
-  * Plasma-powered assembly machine
-  * Used to produce lategame items that until now were regular assembler recipes
-  * Can pass on plasma, 25% of the plasma energy that passes through a plasma forge is consumed
-  * This allows plasma forges to be chained, or unused residue energy to be used in turbines
-  * Parts that interact with the fusion reactor directly, like the collector chambers, are not compatible
-  * Like all assembler-type machines, features custom animations (i spent a lot of time on those, please look at them for prolonged periods of time, ideally without blinking)
-
 ## Changed
-* Doubled bismuth and tantalum yields from high-performance solvent bedrock ore processing
-* Hoppers and buckets can now be made out of steel
-* RoR gauges now show the lowest and highest configured value on the actual gauge
-* The steel sword now looks like a medieval broad sword with the appropriate scale
-* All remaining items have been removed from the template folder, siren tracks and plate stamps are now made in the anvil
-* Gerald assembly now requires stellar flux
-* The DFC parts are now made in the plasma forge, with the recipes being more expensive
-* The restrictions for firing Folly (using the scope, waiting for the startup) no longer apply to NPCs (which can never fulfill them anyway), allowing them to actually use it
-* The plinking sound played when a drill cannot break a block now only plays once for the entire AoE instead of once for every single block that couldn't be broken
+* Updated russian and chinese localization
+* Oil bubbles are now 3x more common in deserts (biomes with a temperature value of 2 and rainfall of 0)
+* Oil bubbles now have a 50% chance of spawning a surface indicator (similar to bedrock oil but still distinct)
+* Oil deposits will never drop themselves, they always produce tar when mined
+* Any tar type can now be turned into bitumen in a mixer (with worse efficiency compared to a liquefactor)
+* RoR levers and indicator lights now have OpenComputers integration
+* Alexandrite dropped with fortune is now capped at 2 gems per ore
+* Added a config option for decreasing the soot requirement for skeleton guns (or rather, for the calculation, this number is added to the actual soot value, simulating a higher value)
+* Radioisotope cells and PT cells are now deprecated, and can no longer be crafted
+  * Existing cells will continue to work for now
+* If two pipe anchors are connected, one having a type set and one still being "none", instead of erroring, the "none" pipe will assume the other one's type
+* Self-chargers in battery sockets now produce unreliable power output which constantly fluctuates
+* Self-chargers in battery sockets now cause static discharges in regular intervals
+* Added more RoR functionality to the boilers, industrial combustion engine, CCGT and ZIRNOX
+* The industrial steam turbine now has OpenComputers integration
+* Crates now open when right-clicked by default, holding shift is required to place them down
+* The automatic buzzsaw can now burn coal tar creosote
+* The old cluster type effect used by MPBs and cluster missiles now use the new generic projectile system with actual bomblet models
+* Removed the legacy fusion reactor entirely
+* Changed neutron reflectors
+  * Reflectors can no longer be made in the blast furnace
+  * Rather, they are welded from HSS and tungsten carbide
+  * Tungsten carbide is made in the pyrolysis oven using syngas and tungsten powder
+  * Many recipes that used to use neutron reflectors now use alternative materials like HSS plates or weapon steel
+  * This effectively means that neutron reflectors are post oil 3
+* Removed legacy battery items and selfchargers
+* Added more QMAW pages
 
 ## Fixed
-* Fixed size 15 dual kerosene thruster not rendering at all
-* Fixed HUD/jetpack toggle popup not working at all on multiplayer servers
-* Fixed assembly machine NEI handler not being able to handle all thirteen inputs at once
-* Fixed RBMK fuel channels playing the meltdown sound when broken while hot with meltdowns disabled
+* Fixed uncrafting of the nickel RTG pellet not respecting item metadata
+* Tile entities that use fluids should now force the chunk they are in to be written to disk when unloaded
+  * This should fix the issue where systems that constantly move fluids around may not properly save to disk
+* Fixed dispensed dynamites being considered impact grenades for some reason
+* Fixed RBMK flux detection with RoR and OC not working
+* Moved the soyuz launcher core component recipe to the assembler, fixing an issue where the component recipe is not available in 528 mode
+* Fixed crash caused by using the copy tool on uncolored RBMK control rods

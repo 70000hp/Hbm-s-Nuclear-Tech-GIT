@@ -23,6 +23,7 @@ public class ServerConfig extends RunningConfig {
 	public static ConfigWrapper<Boolean> ENABLE_MKU =					new ConfigWrapper(true);
 	public static ConfigWrapper<Boolean> STRUCTURE_DEBUG =				new ConfigWrapper(false);
 	public static ConfigWrapper<Boolean> LEGACY_CRUCIBLE_RULES =		new ConfigWrapper(false);
+
 	private static void initDefaults() {
 		configMap.put("DAMAGE_COMPATIBILITY_MODE", DAMAGE_COMPATIBILITY_MODE);
 		configMap.put("MINE_AP_DAMAGE", MINE_AP_DAMAGE);

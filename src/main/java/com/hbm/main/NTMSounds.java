@@ -34,6 +34,8 @@ public class NTMSounds {
 	public static final String GUN_LATCH_OPEN = "hbm:weapon.reload.openLatch";
 	public static final String GUN_VALVE = "hbm:weapon.reload.pressureValve";
 	public static final String GUN_FATMAN_RELOAD = "hbm:weapon.reload.fatmanFull";
+	public static final String GRENADE_TECH = "hbm:weapon.reload.grenadeTech";
+	public static final String GRENADE_NUKA = "hbm:weapon.reload.grenadeNuka";
 	
 	/// FOLEY ///
 	public static final String GUN_WHACK = "hbm:weapon.foley.gunWhack";
@@ -98,6 +100,9 @@ public class NTMSounds {
 	public static final String BLOCK_PLUSHY = "hbm:block.squeakyToy"; // squee
 	public static final String BLOCK_HUNDUNS_MAGNIFICENT_HOWL = "hbm:block.hunduns_magnificent_howl"; // tragic yuri
 	public static final String BLOCK_FALLOUT_3_POPUP = "hbm:block.bobble";
+	public static final String LEVER_START = "hbm:block.leverStart";
+	public static final String LEVER_STOP = "hbm:block.leverStop";
+	public static final String SPARK = "hbm:block.spark";
 	
 	/// MACHINE SOUNDS, MOSTLY LOOPS ///
 	public static final String ELECTRIC_MOTOR_LOOP = "hbm:block.motor";
@@ -125,6 +130,22 @@ public class NTMSounds {
 	public static final String TECH_BOOP = "hbm:item.techBoop"; // boop
 	public static final String TECH_BLEEP = "hbm:item.techBleep"; // blee-boo-bee-boop
 	public static final String UPGRADE_PLUG = "hbm:item.upgradePlug"; // plok
+	public static final String UNPACK = "hbm:item.unpack";
+	public static final String RIVET_GUN = "hbm:item.boltgun";
+	public static final String GEIGER_PREFIX = "hbm:item.geiger"; // needs a number appended to be a valid sound, 0-6
+	public static final String FILTER_SCREW = "hbm:item.gasmaskScrew";
+	public static final String SUIT_BATTERY = "hbm:item.battery";
+	public static final String CRATE_OPEN = "hbm:block.crateOpen";
+	public static final String CRATE_CLOSE = "hbm:block.crateClose";
+	public static final String PADLOCK = "hbm:block.lockHang";
+	public static final String SPRAY_CAN = "hbm:item.spray";
+	public static final String REPAIR = "hbm:item.repair";
+	public static final String GAVEL = "hbm:weapon.whack";
+	public static final String BONK = "hbm:weapon.bonk";
+	public static final String STOP = "hbm:weapon.stop"; // STAHP
+	public static final String BANG = "hbm:weapon.bang"; // frying pan
+	public static final String SLICE = "hbm:weapon.slice";
+	public static final String KAPENG = "hbm:weapon.kapeng"; // third degree
 	
 	/// VANILLA CRAP I CANNOT BE ASSED TO REMEMBER ///
 	public static final String VANILLA_ORB = "random.orb"; // xp orb ping
@@ -132,6 +153,9 @@ public class NTMSounds {
 	public static final String VANILLA_FIREWORKS_BANG = "fireworks.blast";
 	public static final String VANILLA_HISS = "random.fizz"; // fire extinguishes
 	public static final String VANILLA_FIRE = "fire.fire"; // fire crackles
+	public static final String VANILLA_IGNITE = "fire.ignite"; // flint and steel
 	public static final String VANILLA_MINECART = "minecart.base"; // minecart rolling loop
 	public static final String VANILLA_GIB = "mob.zombie.woodbreak"; // zombie breaks door down
+	public static final String VANILLA_TELEPORT = "mob.endermen.portal"; // enderman teleports
+	public static final String VANILLA_ANVIL = "random.anvil_land"; // falling anvil lands
 }
