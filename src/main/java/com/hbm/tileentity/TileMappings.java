@@ -221,8 +221,9 @@ public class TileMappings {
 		put(TileEntityPlushie.class, "tileentity_ntm_plushie");
 		put(TileEntityEmitter.class, "tileentity_ntm_emitter");
 
+		put(TileEntityCargoElevator.class, "tileentity_cargo_elevator");
 		put(TileEntityDoorGeneric.class, "tileentity_ntm_door");
-
+		
 		put(TileEntityCharger.class, "tileentity_ntm_charger");
 		put(TileEntityRefueler.class, "tileentity_ntm_refueler");
 
@@ -285,7 +286,6 @@ public class TileMappings {
 		put(TileEntityTurretHowardDamaged.class, "tileentity_turret_howard_damaged");
 		put(TileEntityTurretMaxwell.class, "tileentity_turret_maxwell");
 		put(TileEntityTurretFritz.class, "tileentity_turret_fritz");
-		put(TileEntityTurretBrandon.class, "tileentity_turret_brandon");
 		put(TileEntityTurretArty.class, "tileentity_turret_arty");
 		put(TileEntityTurretHIMARS.class, "tileentity_turret_himars");
 		put(TileEntityTurretSentry.class, "tileentity_turret_sentry");
@@ -412,6 +412,7 @@ public class TileMappings {
 		put(TileEntityRBMKGraph.class, "tileentity_rbmk_graph");
 		put(TileEntityRBMKLever.class, "tileentity_rbmk_lever");
 		put(TileEntityRBMKIndicator.class, "tileentity_rbmk_indicator");
+		put(TileEntityRBMKTerminal.class, "tileentity_rbmk_terminal");
 		put(TileEntityRBMKInlet.class, "tileentity_rbmk_inlet");
 		put(TileEntityRBMKOutlet.class, "tileentity_rbmk_outlet");
 		put(TileEntityRBMKAutoloader.class, "tileentity_rbmk_autoloader");
