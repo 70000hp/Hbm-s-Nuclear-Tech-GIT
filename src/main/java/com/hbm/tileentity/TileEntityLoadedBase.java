@@ -1,7 +1,9 @@
 package com.hbm.tileentity;
 
+import com.hbm.blocks.ModBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.handler.threading.PacketThreading;
+import com.hbm.main.NTMSounds;
 import com.hbm.packet.toclient.BufPacket;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.util.fauxpointtwelve.BlockPos;
@@ -103,17 +105,26 @@ public class TileEntityLoadedBase extends TileEntity implements ILoadedTile, IBu
 		PacketThreading.createAllAroundThreadedPacket(packet, new NetworkRegistry.TargetPoint(this.worldObj.provider.dimensionId, xCoord, yCoord, zCoord, range));
 	}
 	
-	public void checkTilt(boolean extraHeavy) {
-		if(!GeneralConfig.enable528MachineGravity) { this.tilted = false; return; }
+	public static enum TiltType {
+		UNAVOIDABLE, CONFIG;
+	}
+	
+	public void checkTilt(TiltType cfg, boolean extraHeavy) {
+		boolean doesTilt = false;
+		if(cfg == TiltType.UNAVOIDABLE) doesTilt = true;
+		if(cfg == TiltType.CONFIG && GeneralConfig.enableMachineGravity) doesTilt = true;
+		if(cfg == TiltType.CONFIG && GeneralConfig.enable528MachineGravity) doesTilt = true;
+		
+		if(!doesTilt) { this.tilted = false; return; }
 		if(this.getFloorCount() <= 0) { this.tilted = false; return; }
-		if(this.worldObj.getTotalWorldTime() % 20 != 0) return;
+		if((this.worldObj.getTotalWorldTime() + BlockPos.getIdentity(xCoord, yCoord, zCoord)) % 20 != 0) return;
 		
 		if(this.tiltBlocksChecked >= this.getFloorCount()) {
 			
 			if(this.tiltBlocksValid >= this.tiltBlocksChecked * 0.95) {
 				this.tilted = false;
 			} else {
-				// if(!this.tiled) play sound
+				if(!this.tilted) worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, NTMSounds.METAL_IMPACT, 3F, 1F);
 				this.tilted = true;
 			}
 			
@@ -145,6 +156,7 @@ public class TileEntityLoadedBase extends TileEntity implements ILoadedTile, IBu
 		} else {
 			if(!ground.isSideSolid(worldObj, pos.getX(), pos.getY(), pos.getZ(), ForgeDirection.UP)) return;
 			if(ground.getMaterial() == Material.sand) return;
+			if(ground == ModBlocks.dirt_dead || ground == ModBlocks.dirt_oily || ground == ModBlocks.stone_cracked) return;
 			this.tiltBlocksValid++;
 		}
 	}
@@ -153,9 +165,12 @@ public class TileEntityLoadedBase extends TileEntity implements ILoadedTile, IBu
 	public BlockPos getFloorPosFromIndex(int index) { return null; }
 
 	public BlockPos standardFloor3x3(int index) {
-		return new BlockPos(xCoord - 1 + (index / 2) * 2, yCoord - 1, zCoord - 2 + (index % 2) * 2);
+		return new BlockPos(xCoord - 1 + (index / 2) * 2, yCoord - 1, zCoord - 1 + (index % 2) * 2);
 	}
 	public BlockPos standardFloor5x5(int index) {
 		return new BlockPos(xCoord - 2 + (index / 3) * 2, yCoord - 1, zCoord - 2 + (index % 3) * 2);
+	}
+	public BlockPos standardFloor7x7(int index) {
+		return new BlockPos(xCoord - 3 + (index / 4) * 2, yCoord - 1, zCoord - 3 + (index % 4) * 2);
 	}
 }
