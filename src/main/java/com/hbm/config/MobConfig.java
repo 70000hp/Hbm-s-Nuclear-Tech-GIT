@@ -28,6 +28,7 @@ public class MobConfig {
 	public static boolean enableDucks = true;
 	public static boolean enableMobGear = true;
 	public static boolean enableMobWeapons = true;
+	public static double mobWeaponSootReduction = 0;
 	
 	public static boolean enableHives = true;
 	public static int hiveSpawn = 256;
@@ -68,6 +69,10 @@ public class MobConfig {
 	public static double rampantSmokeStackOverride = 0.4;
 	public static double pollutionMult = 3;
 	
+	public static boolean trueRam() {
+		return rampantMode && rampantNaturalScoutSpawn && scoutThreshold <= 0.1 && rampantExtendedTargetting && rampantDig && rampantGlyphidGuidance;
+	}
+	
 	public static void loadFromConfig(Configuration config) {
 
 		final String CATEGORY = CommonConfig.CATEGORY_MOBS;
@@ -96,6 +101,7 @@ public class MobConfig {
 		enableDucks = CommonConfig.createConfigBool(config, CATEGORY, "12.D00_enableDucks", "Whether pressing O should allow the player to duck", true);
 		enableMobGear = CommonConfig.createConfigBool(config, CATEGORY, "12.D01_enableMobGear", "Whether zombies and skeletons should have additional gear when spawning", true);
 		enableMobWeapons = CommonConfig.createConfigBool(config, CATEGORY, "12.D02_enableMobWeapons", "Whether skeletons should have bows replaced with guns when spawning at higher soot levels", true);
+		mobWeaponSootReduction = CommonConfig.createConfigDouble(config, CATEGORY, "12.D03_mobWeaponSootReduction", "Reduces the amount of soot needed for skeleton guns to appear", 0D);
 
 		enableHives = CommonConfig.createConfigBool(config, CATEGORY, "12.G00_enableHives", "Whether glyphid hives should spawn", true);
 		hiveSpawn = CommonConfig.createConfigInt(config, CATEGORY, "12.G01_hiveSpawn", "The average amount of chunks per hive", 256);

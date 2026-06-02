@@ -110,7 +110,8 @@ public class ItemPoolsComponent {
 					weighted(ModItems.cap_nuka, 0, 1, 16, 2),
 					weighted(ModItems.book_guide, 3, 1, 1, 1),
 					weighted(ModBlocks.deco_computer, 0, 1, 1, 1),
-					weighted(ModItems.blueprint_folder, 0, 1, 1, 1)
+					weighted(ModItems.blueprint_folder, 0, 1, 1, 1),
+					weighted(ModItems.coin_token, 0, 1, 1, 2)
 			};
 		}};
 
@@ -122,11 +123,12 @@ public class ItemPoolsComponent {
 					weighted(Items.map, 0, 1, 1, 50),
 					weighted(Items.writable_book, 0, 1, 1, 30),
 					weighted(ModItems.cigarette, 0, 1, 16, 20),
-					weighted(ModItems.toothpicks, 0, 1, 16, 10),
 					weighted(ModItems.dust, 0, 1, 1, 40),
 					weighted(ModItems.dust_tiny, 0, 1, 3, 75),
 					weighted(ModItems.ink, 0, 1, 1, 1),
-					weighted(ModItems.blueprint_folder, 0, 1, 1, 5)
+					weighted(ModItems.screwdriver, 0, 1, 1, 10),
+					weighted(ModItems.blueprint_folder, 0, 1, 1, 5),
+					weighted(ModItems.coin_token, 0, 1, 1, 30)
 			};
 		}};
 
@@ -191,7 +193,8 @@ public class ItemPoolsComponent {
 					weighted(Items.experience_bottle, 0, 1, 3, 1),
 					weighted(ModItems.blueprint_folder, 0, 1, 1, 1),
 					weighted(ModItems.blueprint_folder, 1, 1, 1, 1),
-					weighted(ModItems.ammo_container, 0, 1, 1, 1)
+					weighted(ModItems.ammo_container, 0, 1, 1, 1),
+					weighted(ModItems.coin_token, 0, 1, 1, 5)
 			};
 		}};
 

@@ -11,6 +11,7 @@ import com.hbm.handler.CompatHandler;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.gui.GUIRBMKConsole;
+import com.hbm.items.machine.ItemRBMKRod;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.tileentity.machine.rbmk.TileEntityRBMKControlManual.RBMKColor;
@@ -100,6 +101,7 @@ public class TileEntityRBMKConsole extends TileEntityMachineBase implements ICon
 				columns[index] = new RBMKColumn(rbmk.getConsoleType(), rbmk.getNBTForConsole());
 				columns[index].data.setDouble("heat", rbmk.heat);
 				columns[index].data.setDouble("maxHeat", rbmk.maxHeat());
+				columns[index].data.setByte("indicator", (byte) rbmk.craneIndicator);
 				if(rbmk.isModerated()) columns[index].data.setBoolean("moderated", true); //false is the default anyway and not setting it when we don't need to reduces cruft
 
 				if(te instanceof TileEntityRBMKRod) {
@@ -136,8 +138,7 @@ public class TileEntityRBMKConsole extends TileEntityMachineBase implements ICon
 
 				RBMKColumn col = this.columns[i];
 
-				if(col == null)
-					continue;
+				if(col == null) continue;
 
 				switch(screen.type) {
 				case COL_TEMP:
@@ -667,6 +668,21 @@ public class TileEntityRBMKConsole extends TileEntityMachineBase implements ICon
 			if (te instanceof TileEntityRBMKCooler){
 				TileEntityRBMKCooler coolerChannel = (TileEntityRBMKCooler) te;
 				data_table.put("cryogel", coolerChannel.getAllTanks()[0].getFill());
+			}
+
+			if (te instanceof TileEntityRBMKStorage){
+				TileEntityRBMKStorage storageChannel = (TileEntityRBMKStorage) te;
+				ItemStack loadedItem;
+				for (int k = 0; k < 12; k++) {
+					loadedItem = storageChannel.slots[k];
+					if(loadedItem != null && loadedItem.getItem() instanceof ItemRBMKRod) {
+						data_table.put("slot" + k + "coreSkinTemp", ItemRBMKRod.getHullHeat(loadedItem));
+						data_table.put("slot" + k + "coreTemp", ItemRBMKRod.getCoreHeat(loadedItem));
+						data_table.put("slot" + k + "enrichment", ItemRBMKRod.getEnrichment(loadedItem));
+						data_table.put("slot" + k + "xenon", ItemRBMKRod.getPoisonLevel(loadedItem));
+						data_table.put("slot" + k + "rodName", loadedItem.getItem().getUnlocalizedName());
+					}
+				}
 			}
 
 			return new Object[] {data_table};

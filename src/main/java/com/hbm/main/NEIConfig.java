@@ -58,8 +58,6 @@ public class NEIConfig implements IConfigureNEI {
 		API.hideItem(new ItemStack(ModBlocks.machine_rtg_furnace_on));
 		API.hideItem(new ItemStack(ModBlocks.reinforced_lamp_on));
 		API.hideItem(new ItemStack(ModBlocks.statue_elb_f));
-		API.hideItem(new ItemStack(ModBlocks.cheater_virus));
-		API.hideItem(new ItemStack(ModBlocks.cheater_virus_seed));
 		API.hideItem(new ItemStack(ModItems.euphemium_kit));
 		API.hideItem(new ItemStack(ModItems.bobmazon_hidden));
 		API.hideItem(new ItemStack(ModItems.book_lore)); //the broken nbt-less one shouldn't show up in normal play anyway
@@ -69,7 +67,6 @@ public class NEIConfig implements IConfigureNEI {
 			API.hideItem(new ItemStack(ModItems.burnt_bark));
 			API.hideItem(new ItemStack(ModItems.ams_core_thingy));
 		}
-		API.hideItem(new ItemStack(ModBlocks.dummy_block_vault));
 		API.hideItem(new ItemStack(ModBlocks.dummy_block_blast));
 		API.hideItem(new ItemStack(ModBlocks.dummy_port_compact_launcher));
 		API.hideItem(new ItemStack(ModBlocks.dummy_port_launch_table));

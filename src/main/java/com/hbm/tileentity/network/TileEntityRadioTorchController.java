@@ -20,9 +20,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityRadioTorchController extends TileEntityLoadedBase implements IControlReceiver {
 
-	public String channel;
+	public String channel = "";
 	public String prev;
-	public boolean polling = false;
+	public boolean polling = true;
 
 	@Override
 	public void updateEntity() {
@@ -49,7 +49,7 @@ public class TileEntityRadioTorchController extends TileEntityLoadedBase impleme
 							vnt.explode();
 							return;
 						}
-						if(this.polling || !rec.equals(prev)) {
+						if((this.polling && chan.timeStamp >= worldObj.getTotalWorldTime() - 1) || !rec.equals(prev)) {
 							try {
 								if(rec != null && !rec.isEmpty()) ror.runRORFunction(IRORInteractive.PREFIX_FUNCTION + IRORInteractive.getCommand(rec), IRORInteractive.getParams(rec));
 							} catch(RORFunctionException ex) { }

@@ -26,9 +26,12 @@ import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.CompatEnergyControl;
 import com.hbm.util.EnumUtil;
+import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
-import api.hbm.fluid.IFluidStandardTransceiver;
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
+import api.hbm.redstoneoverradio.IRORValueProvider;
+import api.hbm.redstoneoverradio.IRORInteractive;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
@@ -49,10 +52,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityReactorZirnox extends TileEntityMachineBase implements IControlReceiver, IFluidStandardTransceiver, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
+public class TileEntityReactorZirnox extends TileEntityMachineBase implements IControlReceiver, IFluidStandardTransceiverMK2, SimpleComponent, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent, IRORValueProvider, IRORInteractive {
 
 	public int heat;
 	public static final int maxHeat = 100000;
+	public boolean redstonePowered = false;
 	public int pressure;
 	public static final int maxPressure = 100000;
 	public boolean isOn = false;
@@ -85,6 +89,12 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		carbonDioxide = new FluidTank(Fluids.CARBONDIOXIDE, 16000);
 		water = new FluidTank(Fluids.WATER, 32000);
 	}
+	public void setRedstonePowered(boolean powered) {
+		if (!powered && this.redstonePowered) {
+			isOn = false;
+		}
+		this.redstonePowered = powered;
+	}
 
 	@Override
 	public String getName() {
@@ -115,6 +125,7 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		steam.readFromNBT(nbt, "steam");
 		carbonDioxide.readFromNBT(nbt, "carbondioxide");
 		water.readFromNBT(nbt, "water");
+		redstonePowered = nbt.getBoolean("redstonePowered");
 	}
 
 	@Override
@@ -126,6 +137,7 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		steam.writeToNBT(nbt, "steam");
 		carbonDioxide.writeToNBT(nbt, "carbondioxide");
 		water.writeToNBT(nbt, "water");
+		nbt.setBoolean("redstonePowered", redstonePowered);
 
 	}
 
@@ -176,10 +188,14 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 	public void updateEntity() {
 
 		if(!worldObj.isRemote) {
-
+			this.checkTilt(TiltType.CONFIG, true);
+			
+			if (redstonePowered) {
+				isOn = true;
+			}
 			this.output = 0;
 
-			if(worldObj.getTotalWorldTime() % 20 == 0) {
+			if(!tilted && worldObj.getTotalWorldTime() % 20 == 0) {
 				this.updateConnections();
 			}
 
@@ -212,8 +228,8 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 
 			}
 
-			for(DirPos pos : getConPos()) {
-				this.sendFluid(steam, worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+			if(!this.tilted) for(DirPos pos : getConPos()) {
+				this.tryProvide(steam, worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
 			}
 
 			checkIfMeltdown();
@@ -221,6 +237,9 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 			this.networkPackNT(150);
 		}
 	}
+	
+	@Override public int getFloorCount() { return 3 * 3; }
+	@Override public BlockPos getFloorPosFromIndex(int index) { return this.standardFloor5x5(index); }
 
 	@Override
 	public void serialize(ByteBuf buf) {
@@ -228,6 +247,7 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		buf.writeInt(this.heat);
 		buf.writeInt(this.pressure);
 		buf.writeBoolean(this.isOn);
+		buf.writeBoolean(this.redstonePowered);
 		steam.serialize(buf);
 		carbonDioxide.serialize(buf);
 		water.serialize(buf);
@@ -239,6 +259,7 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		this.heat = buf.readInt();
 		this.pressure = buf.readInt();
 		this.isOn = buf.readBoolean();
+		this.redstonePowered = buf.readBoolean();
 		steam.deserialize(buf);
 		carbonDioxide.deserialize(buf);
 		water.deserialize(buf);
@@ -429,7 +450,7 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 
 	@Override
 	public void receiveControl(NBTTagCompound data) {
-		if(data.hasKey("control")) {
+		if(data.hasKey("control") && !redstonePowered) {
 			this.isOn = !this.isOn;
 		}
 
@@ -583,5 +604,50 @@ public class TileEntityReactorZirnox extends TileEntityMachineBase implements IC
 		data.setLong(CompatEnergyControl.L_PRESSURE_BAR, Math.round(pressure * 1.0E-5D * 30.0D));
 		data.setDouble(CompatEnergyControl.D_CONSUMPTION_MB, output);
 		data.setDouble(CompatEnergyControl.D_OUTPUT_MB, output);
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "heat",
+				PREFIX_VALUE + "pressure",
+				PREFIX_VALUE + "water",
+				PREFIX_VALUE + "steam",
+				PREFIX_VALUE + "co2",
+				PREFIX_VALUE + "state",
+				PREFIX_FUNCTION + "setState" + NAME_SEPARATOR + "active (0 or 1)",
+				PREFIX_FUNCTION + "ventCO2"
+		};
+	}
+	
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "heat").equals(name))			return	"" + (int) Math.round(heat * 1.0E-5D * 780.0D + 20.0D);
+		if((PREFIX_VALUE + "pressure").equals(name))		return	"" + (int) Math.round(pressure * 1.0E-5D * 30.0D);
+		if((PREFIX_VALUE + "water").equals(name))			return	"" + water.getFill();
+		if((PREFIX_VALUE + "steam").equals(name))			return	"" + steam.getFill();
+		if((PREFIX_VALUE + "co2").equals(name))				return	"" + carbonDioxide.getFill();
+		if((PREFIX_VALUE + "state").equals(name))			return	"" + (isOn ? 1 : 0);
+		return null;
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+		if((PREFIX_FUNCTION + "setState").equals(name) && params.length > 0) {
+			if(redstonePowered) return null;
+			try {
+				int val = Integer.parseInt(params[0]);
+				this.isOn = (val == 1);
+				this.markDirty();
+			} catch(NumberFormatException e) {}
+			return null;
+		}
+		if ((PREFIX_FUNCTION + "ventCO2").equals(name)) {
+			int fill = this.carbonDioxide.getFill();
+			this.carbonDioxide.setFill(Math.max(fill - 1000, 0));
+			this.markDirty();
+			return null;
+		}
+		return null;
 	}
 }

@@ -26,6 +26,7 @@ import com.hbm.world.gen.MapGenChainloader;
 import com.hbm.world.generator.CellularDungeonFactory;
 import com.hbm.world.generator.DungeonToolbox;
 import cpw.mods.fml.common.IWorldGenerator;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -145,7 +146,7 @@ public class HbmWorldGen implements IWorldGenerator {
 					int randPosX = i + rand.nextInt(2) + 8;
 					int randPosZ = j + rand.nextInt(2) + 8;
 
-					BedrockOre.generate(world, randPosX, randPosZ, new ItemStack(ModItems.bedrock_ore_base), null, 0xD78A16, 1);
+					BedrockOre.generateAuto(world, randPosX, randPosZ);
 				}
 
 			} else {
@@ -247,18 +248,6 @@ public class HbmWorldGen implements IWorldGenerator {
 				new LibraryDungeon().generate(world, rand, x, y, z);
 			}
 
-			if(biome.temperature == 0.5F || biome.temperature == 2.0F) {
-				if(WorldConfig.relayStructure > 0 && rand.nextInt(WorldConfig.relayStructure) == 0) {
-					for(int a = 0; a < 1; a++) {
-						int x = i + rand.nextInt(16);
-						int z = j + rand.nextInt(16);
-						int y = world.getHeightValue(x, z);
-
-						new Relay().generate(world, rand, x, y, z);
-					}
-				}
-			}
-
 			if(WorldConfig.dudStructure > 0 && rand.nextInt(WorldConfig.dudStructure) == 0) {
 				int x = i + 8 + rand.nextInt(16);
 				int z = j + 8 + rand.nextInt(16);
@@ -356,22 +345,13 @@ public class HbmWorldGen implements IWorldGenerator {
 				}
 			}
 
-			if (WorldConfig.geyserChlorine > 0 && biome == BiomeGenBase.plains && rand.nextInt(WorldConfig.geyserWater) == 0) {
+			if (WorldConfig.geyserChlorine > 0 && biome == BiomeGenBase.plains && rand.nextInt(WorldConfig.geyserChlorine) == 0) {
 				int x = i + rand.nextInt(16);
 				int z = j + rand.nextInt(16);
 				int y = world.getHeightValue(x, z);
 
 				if(world.getBlock(x, y - 1, z) == Blocks.grass)
 					new Geyser().generate(world, rand, x, y, z);
-			}
-
-			if (WorldConfig.geyserWater > 0 && biome == BiomeGenBase.desert && rand.nextInt(WorldConfig.geyserChlorine) == 0) {
-				int x = i + rand.nextInt(16);
-				int z = j + rand.nextInt(16);
-				int y = world.getHeightValue(x, z);
-
-				if(world.getBlock(x, y - 1, z) == Blocks.sand)
-					new GeyserLarge().generate(world, rand, x, y, z);
 			}
 
 			if (WorldConfig.capsuleStructure > 0 && biome == BiomeGenBase.beach && rand.nextInt(WorldConfig.capsuleStructure) == 0) {
@@ -392,17 +372,6 @@ public class HbmWorldGen implements IWorldGenerator {
 					if(GeneralConfig.enableDebugMode)
 						MainRegistry.logger.info("[Debug] Successfully spawned capsule at " + x + " " + z);
 				}
-			}
-
-			if (WorldConfig.geyserVapor > 0 && rand.nextInt(WorldConfig.geyserVapor) == 0) {
-				int x = i + rand.nextInt(16);
-				int z = j + rand.nextInt(16);
-				int y = world.getHeightValue(x, z);
-
-				if(world.getBlock(x, y, z) == Blocks.stone)
-						world.setBlock(x, y, z, ModBlocks.geysir_vapor);
-				else if(world.getBlock(x, y - 1, z) == Blocks.stone)
-					world.setBlock(x, y - 1, z, ModBlocks.geysir_vapor);
 			}
 
 			if (rand.nextInt(1000) == 0) {
@@ -504,7 +473,8 @@ public class HbmWorldGen implements IWorldGenerator {
 			int x = i + rand.nextInt(16) + 8;
 			int z = j + rand.nextInt(16) + 8;
 			int y = world.getHeightValue(x, z) - rand.nextInt(10);
-			if(y > 1) (new Meteorite()).generate(world, rand, x, y, z, false, false, false);
+			Block b = world.getBlock(x, y - 2, z);
+			if(!b.isAir(world, x, y, z) && !b.getMaterial().isLiquid() && y > 1) (new Meteorite()).generate(world, rand, x, y, z, false, false, false);
 		}
 
 		if(rand.nextInt(4) == 0) {

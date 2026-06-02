@@ -23,6 +23,7 @@ import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
@@ -97,7 +98,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 		super.setInventorySlotContents(i, stack);
 
 		if(stack != null && stack.getItem() instanceof ItemMachineUpgrade && i == 4) {
-			worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "hbm:item.upgradePlug", 1.0F, 1.0F);
+			worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, NTMSounds.UPGRADE_PLUG, 1.0F, 1.0F);
 		}
 	}
 
@@ -212,7 +213,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 
 			if(this.isProgressing) {
 				if(this.audioProgress == null || !this.audioProgress.isPlaying()) {
-					this.audioProgress = MainRegistry.proxy.getLoopedSound("hbm:block.electricHum", xCoord, yCoord, zCoord, this.getVolume(1.5F), 15F, 0.75F, 5);
+					this.audioProgress = MainRegistry.proxy.getLoopedSound(NTMSounds.ELECTRIC_HUM_LOOP, xCoord, yCoord, zCoord, this.getVolume(1.5F), 15F, 0.75F, 5);
 					this.audioProgress.startSound();
 				}
 				this.audioProgress.updatePitch(0.75F);
@@ -242,20 +243,6 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 			}
 
 			if(this.lid != this.prevLid && this.lid < this.prevLid && this.lid > 0.5F && this.hasMaterial && MainRegistry.proxy.me().getDistance(xCoord + 0.5, yCoord + 4, zCoord + 0.5) < 50) {
-				/*NBTTagCompound data = new NBTTagCompound();
-				data.setString("type", "tower");
-				data.setFloat("lift", 0.01F);
-				data.setFloat("base", 0.5F);
-				data.setFloat("max", 2F);
-				data.setInteger("life", 50 + worldObj.rand.nextInt(20));
-				data.setDouble("posX", xCoord + 0.5 + worldObj.rand.nextGaussian() * 0.25);
-				data.setDouble("posZ", zCoord + 0.5 + worldObj.rand.nextGaussian() * 0.25);
-				data.setDouble("posY", yCoord + 4);
-				data.setBoolean("noWind", true);
-				data.setFloat("alphaMod", prevLid / lid);
-				data.setInteger("color", 0x808080);
-				data.setFloat("strafe", 0.15F);
-				MainRegistry.proxy.effectNT(data);*/
 
 				if(worldObj.rand.nextInt(5) == 0) {
 					NBTTagCompound flame = new NBTTagCompound();
@@ -286,7 +273,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 			// add to existing stacks
 			for(int i /* ingredient */ = 5; i < 25; i++) {
 				if(slots[i] == null) continue;
-				if(!slots[q].isItemEqual(slots[i])) continue;
+				if(!slots[q].isItemEqual(slots[i]) || !ItemStack.areItemStackTagsEqual(slots[q], slots[i])) continue;
 				int toMove = BobMathUtil.min(slots[i].getMaxStackSize() - slots[i].stackSize, slots[q].stackSize, max - slots[i].stackSize);
 				if(toMove > 0) {
 					this.decrStackSize(q, toMove);

@@ -13,7 +13,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.inventory.FluidStack;
-import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
@@ -34,20 +33,20 @@ public class ArcWelderRecipes extends SerializableRecipe {
 	public void registerDefaults() {
 
 		//Parts
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor, 2), 100, 200L,
-				new OreDictStack(IRON.plate(), 2), new ComparableStack(ModItems.coil_copper), new ComparableStack(ModItems.coil_copper_torus)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.motor, 2), 100, 400L,
-				new OreDictStack(STEEL.plate(), 1), new ComparableStack(ModItems.coil_copper), new ComparableStack(ModItems.coil_copper_torus)));
+				new OreDictStack(STEEL.plate(), 2), new OreDictStack(MINGRADE.wireDense(), 2)));
 		recipes.add(new ArcWelderRecipe(DictFrame.fromOne(ModItems.part_generic, EnumPartType.LDE), 200, 5_000L,
 				new OreDictStack(AL.plate(), 4), new OreDictStack(FIBER.ingot(), 4), new OreDictStack(ANY_HARDPLASTIC.ingot())));
 		recipes.add(new ArcWelderRecipe(DictFrame.fromOne(ModItems.part_generic, EnumPartType.LDE), 200, 10_000L,
 				new OreDictStack(TI.plate(), 2), new OreDictStack(FIBER.ingot(), 4), new OreDictStack(ANY_HARDPLASTIC.ingot())));
-		recipes.add(new ArcWelderRecipe(DictFrame.fromOne(ModItems.part_generic, EnumPartType.HDE), 600, 25_000_000L, new FluidStack(Fluids.STELLAR_FLUX, 4_000),
-				new OreDictStack(ANY_BISMOIDBRONZE.plateCast(), 2), new OreDictStack(CMB.plateWelded(), 1), new ComparableStack(ModItems.ingot_cft)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.neutron_reflector, 2), 400, 50_000L,
+				new OreDictStack(WC.ingot(), 2), new OreDictStack(DURA.plate())));
 
 		//Dense Wires
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.wire_dense, 1, Mats.MAT_COPPER.id), 100, 10_000L,
 				new OreDictStack(CU.wireFine(), 8)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.wire_dense, 1, Mats.MAT_MINGRADE.id), 100, 10_000L,
+				new OreDictStack(MINGRADE.wireFine(), 8)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.wire_dense, 1, Mats.MAT_ALLOY.id), 100, 10_000L,
 				new OreDictStack(ALLOY.wireFine(), 8)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.wire_dense, 1, Mats.MAT_GOLD.id), 100, 10_000L,
@@ -80,13 +79,13 @@ public class ArcWelderRecipes extends SerializableRecipe {
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_CMB.id), 1_200, 10_000_000L, new FluidStack(Fluids.REFORMGAS, 1_000),
 				new OreDictStack(CMB.plateCast(), 2)));
 		//pre-DFC
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_OSMIRIDIUM.id), 6_000, 20_000_000L, new FluidStack(Fluids.REFORMGAS, 16_000),
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.plate_welded, 1, Mats.MAT_OSMIRIDIUM.id), 6_000, 50_000_000L, new FluidStack(Fluids.REFORMGAS, 16_000),
 				new OreDictStack(OSMIRIDIUM.plateCast(), 2)));
 		
 		//Missile Parts
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.thruster_small), 60, 1_000L, new OreDictStack(STEEL.plate(), 4), new OreDictStack(AL.wireFine(), 4), new OreDictStack(CU.plate(), 4)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.thruster_medium), 100, 2_000L, new OreDictStack(STEEL.plate(), 8), new ComparableStack(ModItems.motor, 1), new OreDictStack(GRAPHITE.ingot(), 8)));
-		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.thruster_large), 200, 5_000L, new OreDictStack(DURA.ingot(), 10), new ComparableStack(ModItems.motor, 1), new OreDictStack(OreDictManager.getReflector(), 12)));
+		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.thruster_large), 200, 5_000L, new OreDictStack(DURA.ingot(), 10), new ComparableStack(ModItems.motor, 1), new OreDictStack(WC.ingot(), 12)));
 
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_small), 60, 1_000L, new OreDictStack(AL.plate(), 6), new OreDictStack(CU.plate(), 4), new ComparableStack(ModBlocks.steel_scaffold, 4)));
 		recipes.add(new ArcWelderRecipe(new ItemStack(ModItems.fuel_tank_medium), 100, 2_000L, new OreDictStack(AL.plateCast(), 4), new OreDictStack(TI.plate(), 8), new ComparableStack(ModBlocks.steel_scaffold, 12)));

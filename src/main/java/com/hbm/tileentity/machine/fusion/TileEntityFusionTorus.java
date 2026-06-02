@@ -12,6 +12,7 @@ import com.hbm.inventory.recipes.FusionRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.module.machine.ModuleMachineFusion;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
@@ -26,6 +27,7 @@ import com.hbm.util.BobMathUtil;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
+import api.hbm.redstoneoverradio.IRORValueProvider;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -44,7 +46,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIProvider, IControlReceiver, SimpleComponent, CompatHandler.OCComponent {
+public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIProvider, IControlReceiver, SimpleComponent, CompatHandler.OCComponent, IRORValueProvider {
 
 	public boolean didProcess = false;
 
@@ -96,6 +98,7 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 	public void updateEntity() {
 
 		if(!worldObj.isRemote) {
+			this.checkTilt(TiltType.CONFIG, true);
 
 			for(int i = 0; i < 4; i++) {
 				if(klystronNodes[i] == null || klystronNodes[i].expired) klystronNodes[i] = createNode(KlystronNetworkProvider.THE_PROVIDER, ForgeDirection.getOrientation(i + 2));
@@ -169,15 +172,21 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 
 			boolean ignition = recipe != null ? recipe.ignitionTemp <= this.klystronEnergy : true;
 
+			float r = 0F;
+			float g = 0F;
+			float b = 0F;
 			this.plasmaEnergy = 0;
 			this.fuelConsumption = 0;
 			this.fusionModule.preUpdate(factor, collectors * 0.5D);
-			this.fusionModule.update(1D, 1D, this.isCool() && ignition, slots[1]);
+			this.fusionModule.update(1D, 1D, !this.tilted && this.isCool() && ignition, slots[1]);
 			this.didProcess = this.fusionModule.didProcess;
 			if(this.fusionModule.markDirty) this.markDirty();
 			if(didProcess && recipe != null) {
 				this.plasmaEnergy = (long) Math.ceil(recipe.outputTemp * factor);
 				this.fuelConsumption = factor;
+				r = recipe.r;
+				g = recipe.g;
+				b = recipe.b;
 			}
 
 			double outputIntensity = this.getOuputIntensity(receiverCount);
@@ -192,7 +201,7 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 
 						if(entry.getKey() instanceof IFusionPowerReceiver) {
 							long powerReceived = (long) Math.ceil(this.plasmaEnergy * outputIntensity);
-							((IFusionPowerReceiver) entry.getKey()).receiveFusionPower(powerReceived, outputFlux);
+							((IFusionPowerReceiver) entry.getKey()).receiveFusionPower(powerReceived, outputFlux, r, g, b);
 						}
 					}
 				}
@@ -225,7 +234,7 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 				float speed = this.magnetSpeed / 30F;
 
 				if(audio == null) {
-					audio = MainRegistry.proxy.getLoopedSound("hbm:block.fusionReactorRunning", xCoord + 0.5F, yCoord + 2.5F, zCoord + 0.5F, getVolume(speed), 30F, speed, 20);
+					audio = MainRegistry.proxy.getLoopedSound(NTMSounds.FUSION_REACTOR_LOOP, xCoord + 0.5F, yCoord + 2.5F, zCoord + 0.5F, getVolume(speed), 30F, speed, 20);
 					audio.startSound();
 				} else {
 					audio.updateVolume(getVolume(speed));
@@ -384,6 +393,15 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 				new DirPos(xCoord - 2, yCoord - 1, zCoord - 6, Library.NEG_Y),
 				new DirPos(xCoord - 2, yCoord + 5, zCoord - 6, Library.POS_Y),
 		};
+	}
+	
+	@Override public int getFloorCount() { return 6 * 6; }
+	@Override public BlockPos getFloorPosFromIndex(int index) {
+		return new BlockPos(
+				xCoord - 5 + (index / 6) * 2,
+				yCoord - 1,
+				zCoord - 5 + (index % 6) * 2
+		);
 	}
 
 	@Override
@@ -565,5 +583,20 @@ public class TileEntityFusionTorus extends TileEntityCooledBase implements IGUIP
 			case "getInfo": return getInfo(context, args);
 		}
 		throw new NoSuchMethodException();
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "plasma",
+				PREFIX_VALUE + "consumption"
+		};
+	}
+
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "plasma").equals(name))		return "" + this.plasmaEnergy;
+		if((PREFIX_VALUE + "consumption").equals(name))	return "" + (int) (this.fuelConsumption * 100);
+		return null;
 	}
 }
