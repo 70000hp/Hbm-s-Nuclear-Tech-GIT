@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import static com.hbm.inventory.OreDictManager.*;
 
@@ -21,7 +20,6 @@ import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.FluidsF;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
-import com.hbm.items.ItemEnums;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ItemEnums.EnumBriquetteType;
 import com.hbm.items.ItemEnums.EnumCokeType;
@@ -29,13 +27,11 @@ import com.hbm.items.ItemEnums.EnumTarType;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemFluidIcon;
 import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
+import com.hbm.items.special.ItemBedrockOreNew.ProcessingGrade;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
-import com.hbm.util.Tuple.Pair;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CombinationRecipes extends SerializableRecipe {
@@ -169,28 +165,29 @@ public class CombinationRecipes extends SerializableRecipe {
 			.in(new ComparableStack(ModBlocks.stone_resource, 1, BlockEnums.EnumStoneType.GALENA.ordinal()))
 			.out(new ItemStack(ModItems.powder_lead, 2), new ItemStack(ModItems.sulfur_small, 6)));
 
+		/*
 		for(BedrockOreType type : BedrockOreType.values()) {
 			recipes.add(new CombinationRecipe()
-				.in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.BASE, type)))
-				.out(ItemBedrockOreNew.make(BedrockOreGrade.BASE_ROASTED, type))
+				.in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.BASE, type)))
+				.out(ItemBedrockOreNew.make(ProcessingGrade.BASE_ROASTED, type))
 				.out(new FluidStack(Fluids.VITRIOL, 50)));
 			recipes.add(new CombinationRecipe()
-				.in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY, type)))
-				.out(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_ROASTED, type))
+				.in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.PRIMARY, type)))
+				.out(ItemBedrockOreNew.make(ProcessingGrade.PRIMARY_ROASTED, type))
 				.out(new FluidStack(Fluids.VITRIOL, 50)));
 			recipes.add(new CombinationRecipe()
-				.in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_BYPRODUCT, type)))
-				.out(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_ROASTED, type))
+				.in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.SULFURIC_BYPRODUCT, type)))
+				.out(ItemBedrockOreNew.make(ProcessingGrade.SULFURIC_ROASTED, type))
 				.out(new FluidStack(Fluids.VITRIOL, 50)));
 			recipes.add(new CombinationRecipe()
-				.in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_BYPRODUCT, type)))
-				.out(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_ROASTED, type))
+				.in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.SOLVENT_BYPRODUCT, type)))
+				.out(ItemBedrockOreNew.make(ProcessingGrade.SOLVENT_ROASTED, type))
 				.out(new FluidStack(Fluids.VITRIOL, 50)));
 			recipes.add(new CombinationRecipe()
-				.in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.RAD_BYPRODUCT, type)))
-				.out(ItemBedrockOreNew.make(BedrockOreGrade.RAD_ROASTED, type))
+				.in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.RAD_BYPRODUCT, type)))
+				.out(ItemBedrockOreNew.make(ProcessingGrade.RAD_ROASTED, type))
 				.out(new FluidStack(Fluids.VITRIOL, 50)));
-		}
+		}*/
 	}
 
 

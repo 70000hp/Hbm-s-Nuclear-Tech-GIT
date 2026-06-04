@@ -15,7 +15,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
+import com.hbm.items.special.ItemBedrockOreNew.ProcessingGrade;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
@@ -162,7 +162,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 			}
 
 			for(BedrockOreType type : BedrockOreType.values()) {
-				ItemStack output = ItemBedrockOreNew.make(BedrockOreGrade.BASE, type);
+				ItemStack output = ItemBedrockOreNew.make(ProcessingGrade.BASE, type);
 				outer: while(ores[type.ordinal()] >= 1) {
 					for(int i = 3; i <= 8; i++) if(slots[i] != null && slots[i].getItem() == output.getItem() && slots[i].getItemDamage() == output.getItemDamage() && slots[i].stackSize < output.getMaxStackSize()) {
 						slots[i].stackSize++; ores[type.ordinal()] -= 1F; continue outer;

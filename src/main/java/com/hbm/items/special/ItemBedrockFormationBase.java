@@ -22,13 +22,24 @@ import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import static com.hbm.items.special.ItemBedrockOreNew.BedrockOreType.*;
 public class ItemBedrockFormationBase extends Item {
 
+
+	public ItemBedrockFormationBase() {
+		this.setHasSubtypes(true);
+		this.setMaxDamage(0);
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
-		ItemStack ore = new ItemStack(item);
-		EntityPlayer player = MainRegistry.proxy.me();
-		if(player != null) setOreAmount(ore, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), 1D);
-		list.add(ore);
+		for(int i = 0; i < BedrockFormationType.values().length; i++) {
+			BedrockFormationType type = BedrockFormationType.values()[i];
+			BedrockOreType[] composition = type.composition;
+
+			ItemStack ore = new ItemStack(item);
+			EntityPlayer player = MainRegistry.proxy.me();
+			if (player != null) setOreAmount(ore, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), 1D, composition);
+			list.add(ore);
+		}
 	}
 
 	public static double getOreAmount(ItemStack stack, BedrockOreType type) {
@@ -37,11 +48,11 @@ public class ItemBedrockFormationBase extends Item {
 		return data.getDouble(type.suffix);
 	}
 
-	public static void setOreAmount(ItemStack stack, int x, int z, double mult) {
+	public static void setOreAmount(ItemStack stack, int x, int z, double mult, BedrockOreType[] composition) {
 		if(!stack.hasTagCompound()) stack.stackTagCompound = new NBTTagCompound();
 		NBTTagCompound data = stack.getTagCompound();
 
-		for(BedrockOreType type : BedrockOreType.values()) {
+		for(BedrockOreType type : composition) {
 			data.setDouble(type.suffix, getOreLevel(x, z, type) * mult);
 		}
 	}
@@ -71,18 +82,19 @@ public class ItemBedrockFormationBase extends Item {
 
 	public enum BedrockFormationType {
 		//												primary									sulfuric															solvent																		radsolvent
-		LATERITE(	 0xFFFFFF, "form.laterite", HEMATITE, BAUXITE),
-		SULFIDE(	 0xFFFFFF, "form.sulfide",  CHALCOPYRITE, GALENA),
-		SKARN(       0x868686, "form.skarn",    WOLFRAMITE, PITCHBLENDE);
+		OXIDE(	     0xFFFFFF, "form.oxide", HEMATITE, BAUXITE, MALACHITE),
+		SULFIDE(	 0xFFFFFF, "form.sulfide",  CHALCOPYRITE, GALENA, PYRITE),
+		SKARN(       0x868686, "form.skarn",    WOLFRAMITE, PITCHBLENDE),
+		SEDIMENTARY( 0x868686, "form.sedimentary",    COAL, FLUORITE, LIMESTONE);
 
 		public final int color;
 		public final String suffix;
-		public final ItemBedrockOreNew.BedrockOreType[] traits;
+		public final ItemBedrockOreNew.BedrockOreType[] composition;
 
-		private BedrockFormationType(int color, String suffix, ItemBedrockOreNew.BedrockOreType... traits) {
+		private BedrockFormationType(int color, String suffix, ItemBedrockOreNew.BedrockOreType... composition) {
 			this.color = color;
 			this.suffix = suffix;
-			this.traits = traits;
+			this.composition = composition;
 
 		}
 	}

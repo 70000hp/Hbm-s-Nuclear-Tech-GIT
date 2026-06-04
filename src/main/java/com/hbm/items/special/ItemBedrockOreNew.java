@@ -1,8 +1,8 @@
 package com.hbm.items.special;
 
-import static com.hbm.inventory.material.Mats.*;
-import static com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade.*;
+import static com.hbm.items.special.ItemBedrockOreNew.ProcessingGrade.*;
 import static com.hbm.items.special.ItemBedrockOreNew.ProcessingTrait.*;
+import static com.hbm.items.special.ItemBedrockOreNew.OreRichness.*;
 
 
 import java.util.List;
@@ -34,7 +34,7 @@ import net.minecraft.util.StatCollector;
 
 public class ItemBedrockOreNew extends Item {
 
-	public IIcon[] icons = new IIcon[BedrockOreType.values().length * BedrockOreGrade.values().length];
+	public IIcon[] icons = new IIcon[BedrockOreType.values().length * ProcessingGrade.values().length];
 	public IIcon[] overlays = new IIcon[ProcessingTrait.values().length];
 
 	public ItemBedrockOreNew() {
@@ -53,7 +53,7 @@ public class ItemBedrockOreNew extends Item {
 			for(int i = 0; i < BedrockOreType.values().length; i++) {
 				BedrockOreType type = BedrockOreType.values()[i];
 				for(int j = 0; j < type.traits.length; j++) {
-					BedrockOreGrade grade = BedrockOreGrade.values()[j];
+					ProcessingGrade grade = ProcessingGrade.values()[j];
 					String placeholderName = RefStrings.MODID + ":bedrock_ore_new_" + grade.prefix + "_" + type.suffix + "-" + (i * BedrockOreType.values().length + j);
 					TextureAtlasSpriteMutatable mutableIcon = new TextureAtlasSpriteMutatable(placeholderName, new RGBMutatorInterpolatedComponentRemap(0xFFFFFF, 0x505050, type.light, type.dark));
 					map.setTextureEntry(placeholderName, mutableIcon);
@@ -75,7 +75,7 @@ public class ItemBedrockOreNew extends Item {
 		for(int i = 0; i < BedrockOreType.values().length; i++) {
 			BedrockOreType type = BedrockOreType.values()[i];
 			for(int j = 0; j < type.traits.length; j++) {
-				BedrockOreGrade grade = BedrockOreGrade.values()[j];
+				ProcessingGrade grade = ProcessingGrade.values()[j];
 				list.add(this.make(grade, type));
 			}
 		}
@@ -160,21 +160,25 @@ public class ItemBedrockOreNew extends Item {
 
 	public enum BedrockOreType {
 		//												primary									sulfuric															solvent																		radsolvent
-		HEMATITE(	 0xFFFFFF, 0x353535, "HEMATITE",     CRUSHED, FINE, FROTHED, CONCENTRATE),
-		CHALCOPYRITE(0x868686, 0x000000, "CHALCOPYRITE", CRUSHED, FINE, FROTHED, ROASTED, CONCENTRATE),
-		BAUXITE(	 0xE6E6B6, 0x1C1C00, "BAUXITE",      CRUSHED, FINE, FROTHED, CONCENTRATE),
-		GALENA( 	 0xE6E6B6, 0x1C1C00, "GALENA",       CRUSHED, FINE, FROTHED, ROASTED, CONCENTRATE),
-		WOLFRAMITE(	 0xC1C7BD, 0x2B3227, "WOLFRAMITE",   CRUSHED, FINE, FROTHED, CONCENTRATE),
-		PITCHBLENDE( 0xAFAFAF, 0x0F0F0F, "PITCHBLENDE",  CRUSHED, FINE, FROTHED, CONCENTRATE),
-		AGGREGATE(   0xE2FFFA, 0x1E8A77, "AGGREGATE",    CRUSHED, FINE);
+		HEMATITE(	 0xFFFFFF, 0x353535, "HEMATITE",     CRUSHED, FINE, LEACHED_REGULAR, FROTHED, CONCENTRATE),
+		PYRITE(	     0xFFFFFF, 0x353535, "PYRITE",       CRUSHED, FINE, LEACHED_REGULAR, FROTHED, ROASTED, CONCENTRATE),
+		CHALCOPYRITE(0x868686, 0x000000, "CHALCOPYRITE", CRUSHED, FINE, LEACHED_REGULAR, FROTHED, ROASTED, CONCENTRATE),
+		MALACHITE(   0x868686, 0x000000, "MALACHITE",    CRUSHED, FINE, LEACHED_REGULAR, FROTHED, ROASTED, CONCENTRATE),
+		BAUXITE(	 0xE6E6B6, 0x1C1C00, "BAUXITE",      CRUSHED, FINE, LEACHED_NAOH, FROTHED, CONCENTRATE),
+		GALENA( 	 0xE6E6B6, 0x1C1C00, "GALENA",       CRUSHED, FINE, LEACHED_REGULAR, FROTHED, ROASTED, CONCENTRATE),
+		WOLFRAMITE(	 0xC1C7BD, 0x2B3227, "WOLFRAMITE",   CRUSHED, FINE, LEACHED_REGULAR, FROTHED, CONCENTRATE),
+		PITCHBLENDE( 0xAFAFAF, 0x0F0F0F, "PITCHBLENDE",  CRUSHED, FINE, LEACHED_REGULAR, FROTHED, CONCENTRATE),
+		FLUORITE(    0xE2FFFA, 0x1E8A77, "FLUORITE",     CRUSHED, FINE),
+		COAL(        0xE2FFFA, 0x1E8A77, "COAL",         CRUSHED, FINE),
+		LIMESTONE(   0xE2FFFA, 0x1E8A77, "LIMESTONE",    CRUSHED, FINE);
 		//sediment
 
 		public int light;
 		public int dark;
 		public String suffix;
-		public BedrockOreGrade[] traits;
+		public ProcessingGrade[] traits;
 
-		private BedrockOreType(int light, int dark, String suffix, BedrockOreGrade... traits) {
+		private BedrockOreType(int light, int dark, String suffix, ProcessingGrade... traits) {
 			this.light = light;
 			this.dark = dark;
 			this.suffix = suffix;
@@ -198,7 +202,7 @@ public class ItemBedrockOreNew extends Item {
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int pass) {
 		if(pass != 0) return 0xFFFFFF;
-		BedrockOreGrade grade = this.getGrade(stack.getItemDamage());
+		ProcessingGrade grade = this.getGrade(stack.getItemDamage());
 		return grade.tint;
 	}
 
@@ -208,21 +212,37 @@ public class ItemBedrockOreNew extends Item {
 	public static final int washed = 0xDBE2CB;
 
 	public enum ProcessingTrait {
-		CRUSH,
-		CENTRIFUGE,
-		FROTH,
-		MISC,
-		ROAST,
-		ELECTRO,
-		LEACH,
+		CRUSH(RICH, MEDIUM, POOR),
+		CENTRIFUGE(RICH, MEDIUM, POOR),
+		FROTH(RICH, MEDIUM, POOR),
+		MISC(RICH, MEDIUM, POOR),
+		ROAST(MEDIUM, POOR),
+		ELECTRO(RICH, MEDIUM, POOR),
+		LEACH_SULF(MEDIUM),
+		LEACH_AMMONIA(POOR),
+		LEACH_NAOH(MEDIUM);
+
+		public final OreRichness[] richness;
+
+		ProcessingTrait(OreRichness... grades){
+			richness = grades;
+		}
 	}
 
-	public enum BedrockOreGrade {			//from the slopper
+	public enum OreRichness {
+		RICH,
+		MEDIUM,
+		POOR
+	}
+
+	public enum ProcessingGrade {
+		NONE(none, "none", MISC),//from the slopper
 		CRUSHED(none, "crush", CRUSH),
 		FINE(none, "fine", CENTRIFUGE),
 		FROTHED(none, "frothed", FROTH),
 		ROASTED(roasted, "roasted", "fine", ROAST),
-		LEACHED(leached, "leached", "fine", LEACH),
+		LEACHED_REGULAR(leached, "leached", "fine", LEACH_SULF, LEACH_AMMONIA),
+		LEACHED_NAOH(leached, "leached", "fine", LEACH_NAOH),
 		CONCENTRATE(washed, "concentrate", MISC),
 		SPECIAL(washed, "special", MISC);
 						//endpoint for primary, recycling
@@ -233,14 +253,14 @@ public class ItemBedrockOreNew extends Item {
 		public String textureName;
 		public ProcessingTrait[] traits;
 
-		private BedrockOreGrade(int tint, String prefix, ProcessingTrait... traits) {
+		ProcessingGrade(int tint, String prefix, ProcessingTrait... traits) {
 			this.tint = tint;
 			this.prefix = prefix;
 			this.textureName = prefix;
 			this.traits = traits;
 		}
 
-		private BedrockOreGrade(int tint, String prefix, String textureName, ProcessingTrait... traits) {
+		ProcessingGrade(int tint, String prefix, String textureName, ProcessingTrait... traits) {
 			this.tint = tint;
 			this.prefix = prefix;
 			this.textureName = textureName;
@@ -248,16 +268,16 @@ public class ItemBedrockOreNew extends Item {
 		}
 	}
 
-	public static ItemStack make(BedrockOreGrade grade, BedrockOreType type) {
+	public static ItemStack make(ProcessingGrade grade, BedrockOreType type) {
 		return make(grade, type, 1);
 	}
 
-	public static ItemStack make(BedrockOreGrade grade, BedrockOreType type, int amount) {
+	public static ItemStack make(ProcessingGrade grade, BedrockOreType type, int amount) {
 		return new ItemStack(ModItems.bedrock_ore, amount, grade.ordinal() << 4 | type.ordinal());
 	}
 
-	public BedrockOreGrade getGrade(int meta) {
-		return EnumUtil.grabEnumSafely(BedrockOreGrade.class, meta >> 4);
+	public ProcessingGrade getGrade(int meta) {
+		return EnumUtil.grabEnumSafely(ProcessingGrade.class, meta >> 4);
 	}
 
 	public BedrockOreType getType(int meta) {

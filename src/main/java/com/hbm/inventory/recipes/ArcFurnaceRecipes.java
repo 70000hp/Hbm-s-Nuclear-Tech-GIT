@@ -27,9 +27,6 @@ import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemScraps;
-import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.util.Tuple.Pair;
 
 import net.minecraft.init.Items;

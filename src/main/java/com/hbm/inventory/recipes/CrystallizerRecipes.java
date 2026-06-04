@@ -9,36 +9,23 @@ import static com.hbm.inventory.OreDictManager.*;
 import com.hbm.blocks.ModBlocks;
 
 import com.hbm.inventory.FluidStack;
-import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.FluidsF;
-import com.hbm.inventory.material.MaterialShapes;
-import com.hbm.inventory.material.Mats;
-import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ItemEnums.EnumChunkType;
 import com.hbm.items.ItemEnums.EnumPlantType;
-import com.hbm.items.ItemEnums.EnumTarType;
 import com.hbm.items.ModItems;
-import com.hbm.items.machine.ItemChemicalDye;
-import com.hbm.items.machine.ItemChemicalDye.EnumChemDye;
 import com.hbm.items.machine.ItemFluidIcon;
-import com.hbm.items.machine.ItemScraps;
-import com.hbm.items.special.ItemBedrockOreNew;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.items.special.ItemPlasticScrap.ScrapType;
-import com.hbm.main.MainRegistry;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 

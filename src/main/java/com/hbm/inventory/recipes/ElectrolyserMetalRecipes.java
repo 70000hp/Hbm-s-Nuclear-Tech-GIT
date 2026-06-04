@@ -1,32 +1,16 @@
 package com.hbm.inventory.recipes;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
-import com.hbm.inventory.RecipesCommon.OreDictStack;
-import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ItemEnums;
 import com.hbm.items.ModItems;
-import com.hbm.items.machine.ItemFluidIcon;
-import com.hbm.items.machine.ItemScraps;
-import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreOutput;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
-import com.hbm.util.ItemStackUtil;
 
-import com.hbm.util.Tuple.*;
 import net.minecraft.item.ItemStack;
 
 public class ElectrolyserMetalRecipes extends SerializableRecipe {

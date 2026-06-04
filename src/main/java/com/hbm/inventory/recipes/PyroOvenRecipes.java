@@ -23,7 +23,7 @@ import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemFluidIcon;
 import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
+import com.hbm.items.special.ItemBedrockOreNew.ProcessingGrade;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 
 import net.minecraft.init.Items;
@@ -66,13 +66,14 @@ public class PyroOvenRecipes extends SerializableRecipe {
 
 		//bedrock ores
 
+		/*
 		for(BedrockOreType type : BedrockOreType.values()) {
-			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.BASE, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(BedrockOreGrade.BASE_ROASTED, type)));
-			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(BedrockOreGrade.PRIMARY_ROASTED, type)));
-			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(BedrockOreGrade.SULFURIC_ROASTED, type)));
-			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(BedrockOreGrade.SOLVENT_ROASTED, type)));
-			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.RAD_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(BedrockOreGrade.RAD_ROASTED, type)));
-		}
+			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.BASE, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(ProcessingGrade.BASE_ROASTED, type)));
+			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.PRIMARY, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(ProcessingGrade.PRIMARY_ROASTED, type)));
+			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.SULFURIC_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(ProcessingGrade.SULFURIC_ROASTED, type)));
+			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.SOLVENT_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(ProcessingGrade.SOLVENT_ROASTED, type)));
+			recipes.add(new PyroOvenRecipe(10).in(new ComparableStack(ItemBedrockOreNew.make(ProcessingGrade.RAD_BYPRODUCT, type))).out(new FluidStack(Fluids.VITRIOL, 50)).out(ItemBedrockOreNew.make(ProcessingGrade.RAD_ROASTED, type)));
+		}*/
 
 		//syngas from coal
 		recipes.add(new PyroOvenRecipe(100)
