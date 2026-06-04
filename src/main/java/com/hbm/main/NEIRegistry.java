@@ -15,11 +15,14 @@ public class NEIRegistry {
 
 		if(!handlers.isEmpty()) return handlers;
 
+		handlers.add(new ToolingHandler());
+		handlers.add(new ConstructionHandler());
 		handlers.add(new AnnihilatorHandler());
+		handlers.add(new SolderingStationHandler());
+		handlers.add(new BlastFurnaceHandler());
 		handlers.add(new AnvilRecipeHandler());
 		handlers.add(new SmithingRecipeHandler());
 		handlers.add(new PressRecipeHandler());
-		handlers.add(new AlloyFurnaceRecipeHandler());
 		handlers.add(new ShredderRecipeHandler());
 		handlers.add(new CrucibleSmeltingHandler());
 		handlers.add(new CrucibleAlloyingHandler());
@@ -47,9 +50,8 @@ public class NEIRegistry {
 		handlers.add(new FuelPoolHandler());
 		handlers.add(new RBMKRodDisassemblyHandler());
 		handlers.add(new RBMKWasteDecayHandler());
-		handlers.add(new ToolingHandler());
-		handlers.add(new ConstructionHandler());
 		handlers.add(new SatelliteHandler());
+		handlers.add(new GrenadeRecipeHandler());
 
 		//universal boyes
 		handlers.add(new ZirnoxRecipeHandler());
@@ -71,7 +73,6 @@ public class NEIRegistry {
 		handlers.add(new ElectrolyserMetalHandler());
 		handlers.add(new AshpitHandler());
 		handlers.add(new ArcWelderHandler());
-		handlers.add(new SolderingStationHandler());
 		handlers.add(new ExposureChamberHandler());
 		handlers.add(new ArcFurnaceSolidHandler());
 		handlers.add(new ArcFurnaceFluidHandler());

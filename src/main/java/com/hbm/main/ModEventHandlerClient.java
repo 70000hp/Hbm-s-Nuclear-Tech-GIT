@@ -630,23 +630,8 @@ public class ModEventHandlerClient {
 	@SubscribeEvent
 	public void onPlaySound(PlaySoundEvent17 e) {
 
-		EntityPlayer player = MainRegistry.proxy.me();
 		Minecraft mc = Minecraft.getMinecraft();
-
-		if(player != null && mc.theWorld != null) {
-			int i = MathHelper.floor_double(player.posX);
-			int j = MathHelper.floor_double(player.posY);
-			int k = MathHelper.floor_double(player.posZ);
-			Block block = mc.theWorld.getBlock(i, j, k);
-
-			if(block == ModBlocks.vacuum) {
-				e.result = null;
-				return;
-			}
-		}
-
 		ResourceLocation r = e.sound.getPositionedSoundLocation();
-
 		WorldClient wc = mc.theWorld;
 
 		//Alright, alright, I give the fuck up, you've wasted my time enough with this bullshit. You win.
@@ -989,7 +974,6 @@ public class ModEventHandlerClient {
 				MainRegistry.logger.info("Taking a screenshot of ALL items, if you did this by mistake: fucking lmao get rekt nerd");
 
 				List<Item> ignoredItems = Arrays.asList(
-					ModItems.crucible_template,
 					ModItems.achievement_icon,
 					Items.spawn_egg,
 					Item.getItemFromBlock(Blocks.mob_spawner)
@@ -1465,7 +1449,7 @@ public class ModEventHandlerClient {
 			}
 
 			double d = Math.random();
-			if(d < 0.1) main.splashText = "Redditors aren't people!";
+			if(d < 0.025) main.splashText = "Redditors aren't people!";
 		}
 	}
 }

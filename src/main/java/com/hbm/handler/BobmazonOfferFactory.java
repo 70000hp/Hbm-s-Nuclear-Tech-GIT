@@ -42,6 +42,9 @@ public class BobmazonOfferFactory {
 		//blueprints
 		standard.add(new Offer(new ItemStack(ModItems.blueprint_folder, 1, 0), Requirement.ASSEMBLY, 64));
 		standard.add(new Offer(new ItemStack(ModItems.blueprint_folder, 1, 1), Requirement.OIL, 256));
+		//vending machines
+		standard.add(new Offer(new ItemStack(ModBlocks.vending_machine, 1, 0), Requirement.CHEMICS, 64));
+		standard.add(new Offer(new ItemStack(ModBlocks.vending_machine, 1, 1), Requirement.CHEMICS, 64));
 		//plants
 		standard.add(new Offer(new ItemStack(Blocks.sapling, 1, 3), Requirement.STEEL, 12, 9));
 		standard.add(new Offer(new ItemStack(ModBlocks.plant_flower, 1, EnumFlowerType.FOXGLOVE.ordinal()), Requirement.STEEL, 16, 5));
@@ -78,7 +81,6 @@ public class BobmazonOfferFactory {
 		special.add(new Offer(new ItemStack(ModItems.boy_kit), Requirement.STEEL, 5));
 		special.add(new Offer(new ItemStack(ModItems.prototype_kit), Requirement.STEEL, 10));
 		special.add(new Offer(new ItemStack(ModItems.missile_kit), Requirement.STEEL, 5));
-		special.add(new Offer(new ItemStack(ModItems.grenade_kit), Requirement.STEEL, 5));
 		special.add(new Offer(new ItemStack(ModItems.jetpack_vector), Requirement.STEEL, 2));
 		special.add(new Offer(new ItemStack(ModItems.jetpack_tank), Requirement.STEEL, 2));
 		special.add(new Offer(new ItemStack(ModItems.gun_kit_1, 1), Requirement.STEEL, 1));

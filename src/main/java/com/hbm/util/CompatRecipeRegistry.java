@@ -100,11 +100,10 @@ public class CompatRecipeRegistry {
 		CombinationRecipes.recipes.add(new CombinationRecipes.CombinationRecipe().in(inputFluid).in(inputItem).out(outputFluid).out(outputItem));
 	}
 
-
-	/** Crucible recipes need unique IDs, game will crash when an ID collision is detected! */
+	/** Numeric IDs are now unused, names need to be unique! */
 	public static void registerCrucible(int index, String name, int frequency, ItemStack icon, MaterialStack[] input, MaterialStack[] output) {
-		CrucibleRecipe recipe = new CrucibleRecipe(index, name, frequency, icon).inputs(input).outputs(output);
-		CrucibleRecipes.recipes.add(recipe);
+		CrucibleRecipe recipe = new CrucibleRecipe(name).setup(frequency, icon).inputs(input).outputs(output);
+		CrucibleRecipes.INSTANCE.register(recipe);
 	}
 
 	public static void registerCentrifuge(AStack input, ItemStack[] outputs) {

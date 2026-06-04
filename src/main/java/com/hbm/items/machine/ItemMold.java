@@ -58,8 +58,7 @@ public class ItemMold extends Item {
 		
 		registerMold(new MoldMulti(		6, S, "blades", MaterialShapes.INGOT.q(4),
 				Mats.MAT_STEEL,			new ItemStack(ModItems.blades_steel),
-				Mats.MAT_TITANIUM,		new ItemStack(ModItems.blades_titanium),
-				Mats.MAT_ALLOY,			new ItemStack(ModItems.blades_advanced_alloy)));
+				Mats.MAT_TITANIUM,		new ItemStack(ModItems.blades_titanium)));
 		
 		registerMold(new MoldMulti(		7, S, "stamp", MaterialShapes.INGOT.q(4),
 				Mats.MAT_STONE,			new ItemStack(ModItems.stamp_stone_flat),
@@ -73,9 +72,9 @@ public class ItemMold extends Item {
 		
 		registerMold(new MoldShape(		10, L, "ingots", MaterialShapes.INGOT, 9));
 		registerMold(new MoldShape(		11, L, "plates", MaterialShapes.PLATE, 9));
+		registerMold(new MoldShape(		13, L, "plates_cast", MaterialShapes.CASTPLATE, 3));
 		registerMold(new MoldShape(		21, L, "wires_dense", MaterialShapes.DENSEWIRE, 9));
 		registerMold(new MoldBlock(		12, L, "block", MaterialShapes.BLOCK));
-		//registerMold(new MoldSingle(	13, L, "pipes", new ItemStack(ModItems.pipes_steel), Mats.MAT_STEEL, MaterialShapes.BLOCK.q(3)));
 
 		registerMold(new MoldMulti(		16, S, "c9", MaterialShapes.PLATE.q(1, 4),
 				Mats.MAT_GUNMETAL,		DictFrame.fromOne(ModItems.casing, EnumCasingType.SMALL),

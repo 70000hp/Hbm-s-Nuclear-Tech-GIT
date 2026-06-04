@@ -52,6 +52,8 @@ public class HbmPlayerProps implements IExtendedEntityProperties {
 	public int reputation;
 
 	public boolean isOnLadder = false;
+	
+	public int grenadeDeployment;
 
 	public HbmPlayerProps(EntityPlayer player) {
 		this.player = player;
@@ -101,7 +103,7 @@ public class HbmPlayerProps implements IExtendedEntityProperties {
 					if(this.enableMagnet)
 						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.GREEN + "Magnet ON", MainRegistry.proxy.ID_MAGNET, 1000), (EntityPlayerMP) player);
 					else
-						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.GREEN + "Magnet ON", MainRegistry.proxy.ID_MAGNET, 1000), (EntityPlayerMP) player);
+						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.RED + "Magnet OFF", MainRegistry.proxy.ID_MAGNET, 1000), (EntityPlayerMP) player);
 				}
 			}
 			if(key == EnumKeybind.TOGGLE_HEAD) {
@@ -112,7 +114,7 @@ public class HbmPlayerProps implements IExtendedEntityProperties {
 					if(this.enableHUD)
 						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.GREEN + "HUD ON", MainRegistry.proxy.ID_HUD, 1000), (EntityPlayerMP) player);
 					else
-						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.GREEN + "HUD ON", MainRegistry.proxy.ID_HUD, 1000), (EntityPlayerMP) player);
+						PacketDispatcher.wrapper.sendTo(new PlayerInformPacket(EnumChatFormatting.RED + "HUD OFF", MainRegistry.proxy.ID_HUD, 1000), (EntityPlayerMP) player);
 				}
 			}
 

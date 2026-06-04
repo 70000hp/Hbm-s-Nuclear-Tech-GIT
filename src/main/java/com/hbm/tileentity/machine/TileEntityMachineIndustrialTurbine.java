@@ -6,6 +6,7 @@ import java.util.Random;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.CompatHandler;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
@@ -17,12 +18,18 @@ import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
+import cpw.mods.fml.common.Optional;
 import io.netty.buffer.ByteBuf;
+import li.cil.oc.api.machine.Arguments;
+import li.cil.oc.api.machine.Callback;
+import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase implements IConfigurableMachine {
+@Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
+public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase implements IConfigurableMachine, SimpleComponent, CompatHandler.OCComponent {
 
 	public static int inputTankSize = 750_000;
 	public static int outputTankSize = 3_000_000;
@@ -32,9 +39,11 @@ public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase im
 	public float lastRotor;
 	
 	public double spin = 0;
-	public static double ACCELERATION = 1D / 400D;
+	public static double FLYWHEEL_MAX_ENERGY = 0.5e8; //aka flywheel mass
+	public long maxPower = 0;
 	public long lastPowerTarget = 0;
-
+	public long flywheel_energy = 0;
+	
 	private AudioWrapper audio;
 	private float audioDesync;
 
@@ -52,7 +61,7 @@ public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase im
 
 	@Override
 	public void writeConfig(JsonWriter writer) throws IOException {
-		writer.name("INFO").value("industrial steam turbine consumes 20% of availible steam per tick");
+		writer.name("INFO").value("industrial steam turbine consumes 20% of available steam per tick");
 		writer.name("I:inputTankSize").value(inputTankSize);
 		writer.name("I:outputTankSize").value(outputTankSize);
 		writer.name("D:efficiency").value(efficiency);
@@ -73,29 +82,17 @@ public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase im
 		FT_Coolable trait = tanks[0].getTankType().getTrait(FT_Coolable.class);
 		double eff = trait.getEfficiency(CoolingType.TURBINE) * getEfficiency();
 		int maxOps = (int) Math.ceil((tanks[0].getMaxFill() * consumptionPercent()) / trait.amountReq);
-		this.lastPowerTarget = (long) (maxOps * trait.heatEnergy * eff); // theoretical max output at full blast with this type
-		double fraction = (double) steamConsumed / (double) (trait.amountReq * maxOps); // % of max steam throughput currently achieved
+		this.maxPower = (long) (maxOps * trait.heatEnergy * eff);
 		
-		if(Math.abs(spin - fraction) <= ACCELERATION) {
-			this.spin = fraction;
-		} else if(spin < fraction) {
-			this.spin += ACCELERATION;
-		} else if(spin > fraction) {
-			this.spin -= ACCELERATION;
-		}
+		this.flywheel_energy += power;
 	}
 
 	@Override
 	public void onServerTick() {
-		if(!operational) {
-			this.spin -= ACCELERATION;
-		}
-		
-		if(this.spin <= 0) {
-			this.spin = 0;
-		} else {
-			this.powerBuffer = (long) (this.lastPowerTarget * this.spin);
-		}
+		this.spin = (double) flywheel_energy / FLYWHEEL_MAX_ENERGY; //because dense steams have way lower energy output, turbines running them take a lot longer to spool up
+		this.lastPowerTarget = Math.min((long) (Math.max(this.spin, 0.05) * maxPower), this.flywheel_energy);
+		this.flywheel_energy -= this.lastPowerTarget;
+		this.powerBuffer = (long) (this.lastPowerTarget);
 	}
 	
 	@Override
@@ -235,5 +232,97 @@ public class TileEntityMachineIndustrialTurbine extends TileEntityTurbineBase im
 		}
 		
 		return bb;
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "output",
+				PREFIX_VALUE + "flywheel"
+		};
+	}
+	
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "output").equals(name))		return "" + (int) this.powerBuffer;
+		if((PREFIX_VALUE + "flywheel").equals(name))	return "" + (int) (spin * 100);
+		return null;
+	}
+
+	// OpenComputers methods
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String getComponentName() {
+		return "ntm_turbine";
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getFluid(Context context, Arguments args) {
+		return new Object[] {
+			tanks[0].getFill(),
+			tanks[0].getMaxFill(),
+			tanks[1].getFill(),
+			tanks[1].getMaxFill()
+		};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getType(Context context, Arguments args) {
+		return CompatHandler.steamTypeToInt(tanks[0].getTankType());
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getPower(Context context, Arguments args) {
+		return new Object[] { this.powerBuffer };
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getFlywheel(Context context, Arguments args) {
+		return new Object[] { (int) (this.spin * 100) };
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getInfo(Context context, Arguments args) {
+		return new Object[] {
+			tanks[0].getFill(),
+			tanks[0].getMaxFill(),
+			tanks[1].getFill(),
+			tanks[1].getMaxFill(),
+			CompatHandler.steamTypeToInt(tanks[0].getTankType())[0],
+			this.powerBuffer,
+			(int) (this.spin * 100)
+		};
+	}
+
+	@Callback(direct = true)
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String[] methods() {
+		return new String[] {
+			"getFluid",
+			"getType",
+			"getPower",
+			"getFlywheel",
+			"getInfo"
+		};
+	}
+
+	@Callback(direct = true)
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] invoke(String method, Context context, Arguments args) throws Exception {
+		switch(method) {
+			case "getFluid":    return getFluid(context, args);
+			case "getType":     return getType(context, args);
+			case "getPower":    return getPower(context, args);
+			case "getFlywheel": return getFlywheel(context, args);
+			case "getInfo":     return getInfo(context, args);
+			default: throw new NoSuchMethodException();
+		}
 	}
 }
