@@ -61,7 +61,7 @@ public class ResourceManager {
 	//Landmines
 	public static final IModelCustom mine_ap = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/bombs/ap_mine.obj")).asVBO();
 	public static final IModelCustom mine_marelet = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/bombs/marelet.obj")).asVBO();
-	public static final IModelCustom mine_fat = AdvancedModelLoader.loadModel(new ResourceLocation(RefStrings.MODID, "models/mine_fat.obj"));
+	public static final IModelCustom mine_fat = AdvancedModelLoader.loadModel(new ResourceLocation(RefStrings.MODID, "models/bombs/mine_fat.obj"));
 	public static final IModelCustom mine_naval = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/bombs/naval_mine.obj")).asVBO();
 
 	//Oil Pumps
@@ -362,13 +362,15 @@ public class ResourceManager {
 	public static final ResourceLocation pheo_label_106 = new ResourceLocation(RefStrings.MODID, "textures/models/pheodoors/vault/label_106.png");
 	public static final ResourceLocation pheo_label_111 = new ResourceLocation(RefStrings.MODID, "textures/models/pheodoors/vault/label_111.png");
 	public static IModelCustomNamed pheo_vault_door = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/pheodoors/vault_door.obj")).asVBO();
+	public static IModelCustomNamed pheo_cargo_door = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/pheodoors/cargo_door.obj")).asVBO();
+	public static final ResourceLocation pheo_cargo_door_tex = new ResourceLocation(RefStrings.MODID, "textures/models/pheodoors/cargo_door.png");
 
 	//Doors
 	public static final ResourceLocation silo_hatch_tex = new ResourceLocation(RefStrings.MODID, "textures/models/doors/silo_hatch.png");
 	public static IModelCustomNamed silo_hatch = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/doors/silo_hatch.obj")).asVBO();
 	public static final ResourceLocation silo_hatch_large_tex = new ResourceLocation(RefStrings.MODID, "textures/models/doors/silo_hatch_large.png");
 	public static IModelCustomNamed silo_hatch_large = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/doors/silo_hatch_large.obj")).asVBO();
-	
+
 	//Vending Machine
 	public static final IModelCustom vending_machine = new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, "models/machines/vending_machine.obj")).noSmooth().asVBO();
 
@@ -467,7 +469,7 @@ public class ResourceManager {
 	//public static final ResourceLocation mine_he_tex = new ResourceLocation(RefStrings.MODID, "textures/models/mine_he.png");
 	public static final ResourceLocation mine_marelet_tex = new ResourceLocation(RefStrings.MODID, "textures/models/bombs/mine_marelet.png");
 	public static final ResourceLocation mine_shrap_tex = new ResourceLocation(RefStrings.MODID, "textures/models/bombs/mine_shrapnel.png");
-	public static final ResourceLocation mine_fat_tex = new ResourceLocation(RefStrings.MODID, "textures/models/mine_fat.png");
+	public static final ResourceLocation mine_fat_tex = new ResourceLocation(RefStrings.MODID, "textures/models/bombs/mine_fat.png");
 	public static final ResourceLocation mine_naval_tex = new ResourceLocation(RefStrings.MODID, "textures/models/NMine.png");
 
 
@@ -672,8 +674,6 @@ public class ResourceManager {
 
 	//RTG
 	public static final ResourceLocation rtg_tex = new ResourceLocation(RefStrings.MODID, "textures/models/machines/rtg.png");
-	public static final ResourceLocation rtg_cell_tex = new ResourceLocation(RefStrings.MODID, "textures/models/machines/rtg_cell.png");
-	public static final ResourceLocation rtg_polonium_tex = new ResourceLocation(RefStrings.MODID, "textures/models/machines/rtg_polonium.png");
 
 	//Waste Drum
 	public static final ResourceLocation waste_drum_tex = new ResourceLocation(RefStrings.MODID, "textures/models/machines/drum_gray.png");
@@ -784,7 +784,7 @@ public class ResourceManager {
 
 	//Elevator
 	public static final ResourceLocation cargo_elevator_tex = new ResourceLocation(RefStrings.MODID, "textures/models/machines/elevator.png");
-	
+
 	//Vault Door
 	public static final ResourceLocation vault_cog_tex = new ResourceLocation(RefStrings.MODID, "textures/models/vault_cog.png");
 	public static final ResourceLocation vault_frame_tex = new ResourceLocation(RefStrings.MODID, "textures/models/vault_frame.png");
@@ -859,7 +859,7 @@ public class ResourceManager {
 	//Pipes
 	public static final ResourceLocation pipe_anchor_tex = new ResourceLocation(RefStrings.MODID, "textures/models/network/pipe_anchor.png");
 	public static final ResourceLocation fluid_pump_tex = new ResourceLocation(RefStrings.MODID, "textures/models/network/fluid_diode.png");
-	
+
 	//Barrels
 	public static ResourceLocation barrel_plastic_tex  = new ResourceLocation(RefStrings.MODID, "textures/blocks/barrel_plastic.png");
 	public static ResourceLocation barrel_steel_tex    = new ResourceLocation(RefStrings.MODID, "textures/blocks/barrel_steel.png");

@@ -12,11 +12,7 @@ import com.hbm.blocks.machine.fusion.*;
 import com.hbm.blocks.machine.pile.*;
 import com.hbm.blocks.machine.rbmk.*;
 import com.hbm.blocks.network.*;
-import com.hbm.blocks.network.pneumatic.PneumoStorageAccess;
-import com.hbm.blocks.network.pneumatic.PneumoStorageClutter;
-import com.hbm.blocks.network.pneumatic.PneumoStorageMono;
-import com.hbm.blocks.network.pneumatic.PneumoTube;
-import com.hbm.blocks.network.pneumatic.PneumoTubePaintableBlock;
+import com.hbm.blocks.network.pneumatic.*;
 import com.hbm.blocks.rail.*;
 import com.hbm.blocks.test.*;
 import com.hbm.blocks.turret.*;
@@ -578,7 +574,7 @@ public class ModBlocks {
 	public static Block seal_hatch;
 
 	public static Block cargo_elevator;
-	
+
 	public static Block vault_door;
 	public static Block blast_door;
 	public static Block sliding_blast_door;
@@ -595,6 +591,7 @@ public class ModBlocks {
 	public static Block round_airlock_door;
 	public static Block sliding_seal_door;
 	public static Block water_door;
+	public static Block cargo_door;
 
 	public static Block door_metal;
 	public static Block door_office;
@@ -807,6 +804,8 @@ public class ModBlocks {
 	public static Block pneumatic_storage_access;
 	public static Block pneumatic_storage_clutter;
 	public static Block pneumatic_storage_mono;
+	public static Block pneumatic_storage_importer;
+	public static Block pneumatic_storage_exporter;
 
 	public static Block fan;
 	public static Block piston_inserter;
@@ -914,9 +913,7 @@ public class ModBlocks {
 	public static Block teleanchor;
 	public static Block field_disturber;
 
-	public static Block machine_rtg_grey;
-	@Deprecated public static Block machine_minirtg;
-	@Deprecated public static Block machine_powerrtg;
+	public static Block machine_rtg;
 	public static Block machine_radiolysis;
 	public static Block machine_hephaestus;
 
@@ -1840,9 +1837,7 @@ public class ModBlocks {
 		teleanchor = new MachineTeleanchor().setBlockName("teleanchor").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab);
 		field_disturber = new MachineFieldDisturber().setBlockName("field_disturber").setHardness(5.0F).setResistance(200.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":field_disturber");
 
-		machine_rtg_grey = new MachineRTG(Material.iron).setBlockName("machine_rtg_grey").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":rtg");
-		machine_minirtg = new MachineMiniRTG(Material.iron).setBlockName("machine_minirtg").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":rtg_cell");
-		machine_powerrtg = new MachineMiniRTG(Material.iron).setBlockName("machine_powerrtg").setHardness(5.0F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":rtg_polonium");
+		machine_rtg = new MachineRTG(Material.iron).setBlockName("machine_rtg_grey").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":rtg");
 		machine_radiolysis = new MachineRadiolysis(Material.iron).setBlockName("machine_radiolysis").setHardness(10.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel_machine");
 		machine_hephaestus = new MachineHephaestus(Material.iron).setBlockName("machine_hephaestus").setHardness(10.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel_machine");
 
@@ -1910,11 +1905,13 @@ public class ModBlocks {
 		drone_crate_provider = new DroneDock().setBlockName("drone_crate_provider").setHardness(0.1F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":drone_crate_provider");
 		drone_crate_requester = new DroneDock().setBlockName("drone_crate_requester").setHardness(0.1F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":drone_crate_requester");
 
-		pneumatic_tube = new PneumoTube().setBlockName("pneumatic_tube").setStepSound(ModSoundTypes.pipe).setHardness(0.1F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_tube");
+		pneumatic_tube = new PneumoTube().setBlockName("pneumatic_tube").setStepSound(ModSoundTypes.pipe).setHardness(2F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_tube");
 		pneumatic_tube_paintable = new PneumoTubePaintableBlock().setBlockName("pneumatic_tube_paintable").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab);
-		pneumatic_storage_access = new PneumoStorageAccess().setBlockName("pneumatic_storage_access").setStepSound(ModSoundTypes.pipe).setHardness(0.1F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_access");
-		pneumatic_storage_clutter = new PneumoStorageClutter().setBlockName("pneumatic_storage_clutter").setStepSound(ModSoundTypes.pipe).setHardness(0.1F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_clutter");
-		pneumatic_storage_mono = new PneumoStorageMono().setBlockName("pneumatic_storage_mono").setStepSound(ModSoundTypes.pipe).setHardness(0.1F).setResistance(10.0F).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_mono");
+		pneumatic_storage_access = new PneumoStorageAccess().setBlockName("pneumatic_storage_access").setStepSound(ModSoundTypes.pipe).setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_access");
+		pneumatic_storage_clutter = new PneumoStorageClutter().setBlockName("pneumatic_storage_clutter").setStepSound(ModSoundTypes.pipe).setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_clutter");
+		pneumatic_storage_mono = new PneumoStorageMono().setBlockName("pneumatic_storage_mono").setStepSound(ModSoundTypes.pipe).setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_mono");
+		pneumatic_storage_importer = new PneumoStorageImporter().setBlockName("pneumatic_storage_importer").setStepSound(ModSoundTypes.pipe).setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_importer");
+		pneumatic_storage_exporter = new PneumoStorageExporter().setBlockName("pneumatic_storage_exporter").setStepSound(ModSoundTypes.pipe).setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":pneumatic_storage_exporter");
 
 		chain = new BlockChain(Material.iron).setBlockName("dungeon_chain").setHardness(0.25F).setResistance(2.0F).setCreativeTab(MainRegistry.blockTab).setBlockTextureName(RefStrings.MODID + ":chain");
 
@@ -2019,7 +2016,7 @@ public class ModBlocks {
 		seal_hatch = new BlockHatch(Material.iron).setBlockName("seal_hatch").setHardness(Float.POSITIVE_INFINITY).setResistance(Float.POSITIVE_INFINITY).setCreativeTab(null).setBlockTextureName(RefStrings.MODID + ":seal_hatch_3");
 
 		cargo_elevator = new BlockCargoElevator().setBlockName("cargo_elevator").setHardness(5.0F).setResistance(10.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel");
-		
+
 		vault_door = new BlockDoorGeneric(Material.iron, DoorDecl.VAULT_DOOR).setBlockName("vault_door").setHardness(10.0F).setResistance(1_000.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":concrete");
 		blast_door = new BlastDoor(Material.iron).setBlockName("blast_door").setHardness(10.0F).setResistance(1_000.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":blast_door");
 
@@ -2035,6 +2032,7 @@ public class ModBlocks {
 		round_airlock_door = new BlockDoorGeneric(Material.iron, DoorDecl.ROUND_AIRLOCK_DOOR).setBlockName("round_airlock_door").setHardness(10.0F).setResistance(1_000.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel");
 		sliding_seal_door = new BlockDoorGeneric(Material.iron, DoorDecl.SLIDING_SEAL_DOOR).setBlockName("sliding_seal_door").setHardness(10.0F).setResistance(1_000.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel");
 		water_door = new BlockDoorGeneric(Material.iron, DoorDecl.WATER_DOOR).setBlockName("water_door").setHardness(5.0F).setResistance(50.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel");
+		cargo_door = new BlockDoorGeneric(Material.iron, DoorDecl.CARGO_DOOR).setBlockName("cargo_door").setHardness(5.0F).setResistance(50.0F).setCreativeTab(MainRegistry.machineTab).setBlockTextureName(RefStrings.MODID + ":block_steel");
 
 		door_metal = new BlockModDoor(Material.iron).setBlockName("door_metal").setHardness(5.0F).setResistance(5.0F).setBlockTextureName(RefStrings.MODID + ":door_metal");
 		door_office = new BlockModDoor(Material.iron).setBlockName("door_office").setHardness(10.0F).setResistance(10.0F).setBlockTextureName(RefStrings.MODID + ":door_office");
@@ -2348,7 +2346,6 @@ public class ModBlocks {
 
 		logic_block = new LogicBlock().setBlockName("logic_block").setBlockTextureName(RefStrings.MODID + ":logic_block");
 		logic_block_invis = new LogicBlockInvis().setBlockName("logic_block_invis").setBlockTextureName(RefStrings.MODID + ":logic_block");
-
 	}
 
 	private static void registerBlock() {
@@ -2943,7 +2940,7 @@ public class ModBlocks {
 
 		//Hooh
 		GameRegistry.registerBlock(cargo_elevator, cargo_elevator.getUnlocalizedName());
-		
+
 		//Vault Door
 		GameRegistry.registerBlock(vault_door, vault_door.getUnlocalizedName());
 		GameRegistry.registerBlock(blast_door, blast_door.getUnlocalizedName());
@@ -2965,6 +2962,7 @@ public class ModBlocks {
 		GameRegistry.registerBlock(round_airlock_door, round_airlock_door.getUnlocalizedName());
 		GameRegistry.registerBlock(sliding_seal_door, sliding_seal_door.getUnlocalizedName());
 		GameRegistry.registerBlock(water_door, water_door.getUnlocalizedName());
+		GameRegistry.registerBlock(cargo_door, cargo_door.getUnlocalizedName());
 
 		//Crates
 		register(crate_iron, ItemBlockStorageCrate.class);
@@ -3056,9 +3054,7 @@ public class ModBlocks {
 		GameRegistry.registerBlock(machine_radgen, machine_radgen.getUnlocalizedName());
 		GameRegistry.registerBlock(machine_cyclotron, machine_cyclotron.getUnlocalizedName());
 		GameRegistry.registerBlock(machine_exposure_chamber, machine_exposure_chamber.getUnlocalizedName());
-		GameRegistry.registerBlock(machine_rtg_grey, machine_rtg_grey.getUnlocalizedName());
-		GameRegistry.registerBlock(machine_minirtg, machine_minirtg.getUnlocalizedName());
-		GameRegistry.registerBlock(machine_powerrtg, machine_powerrtg.getUnlocalizedName());
+		GameRegistry.registerBlock(machine_rtg, machine_rtg.getUnlocalizedName());
 		GameRegistry.registerBlock(machine_radiolysis, machine_radiolysis.getUnlocalizedName());
 		GameRegistry.registerBlock(machine_hephaestus, machine_hephaestus.getUnlocalizedName());
 
@@ -3183,6 +3179,8 @@ public class ModBlocks {
 		register(pneumatic_storage_access);
 		register(pneumatic_storage_clutter);
 		register(pneumatic_storage_mono);
+		register(pneumatic_storage_importer);
+		register(pneumatic_storage_exporter);
 		register(fan);
 		register(piston_inserter);
 
