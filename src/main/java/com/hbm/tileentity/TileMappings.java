@@ -388,6 +388,12 @@ public class TileMappings {
 		put(TileEntityPileSource.class, "tileentity_pile_source");
 		put(TileEntityPileBreedingFuel.class, "tileentity_pile_breedingfuel");
 		put(TileEntityPileNeutronDetector.class, "tileentity_pile_neutrondetector");
+		
+		put(TileEntityPileCore.class, "tileentity_pile_core");
+		put(TileEntityPileBaseMK2.class, "tileentity_pile_block");
+		put(TileEntityPileLoader.class, "tileentity_pile_loader");
+		put(TileEntityPileVent.class, "tileentity_pile_vent");
+		put(TileEntityPileControl.class, "tileentity_pile_control");
 	}
 
 	private static void putRBMK() {
@@ -506,10 +512,6 @@ public class TileMappings {
 
 	private static void put(Class<? extends TileEntity> clazz, String... names) {
 		map.put(clazz, names);
-
-		/*if((IFluidSource.class.isAssignableFrom(clazz) || IFluidAcceptor.class.isAssignableFrom(clazz)) && !IFluidConnector.class.isAssignableFrom(clazz)) {
-			LoggingUtil.errorWithHighlight(clazz.getCanonicalName() + " implements the old interfaces but not IFluidConnector!");
-		}*/
 
 		if(IConfigurableMachine.class.isAssignableFrom(clazz)) {
 			configurables.add((Class<? extends IConfigurableMachine>) clazz);
