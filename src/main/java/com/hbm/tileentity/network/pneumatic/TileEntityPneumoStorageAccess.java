@@ -1,6 +1,6 @@
 package com.hbm.tileentity.network.pneumatic;
 
-import com.hbm.inventory.container.ContainerPneumoStorageAccessMK2;
+import com.hbm.inventory.container.ContainerPneumoStorageAccess;
 import com.hbm.inventory.gui.GUIPneumoStorageAccess;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityLoadedBase;
@@ -14,7 +14,6 @@ import api.hbm.ntl.StackCache;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityPneumoStorageAccess extends TileEntityLoadedBase implements IPneumaticConnector, IGUIProvider {
 	
@@ -69,12 +68,6 @@ public class TileEntityPneumoStorageAccess extends TileEntityLoadedBase implemen
 		if(this.cache != null) this.cache.dissolveCache();
 	}
 
-	@Override
-	public boolean canConnectPneumatic(ForgeDirection dir) {
-		ForgeDirection selfdir = ForgeDirection.getOrientation(getBlockMetadata());
-		return dir == selfdir.getOpposite();
-	}
-
-	@Override public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) { return new ContainerPneumoStorageAccessMK2(player.inventory, this); }
+	@Override public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) { return new ContainerPneumoStorageAccess(player.inventory, this); }
 	@Override public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) { return new GUIPneumoStorageAccess(player.inventory, this); }
 }

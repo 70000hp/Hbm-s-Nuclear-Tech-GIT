@@ -1,23 +1,7 @@
 ## Changed
-* Updated chinese localization
-* Watz powerplant now has OC and RoR integration
-* The automatic thresher now has a fluid port on the bottom as well
-* The foundry basins and outlet filters now use the properly translated name instead of the internal name for the material
-* Removed config for new bedrock ores
-  * New ores are the default anyway and old bedrock ores are now properly deprecated
-  * Existing setups will continue to work for now
-  * Old bedrock ore items still exist but are no longer listed in the creative tab
-* Removed recipe for the small single block steam turbine
-  * We have steam engines and industrial turbines are really not that expensive
-  * "oh no, i have to build an actually good looking setup now if i want to build a zirnox!" yeah you do
-* Updated light brick texture
-* The maximum character limit on RoR channels is now the same for all RoR devices, being 15
-  * This does not include special RoR interactive devices that don't use GUI text fields like the RoR terminal or the AUTOCAL units
-* Pile output rods like the bred uranium and the plutonium rods can no longer be dismantled using the anvil, the PUREX is now mandatory
+* Updated all oil well GUI textures
+  * There's now only two upgrade slots instead of three
+* All legacy pixel gauges have been replaced with smooth ones (watz, ZIRNOX, CCGT) making them more accurate
 
 ## Fixed
-* Fixed AUTOCAL's number comparison functions not working with variable substitution as advertised
-* Fixed broken thorium ore centrifuging recipe shown in NEI
-* Fixed industrial turbine not properly saving its energy values, causing the flywheel to stop on relog
-* Fixed lapis dust to cobalt shredder recipe not using oredict
-* Fixed AUTOCAL's file opening buttons not working on some systems, it will fall back to opening the folder instead
+* Fixed held block being placed when not sneaking when opening the cable diode's GUI
