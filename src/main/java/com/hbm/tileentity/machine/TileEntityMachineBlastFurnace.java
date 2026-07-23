@@ -46,7 +46,7 @@ public class TileEntityMachineBlastFurnace extends TileEntityMachineBase impleme
 	public int fuel;
 	public static final int FUEL_COAL = 200 * 8;
 	public static final int FUEL_RATE = 200 * 4; // half coal per operation
-	public static final int MAX_FUEL = FUEL_COAL * 16; // 16 pieces of coal
+	public static final int MAX_FUEL = FUEL_COAL * 24; // 24 pieces of coal, can also fit a bit more than a coal coke block
 	public static final int FLUE_GAS = 100; // per finished operation, not per tick
 	
 	public ModuleBurnTime burnModule = new ModuleBurnTime()
@@ -56,7 +56,7 @@ public class TileEntityMachineBlastFurnace extends TileEntityMachineBase impleme
 		super(5);
 		this.tanks = new FluidTank[2];
 		this.tanks[0] = new FluidTank(Fluids.AIRBLAST, 4_000);
-		this.tanks[1] = new FluidTank(Fluids.FLUE, 1_000); // TEMP
+		this.tanks[1] = new FluidTank(Fluids.FLUE, 1_000);
 	}
 
 	@Override
@@ -87,9 +87,9 @@ public class TileEntityMachineBlastFurnace extends TileEntityMachineBase impleme
 			this.speed = 0F;
 			GenericRecipe recipe = BlastFurnaceRecipesNT.INSTANCE.getRecipe(slots[1], slots[2]);
 			
-			if(!this.tilted && recipe != null && this.fuel >= FUEL_RATE && this.canOutput(recipe)) {
+			if(!this.tilted && recipe != null && this.fuel >= FUEL_RATE && this.hasQuantities(recipe) && this.canOutput(recipe)) {
 				
-				this.speed = MathHelper.clamp_float(0.5F + this.tanks[0].getFill() * 4F / this.tanks[0].getMaxFill(), 0.5F, 3F);
+				this.speed = MathHelper.clamp_float(0.5F + this.tanks[0].getFill() * 8F / this.tanks[0].getMaxFill(), 0.5F, 5F);
 				
 				this.isProgressing = true;
 				this.progress += speed / recipe.duration;
@@ -156,6 +156,12 @@ public class TileEntityMachineBlastFurnace extends TileEntityMachineBase impleme
 				new DirPos(xCoord + dir.offsetX * 2, yCoord + 5, zCoord + dir.offsetZ * 2, dir),
 				new DirPos(xCoord, yCoord + 7, zCoord, Library.POS_Y)
 		};
+	}
+	
+	public boolean hasQuantities(GenericRecipe recipe) {
+		if(recipe.inputItem[0].matchesRecipe(slots[1], false) && recipe.inputItem[1].matchesRecipe(slots[2], false)) return true;
+		if(recipe.inputItem[0].matchesRecipe(slots[2], false) && recipe.inputItem[1].matchesRecipe(slots[1], false)) return true;
+		return false;
 	}
 	
 	public boolean canOutput(GenericRecipe recipe) {

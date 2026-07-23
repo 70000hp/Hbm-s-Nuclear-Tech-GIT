@@ -3,14 +3,12 @@ package com.hbm.world.feature;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hbm.blocks.BlockEnums.EnumStoneType;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockBedrockOreTE.TileEntityBedrockOre;
 import com.hbm.config.WorldConfig;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.OreDictManager.DictFrame;
 import com.hbm.inventory.fluid.Fluids;
-import com.hbm.items.ItemEnums.EnumChunkType;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBedrockOreBase;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
@@ -25,10 +23,10 @@ import net.minecraft.world.World;
 
 public class BedrockOre {
 
-	public static List<WeightedRandomGeneric<BedrockOreDefinition>> weightedOres = new ArrayList();
 	public static List<WeightedRandomGeneric<BedrockOreDefinition>> weightedOresNether = new ArrayList();
 
 	public static void init() {
+		/*
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.IRON,													1),													WorldConfig.bedrockIronSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.COPPER,												1),													WorldConfig.bedrockCopperSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(EnumBedrockOre.BORAX,													3,	new FluidStack(Fluids.SULFURIC_ACID, 500)),		WorldConfig.bedrockBoraxSpawn);
@@ -48,8 +46,9 @@ public class BedrockOre {
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(new ItemStack(Items.emerald, 4),										1,	0x3FDD85),										WorldConfig.bedrockEmeraldSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(DictFrame.fromOne(ModItems.chunk_ore, EnumChunkType.RARE),			2,	0x8F9999,	new FluidStack(Fluids.PEROXIDE, 500)),	WorldConfig.bedrockRareEarthSpawn);
 		registerBedrockOre(weightedOres, new BedrockOreDefinition(DictFrame.fromOne(ModBlocks.stone_resource, EnumStoneType.BAUXITE, 2),1,	0xEF7213),										WorldConfig.bedrockBauxiteSpawn);
-
+		*/
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.glowstone_dust, 8),		1,	0xF9FF4D),							WorldConfig.bedrockGlowstoneSpawn);
+
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.powder_fire, 4),		1,	0xD7341F),							WorldConfig.bedrockPhosphorusSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.quartz, 4),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.fragment_coltan, 4),				2,	0xF0EFDD,	new FluidStack(Fluids.CHLORINE, 100)),		WorldConfig.bedrockNetherColtanSpawn);

@@ -611,6 +611,7 @@ public class MainRegistry {
 		Compat.handleRailcraftNonsense();
 		SuicideThreadDump.register();
 		CommandReloadClient.register();
+		CommandWikiRender.register();
 
 		//ExplosionTests.runTest();
 	}
@@ -672,6 +673,7 @@ public class MainRegistry {
 		event.registerServerCommand(new CommandReloadServer());
 		event.registerServerCommand(new CommandLocate());
 		event.registerServerCommand(new CommandCustomize());
+		event.registerServerCommand(new CommandWikiRender()); // TODO: make this shitfuck be clientside
 		event.registerServerCommand(new CommandReapNetworks());
 		ArcFurnaceRecipes.registerFurnaceSmeltables(); // because we have to wait for other mods to take their merry ass time to register recipes
 	}
@@ -729,7 +731,6 @@ public class MainRegistry {
 
 		/// IGNORE ///
 		for(int i = 1; i <= 8; i++) ignoreMappings.add("hbm:item.gasflame" + i);
-
 		/// REMAP ///
 		remapItems.put("hbm:item.gadget_explosive8", ModItems.early_explosive_lenses);
 		remapItems.put("hbm:item.man_explosive8", ModItems.explosive_lenses);

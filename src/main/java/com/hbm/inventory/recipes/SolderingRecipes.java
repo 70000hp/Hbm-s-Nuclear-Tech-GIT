@@ -140,7 +140,7 @@ public class SolderingRecipes extends SerializableRecipe {
 							new ComparableStack(ModItems.circuit, lbsm ? 8 : 16, EnumCircuitType.CAPACITOR_TANTALIUM)},
 					new AStack[] {
 							new ComparableStack(ModItems.circuit, 1, EnumCircuitType.CONTROLLER_CHASSIS),
-							new ComparableStack(ModItems.upgrade_speed_1)},
+							new OreDictStack(RUBBER.ingot(), 4)},
 					new AStack[] {
 							new OreDictStack(PB.wireFine(), 16)}
 			));
@@ -152,7 +152,7 @@ public class SolderingRecipes extends SerializableRecipe {
 							new ComparableStack(ModItems.circuit, 1, EnumCircuitType.ATOMIC_CLOCK)},
 					new AStack[] {
 							new ComparableStack(ModItems.circuit, 1, EnumCircuitType.CONTROLLER_CHASSIS),
-							new ComparableStack(ModItems.upgrade_speed_3)},
+							new OreDictStack(ANY_HARDPLASTIC.ingot(), 4)},
 					new AStack[] {
 							new OreDictStack(PB.wireFine(), 24)}
 			));
@@ -164,7 +164,7 @@ public class SolderingRecipes extends SerializableRecipe {
 							new ComparableStack(ModItems.circuit, lbsm ? 1 : 8, EnumCircuitType.ATOMIC_CLOCK)},
 					new AStack[] {
 							new ComparableStack(ModItems.circuit, 2, EnumCircuitType.CONTROLLER_ADVANCED),
-							new ComparableStack(ModItems.upgrade_overdrive_1)},
+							new ComparableStack(ModItems.upgrade_speed_3)},
 					new AStack[] {
 							new OreDictStack(PB.wireFine(), 32)}
 			));
