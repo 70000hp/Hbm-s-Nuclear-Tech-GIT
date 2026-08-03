@@ -1,6 +1,7 @@
 package com.hbm.tileentity.machine.rbmk;
 
-import api.hbm.fluid.IFluidStandardSender;
+import api.hbm.fluidmk2.IFluidStandardSenderMK2;
+
 import com.hbm.blocks.ModBlocks;
 import com.hbm.entity.projectile.EntityRBMKDebris.DebrisType;
 import com.hbm.handler.CompatHandler;
@@ -12,9 +13,9 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIRBMKOutgasser;
 import com.hbm.inventory.recipes.OutgasserRecipes;
+import com.hbm.inventory.recipes.OutgasserRecipes.OutgasserRecipe;
 import com.hbm.lib.Library;
 import com.hbm.tileentity.machine.rbmk.TileEntityRBMKConsole.ColumnType;
-import com.hbm.util.Tuple.Pair;
 import com.hbm.util.fauxpointtwelve.DirPos;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
@@ -31,7 +32,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implements IRBMKFluxReceiver, IFluidStandardSender, SimpleComponent, CompatHandler.OCComponent {
+public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implements IRBMKFluxReceiver, IFluidStandardSenderMK2, SimpleComponent, CompatHandler.OCComponent {
 
 	public FluidTank gas;
 	public double progress;
@@ -46,26 +47,21 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 	public String getName() {
 		return "container.rbmkOutgasser";
 	}
-	
+
 	@Override
 	public void updateEntity() {
-		
+
 		if(!worldObj.isRemote) {
-			
-			if(!canProcess()) {
-				this.progress = 0;
-			}
-			
-			for(DirPos pos : getOutputPos()) {
-				if(this.gas.getFill() > 0) this.sendFluid(gas, worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
-			}
+
+			if(!canProcess()) this.progress = 0;
+			for(DirPos pos : getOutputPos()) if(this.gas.getFill() > 0) this.tryProvide(gas, worldObj, pos);
 		}
-		
+
 		super.updateEntity();
 	}
-	
+
 	protected DirPos[] getOutputPos() {
-		
+
 		if(worldObj.getBlock(xCoord, yCoord - 1, zCoord) == ModBlocks.rbmk_loader) {
 			return new DirPos[] {
 					new DirPos(this.xCoord, this.yCoord + RBMKDials.getColumnHeight(worldObj) + 1, this.zCoord, Library.POS_Y),
@@ -94,58 +90,58 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 
 	@Override
 	public void receiveFlux(NeutronStream stream) {
-		
+
 		if(canProcess()) {
 
 			double efficiency = Math.min(1 - stream.fluxRatio * 0.8, 1);
 
 			progress += stream.fluxQuantity * efficiency * RBMKDials.getOutgasserMod(worldObj);
-			
+
 			if(progress > duration) {
 				process();
 				this.markDirty();
 			}
 		}
 	}
-	
+
 	public boolean canProcess() {
-		
+
 		if(slots[0] == null)
 			return false;
-		
-		Pair<ItemStack, FluidStack> output = OutgasserRecipes.getOutput(slots[0]);
-		
-		if(output == null)
-			return false;
-		
-		FluidStack fluid = output.getValue();
+
+		OutgasserRecipe output = OutgasserRecipes.getOutput(slots[0]);
+
+		if(output == null) return false;
+		if(output.fusionOnly) return false;
+
+		FluidStack fluid = output.liquidOutput;
 
 		if(fluid != null) {
 			if(gas.getTankType() != fluid.type && gas.getFill() > 0) return false;
 			gas.setTankType(fluid.type);
 			if(gas.getFill() + fluid.fill > gas.getMaxFill()) return false;
 		}
-		
-		ItemStack out = output.getKey();
-		
+
+		ItemStack out = output.solidOutput;
+
 		if(slots[1] == null || out == null)
 			return true;
-		
+
 		return slots[1].getItem() == out.getItem() && slots[1].getItemDamage() == out.getItemDamage() && slots[1].stackSize + out.stackSize <= slots[1].getMaxStackSize();
 	}
-	
+
 	private void process() {
-		
-		Pair<ItemStack, FluidStack> output = OutgasserRecipes.getOutput(slots[0]);
+
+		OutgasserRecipe output = OutgasserRecipes.getOutput(slots[0]);
 		this.decrStackSize(0, 1);
 		this.progress = 0;
-		
-		if(output.getValue() != null) {
-			gas.setFill(gas.getFill() + output.getValue().fill);
+
+		if(output.liquidOutput != null) {
+			gas.setFill(gas.getFill() + output.liquidOutput.fill);
 		}
-		
-		ItemStack out = output.getKey();
-		
+
+		ItemStack out = output.solidOutput;
+
 		if(out != null) {
 			if(slots[1] == null) {
 				slots[1] = out.copy();
@@ -154,16 +150,16 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 			}
 		}
 	}
-	
+
 	@Override
 	public void onMelt(int reduce) {
-		
+
 		int count = 4 + worldObj.rand.nextInt(2);
-		
+
 		for(int i = 0; i < count; i++) {
 			spawnDebris(DebrisType.BLANK);
 		}
-		
+
 		super.onMelt(reduce);
 	}
 
@@ -186,19 +182,19 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 		data.setDouble("progress", this.progress);
 		return data;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		
+
 		this.progress = nbt.getDouble("progress");
 		this.gas.readFromNBT(nbt, "gas");
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		
+
 		nbt.setDouble("progress", this.progress);
 		this.gas.writeToNBT(nbt, "gas");
 	}
@@ -260,7 +256,7 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 	public Object[] getGasMax(Context context, Arguments args) {
 		return new Object[] {gas.getMaxFill()};
 	}
-	
+
 		@Callback(direct = true)
 	@Optional.Method(modid = "OpenComputers")
 	public Object[] getGasType(Context context, Arguments args) {
@@ -273,6 +269,15 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 		return new Object[] {progress};
 	}
 
+	@Callback(direct = true, doc = "Returns the unlocalized name and size of the stack that the outgasser is crafting (the input), or nil, nil if there is no stack")
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getCrafting(Context context, Arguments args) {
+		if (slots[0] == null)
+			return new Object[] { "", 0 };
+		else
+			return new Object[]{slots[0].getUnlocalizedName(), slots[0].stackSize };
+	}
+
 	@Callback(direct = true)
 	@Optional.Method(modid = "OpenComputers")
 	public Object[] getCoordinates(Context context, Arguments args) {
@@ -282,7 +287,11 @@ public class TileEntityRBMKOutgasser extends TileEntityRBMKSlottedBase implement
 	@Callback(direct = true)
 	@Optional.Method(modid = "OpenComputers")
 	public Object[] getInfo(Context context, Arguments args) {
-		return new Object[] {gas.getFill(), gas.getMaxFill(), progress, gas.getTankType().getID(), xCoord, yCoord, zCoord};
+		ItemStack input = slots[0];
+		if (input != null)
+			return new Object[] {gas.getFill(), gas.getMaxFill(), progress, gas.getTankType().getID(), xCoord, yCoord, zCoord, input.getUnlocalizedName(), input.stackSize };
+		else
+			return new Object[] {gas.getFill(), gas.getMaxFill(), progress, gas.getTankType().getID(), xCoord, yCoord, zCoord, "", 0 };
 	}
 
 	@Override

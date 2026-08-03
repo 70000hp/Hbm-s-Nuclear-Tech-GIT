@@ -3,11 +3,12 @@ package com.hbm.render.item.weapon.sedna;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 public class ItemRenderCarbine extends ItemRenderWeaponBase {
@@ -18,7 +19,7 @@ public class ItemRenderCarbine extends ItemRenderWeaponBase {
 	@Override
 	public float getViewFOV(ItemStack stack, float fov) {
 		float aimingProgress = ItemGunBaseNT.prevAimingProgress + (ItemGunBaseNT.aimingProgress - ItemGunBaseNT.prevAimingProgress) * interp;
-		return  fov * (1 - aimingProgress * 0.33F);
+		return  fov * (1 - aimingProgress * (isScoped(stack) ? 0.66F : 0.33F));
 	}
 
 	@Override
@@ -26,13 +27,22 @@ public class ItemRenderCarbine extends ItemRenderWeaponBase {
 		GL11.glTranslated(0, 0, 0.875);
 		
 		float offset = 0.8F;
-		standardAimingTransform(stack,
-				-1.5F * offset, -1.5F * offset, 0.875F * offset,
-				0, -6.25 / 8D, 0.25);
+		
+		if(this.isScoped(stack)) {
+			standardAimingTransform(stack,
+					-1.5F * offset, -1.5F * offset, 0.875F * offset,
+					0, -8 / 8D, 0.25);
+		} else {
+			standardAimingTransform(stack,
+					-1.5F * offset, -1.5F * offset, 0.875F * offset,
+					0, -6.25 / 8D, 0.25);
+		}
 	}
 
 	@Override
 	public void renderFirstPerson(ItemStack stack) {
+		boolean isScoped = isScoped(stack);
+		if(isScoped && ItemGunBaseNT.prevAimingProgress == 1 && ItemGunBaseNT.aimingProgress == 1) return;
 		
 		ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
 		Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.carbine_tex);
@@ -75,6 +85,13 @@ public class ItemRenderCarbine extends ItemRenderWeaponBase {
 		GL11.glTranslated(rel[0], rel[1], rel[2]);
 		if(bullet[0] != 1) ResourceManager.carbine.renderPart("Bullet");
 		GL11.glPopMatrix();
+		
+		if(!isScoped(stack)) {
+			ResourceManager.carbine.renderPart("IronSight");
+		} else {
+			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.carbine_scope_tex);
+			ResourceManager.carbine.renderPart("Scope");
+		}
 		
 		if(hasBayonet(stack)) {
 			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.carbine_bayonet_tex);
@@ -134,7 +151,7 @@ public class ItemRenderCarbine extends ItemRenderWeaponBase {
 	}
 
 	@Override
-	public void renderOther(ItemStack stack, ItemRenderType type) {
+	public void renderOther(ItemStack stack, ItemRenderType type, Object... data) {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		
 		GL11.glShadeModel(GL11.GL_SMOOTH);
@@ -142,14 +159,46 @@ public class ItemRenderCarbine extends ItemRenderWeaponBase {
 		ResourceManager.carbine.renderPart("Gun");
 		ResourceManager.carbine.renderPart("Slide");
 		ResourceManager.carbine.renderPart("Magazine");
+		if(!isScoped(stack)) {
+			ResourceManager.carbine.renderPart("IronSight");
+		} else {
+			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.carbine_scope_tex);
+			ResourceManager.carbine.renderPart("Scope");
+		}
 		if(hasBayonet(stack)) {
 			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.carbine_bayonet_tex);
 			ResourceManager.carbine.renderPart("Bayonet");
 		}
 		GL11.glShadeModel(GL11.GL_FLAT);
+		
+		if(type == ItemRenderType.EQUIPPED) {
+			EntityLivingBase ent = (EntityLivingBase) data[1];
+			long shot;
+			double shotRand = 0;
+			if(ent == Minecraft.getMinecraft().thePlayer) {
+				ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+				shot = gun.lastShot[0];
+				shotRand = gun.shotRand;
+			} else {
+				shot = ItemRenderWeaponBase.flashMap.getOrDefault(ent, (long) -1);
+				if(shot < 0) return;
+			}
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 1, 8);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(90 * shotRand, 1, 0, 0);
+			GL11.glScaled(0.5, 0.5, 0.5);
+			this.renderMuzzleFlash(shot, 75, 7.5);
+			GL11.glPopMatrix();
+		}
+	}
+	
+	public boolean isScoped(ItemStack stack) {
+		return XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE);
 	}
 	
 	public boolean hasBayonet(ItemStack stack) {
-		return WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_CARBINE_BAYONET);
+		return XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_CARBINE_BAYONET);
 	}
 }

@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import com.hbm.interfaces.IControlReceiver;
+import com.hbm.inventory.gui.element.GUIElements;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.lib.RefStrings;
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
 public class GUIScreenRecipeSelector extends GuiScreen {
@@ -135,7 +137,7 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 				
 				if(guiLeft + ix <= mouseX && guiLeft + ix + 18 > mouseX && guiTop + iy < mouseY && guiTop + iy + 18 >= mouseY) {
 					GenericRecipe recipe = recipes.get(i);
-					this.func_146283_a(recipe.print(), mouseX, mouseY);
+					GUIElements.drawHoveringTextRecipe(recipe.print(), mouseX, mouseY, this.fontRendererObj, itemRender, this.width, this.height);
 				}
 			}
 		}
@@ -143,7 +145,7 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 		if(guiLeft + 151 <= mouseX && guiLeft + 151 + 18 > mouseX && guiTop + 71 < mouseY && guiTop + 71 + 18 >= mouseY) {
 			if(this.selection != null && this.recipeSet.recipeNameMap.containsKey(selection)) {
 				GenericRecipe recipe = (GenericRecipe) this.recipeSet.recipeNameMap.get(selection);
-				this.func_146283_a(recipe.print(), mouseX, mouseY);
+				GUIElements.drawHoveringTextRecipe(recipe.print(), mouseX, mouseY, this.fontRendererObj, itemRender, this.width, this.height);
 			}
 		}
 
@@ -325,7 +327,16 @@ public class GUIScreenRecipeSelector extends GuiScreen {
 			search(this.search.getText());
 			return;
 		}
-			
+
+		if(keyCode == Keyboard.KEY_UP) pageIndex--;
+		if(keyCode == Keyboard.KEY_DOWN) pageIndex++;
+		if(keyCode == Keyboard.KEY_PRIOR) pageIndex -= 5;
+		if(keyCode == Keyboard.KEY_NEXT) pageIndex += 5;
+		if(keyCode == Keyboard.KEY_HOME) pageIndex = 0;
+		if(keyCode == Keyboard.KEY_END) pageIndex = size;
+		
+		pageIndex = MathHelper.clamp_int(pageIndex, 0, size);
+		
 		if(keyCode == 1 || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
 			FMLCommonHandler.instance().showGuiScreen(previousScreen);
 		}

@@ -1,5 +1,10 @@
 package com.hbm.inventory.gui;
 
+import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toserver.NBTControlPacket;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.inventory.container.ContainerMachineArcWelder;
@@ -18,22 +23,39 @@ public class GUIMachineArcWelder extends GuiInfoContainer {
 
 	public GUIMachineArcWelder(InventoryPlayer playerInv, TileEntityMachineArcWelder tile) {
 		super(new ContainerMachineArcWelder(playerInv, tile));
-		
+
 		this.welder = tile;
 		this.xSize = 176;
 		this.ySize = 204;
 	}
-	
+
 	@Override
 	public void drawScreen(int x, int y, float interp) {
 		super.drawScreen(x, y, interp);
 
 		welder.tank.renderTankInfo(this, x, y, guiLeft + 35, guiTop + 63, 34, 16);
 		this.drawElectricityInfo(this, x, y, guiLeft + 152, guiTop + 18, 16, 52, welder.getPower(), welder.getMaxPower());
-		
+
 		this.drawCustomInfoStat(x, y, guiLeft + 78, guiTop + 67, 8, 8, guiLeft + 78, guiTop + 67, this.getUpgradeInfo(welder));
+
+		this.drawCustomInfoStat(x, y, guiLeft + 5, guiTop + 66, 10, 10, x, y,
+			"Recipe Collision Prevention: " + (welder.collisionPrevention ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF"),
+			"Prevents no-fluid recipes from being processed",
+			"when fluid is present.");
 	}
-	
+
+	@Override
+	protected void mouseClicked(int x, int y, int i) {
+		super.mouseClicked(x, y, i);
+
+		if(guiLeft + 5 <= x && guiLeft + 5 + 10 > x && guiTop + 66 < y && guiTop + 66 + 10 >= y) {
+			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
+			NBTTagCompound data = new NBTTagCompound();
+			data.setBoolean("collision", true);
+			PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(data, welder.xCoord, welder.yCoord, welder.zCoord));
+		}
+	}
+
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j) {
 		String name = this.welder.hasCustomInventoryName() ? this.welder.getInventoryName() : I18n.format(this.welder.getInventoryName());
@@ -46,13 +68,17 @@ public class GUIMachineArcWelder extends GuiInfoContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-		
+
+		if(welder.collisionPrevention) {
+			drawTexturedModalRect(guiLeft + 5, guiTop + 66, 192, 14, 10, 10);
+		}
+
 		int p = (int) (welder.power * 52 / Math.max(welder.maxPower, 1));
 		drawTexturedModalRect(guiLeft + 152, guiTop + 70 - p, 176, 52 - p, 16, p);
-		
+
 		int i = welder.progress * 33 / Math.max(welder.processTime, 1);
 		drawTexturedModalRect(guiLeft + 72, guiTop + 37, 192, 0, i, 14);
-		
+
 		if(welder.power >= welder.consumption) {
 			drawTexturedModalRect(guiLeft + 156, guiTop + 4, 176, 52, 9, 12);
 		}

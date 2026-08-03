@@ -18,7 +18,7 @@ import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityLoadedBase;
 import com.hbm.util.BufferUtil;
 import com.hbm.util.i18n.I18nUtil;
-import com.hbm.world.gen.INBTTransformable;
+import com.hbm.world.gen.nbt.INBTBlockTransformable;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -37,7 +37,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -47,7 +46,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.Pre;
 
-public class BlockWandJigsaw extends BlockContainer implements IBlockSideRotation, INBTTransformable, IGUIProvider, ILookOverlay {
+public class BlockWandJigsaw extends BlockContainer implements IBlockSideRotation, INBTBlockTransformable, IGUIProvider, ILookOverlay {
 
 	private IIcon iconTop;
 	private IIcon iconSide;
@@ -123,7 +122,7 @@ public class BlockWandJigsaw extends BlockContainer implements IBlockSideRotatio
 
 	@Override
 	public int transformMeta(int meta, int coordBaseMode) {
-		return INBTTransformable.transformMetaDeco(meta, coordBaseMode);
+		return INBTBlockTransformable.transformMetaDeco(meta, coordBaseMode);
 	}
 
 	@Override
@@ -135,10 +134,10 @@ public class BlockWandJigsaw extends BlockContainer implements IBlockSideRotatio
 		TileEntityWandJigsaw jigsaw = (TileEntityWandJigsaw) te;
 
 		if(!player.isSneaking()) {
-			Block block = getBlock(world, player.getHeldItem());
+			Block block = ModBlocks.getBlockFromStack(player.getHeldItem());
 			if(block == ModBlocks.wand_air) block = Blocks.air;
 
-			if(block != null && block != ModBlocks.wand_jigsaw && block != ModBlocks.wand_loot) {
+			if(block != null && !ModBlocks.isStructureBlock(block, false)) {
 				jigsaw.replaceBlock = block;
 				jigsaw.replaceMeta = player.getHeldItem().getItemDamage();
 
@@ -153,13 +152,6 @@ public class BlockWandJigsaw extends BlockContainer implements IBlockSideRotatio
 		}
 
 		return false;
-	}
-
-	private Block getBlock(World world, ItemStack stack) {
-		if(stack == null) return null;
-		if(!(stack.getItem() instanceof ItemBlock)) return null;
-
-		return ((ItemBlock) stack.getItem()).field_150939_a;
 	}
 
 	@Override

@@ -63,9 +63,11 @@ public class MixerRecipes extends SerializableRecipe {
 		register(Fluids.RADIOSOLVENT, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.REFORMGAS, 750)).setStack2(new FluidStack(Fluids.CHLORINE, 250)));
 		register(Fluids.SCHRABIDIC, new MixerRecipe(16_000, 100).setStack1(new FluidStack(Fluids.SAS3, 8_000)).setStack2(new FluidStack(Fluids.PEROXIDE, 6_000)).setSolid(new ComparableStack(ModItems.pellet_charged)));
 
-		register(Fluids.PETROIL, new MixerRecipe(1_000, 30).setStack1(new FluidStack(Fluids.RECLAIMED, 800)).setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
+		register(Fluids.PETROIL,
+			new MixerRecipe(1_000, 30).setStack1(new FluidStack(Fluids.HEATINGOIL, 800)).setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
 		register(Fluids.LUBRICANT,
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.HEATINGOIL, 500)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 500)),
+				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.OIL_COKER, 800)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 200)),
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.FISHOIL, 800)).setStack2(new FluidStack(Fluids.ETHANOL, 200)),
 				new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.SUNFLOWEROIL, 800)).setStack2(new FluidStack(Fluids.ETHANOL, 200)));
 		register(Fluids.BIOFUEL,
@@ -95,12 +97,14 @@ public class MixerRecipes extends SerializableRecipe {
 		register(Fluids.PHEROMONE_M, new MixerRecipe(2000, 10).setStack1(new FluidStack(Fluids.PHEROMONE, 1500)).setStack2(new FluidStack(Fluids.BLOOD, 500)).setSolid(new ComparableStack(ModItems.pill_herbal)));
 
 		register(Fluids.BAUXITE_SOLUTION, new MixerRecipe(300, 80).setStack1(new FluidStack(Fluids.LYE, 50)).setSolid(new ComparableStack(ModBlocks.stone_resource, 1, BlockEnums.EnumStoneType.BAUXITE.ordinal())));
-		register(Fluids.LYE, new MixerRecipe(50, 100).setStack1(new FluidStack(Fluids.WATER, 500)).setSolid(new ComparableStack(ModItems.powder_ash, 2, EnumAshType.WOOD)));
+
+		register(Fluids.LYE, new MixerRecipe(100, 100).setStack1(new FluidStack(Fluids.WATER, 100)).setSolid(new ComparableStack(ModItems.powder_ash, 1, EnumAshType.WOOD)));
 		register(Fluids.ALUMINA, new MixerRecipe(200, 40).setStack1(new FluidStack(Fluids.SODIUM_ALUMINATE, 150)).setSolid(new OreDictStack(F.dust(), 3)),
 								 new MixerRecipe(300, 40).setStack1(new FluidStack(Fluids.SODIUM_ALUMINATE, 150)).setSolid(new ComparableStack(DictFrame.fromOne(ModItems.chunk_ore, ItemEnums.EnumChunkType.CRYOLITE))));
 
 		register(Fluids.PERFLUOROMETHYL, new MixerRecipe(1000, 20).setStack1(new FluidStack(Fluids.PETROLEUM, 1000)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 500)).setSolid(new OreDictStack(F.dust())));
 
+		register(Fluids.BITUMEN, new MixerRecipe(50, 20).setSolid(new OreDictStack(ANY_TAR.any())));
 	}
 
 	public static void register(FluidType type, MixerRecipe... rec) {

@@ -1,6 +1,8 @@
 package com.hbm.tileentity.machine.albion;
 
+import api.hbm.redstoneoverradio.IRORInteractive;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.CompatHandler;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.ContainerPASource;
 import com.hbm.inventory.gui.GUIPASource;
@@ -11,9 +13,15 @@ import com.hbm.util.EnumUtil;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
+import api.hbm.redstoneoverradio.IRORValueProvider;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
+import li.cil.oc.api.machine.Arguments;
+import li.cil.oc.api.machine.Callback;
+import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -21,10 +29,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityPASource extends TileEntityCooledBase implements IGUIProvider, IConditionalInvAccess, IControlReceiver {
+@Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
+public class TileEntityPASource extends TileEntityCooledBase implements IGUIProvider, IConditionalInvAccess, IControlReceiver, SimpleComponent, CompatHandler.OCComponent, IRORValueProvider, IRORInteractive {
 
 	public static final long usage = 100_000;
 	public Particle particle;
@@ -71,7 +81,10 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 		if(!worldObj.isRemote) {
 			this.power = Library.chargeTEFromItems(slots, 0, power, this.getMaxPower());
 
-			for(int i = 0; i < 10; i++) {
+			int steps = 1;
+			if(this.particle != null) steps = 1 + MathHelper.clamp_int(this.particle.momentum / 1_000, 0, 9);
+
+			for(int i = 0; i < steps; i++) {
 				if(particle != null) {
 					this.state = PAState.RUNNING;
 					steppy();
@@ -109,6 +122,7 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 	}
 
 	public void tryRun() {
+		if(!isCool()) return;
 		if(slots[1].getItem().hasContainerItem(slots[1]) && slots[3] != null) return;
 		if(slots[2].getItem().hasContainerItem(slots[2]) && slots[4] != null) return;
 
@@ -152,6 +166,9 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 				new DirPos(xCoord - dir.offsetX * 2 + rot.offsetX * 2, yCoord, zCoord - dir.offsetZ * 2 + rot.offsetZ * 2, dir.getOpposite()),
 				new DirPos(xCoord - dir.offsetX * 2 - rot.offsetX * 2, yCoord, zCoord - dir.offsetZ * 2 - rot.offsetZ * 2, dir.getOpposite()),
 				new DirPos(xCoord + rot.offsetX * 5, yCoord, zCoord + rot.offsetZ * 5, rot),
+				new DirPos(xCoord, yCoord-2, zCoord, dir),
+				new DirPos(xCoord + rot.offsetX * 2, yCoord-2, zCoord + rot.offsetZ * 2, dir),
+				new DirPos(xCoord - rot.offsetX * 2, yCoord-2, zCoord - rot.offsetZ * 2, dir),
 		};
 	}
 
@@ -236,7 +253,7 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		
+
 		if(particle != null) {
 			NBTTagCompound particleTag = new NBTTagCompound();
 			particleTag.setInteger("x", particle.x);
@@ -246,12 +263,12 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 			particleTag.setInteger("momentum", particle.momentum);
 			particleTag.setInteger("defocus", particle.defocus);
 			particleTag.setInteger("dist", particle.distanceTraveled);
-	
+
 			NBTTagCompound inputTag1 = new NBTTagCompound();
 			NBTTagCompound inputTag2 = new NBTTagCompound();
 			particle.input1.writeToNBT(inputTag1);
 			particle.input2.writeToNBT(inputTag2);
-	
+
 			particleTag.setTag("input1", inputTag1);
 			particleTag.setTag("input2", inputTag2);
 			nbt.setTag("particle", particleTag);
@@ -275,6 +292,114 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 		this.particle.momentum = particleTag.getInteger("momentum");
 		this.particle.defocus = particleTag.getInteger("defocus");
 		this.particle.distanceTraveled = particleTag.getInteger("dist");
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String getComponentName() {
+		return "ntm_pa_source";
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getEnergyInfo(Context context, Arguments args) {
+		return new Object[] {getPower(), getMaxPower()};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getCoolant(Context context, Arguments args) {
+		return new Object[] {
+			coolantTanks[0].getFill(), coolantTanks[0].getMaxFill(),
+			coolantTanks[1].getFill(), coolantTanks[1].getMaxFill(),
+		};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getMomentum(Context context, Arguments args) {
+		return new Object[] {lastSpeed};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getState(Context context, Arguments args) {
+		return new Object[] {state.name()};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getCrafting(Context context, Arguments args) {
+		Object[] items = new Object[] {"", 0, "", 0, "", 0, "", 0};
+		for (int i = 0; i < 4; i++) {
+			ItemStack slot = slots[i+1];
+			if (slot != null) {
+				items[i*2] = slot.getUnlocalizedName();
+				items[(i*2)+1] = slot.stackSize;
+			}
+		}
+		return items;
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] cancelOperation(Context context, Arguments args) {
+		particle = null;
+		state = PAState.IDLE;
+		return new Object[] {};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getInfo(Context context, Arguments args) {
+		Object[] items = new Object[] {"", 0, "", 0, "", 0, "", 0};
+		for (int i = 0; i < 4; i++) {
+			ItemStack slot = slots[i+1];
+			if (slot != null) {
+				items[i*2] = slot.getUnlocalizedName();
+				items[(i*2)+1] = slot.stackSize;
+			}
+		}
+
+		return new Object[] {
+			getPower(), getMaxPower(),
+
+			coolantTanks[0].getFill(), coolantTanks[0].getMaxFill(),
+			coolantTanks[1].getFill(), coolantTanks[1].getMaxFill(),
+
+			items[0], items[1], items[2], items[3],
+			items[4], items[5], items[6], items[7],
+			lastSpeed, state.name()
+		};
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String[] methods() {
+		return new String[] {
+			"getEnergyInfo",
+			"getCoolant",
+			"getMomentum",
+			"getState",
+			"getCrafting",
+			"cancelOperation",
+			"getInfo"
+		};
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] invoke(String method, Context context, Arguments args) throws Exception {
+		switch (method) {
+			case "getEnergyInfo": return getEnergyInfo(context, args);
+			case "getCoolant": return getCoolant(context, args);
+			case "getMomentum": return getMomentum(context, args);
+			case "getState": return getState(context, args);
+			case "getCrafting": return getCrafting(context, args);
+			case "cancelOperation": return cancelOperation(context, args);
+			case "getInfo": return getInfo(context, args);
+		}
+		throw new NoSuchMethodException();
 	}
 
 	public static class Particle {
@@ -327,5 +452,41 @@ public class TileEntityPASource extends TileEntityCooledBase implements IGUIProv
 			this.defocus -= amount;
 			if(this.defocus < 0) this.defocus = 0;
 		}
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+			PREFIX_VALUE + "status",
+			PREFIX_VALUE + "momentum",
+			PREFIX_VALUE + "defocus",
+			PREFIX_VALUE + "temperature",
+			PREFIX_VALUE + "pfmcold",
+			PREFIX_VALUE + "pfm",
+			PREFIX_FUNCTION + "cancel"
+		};
+	}
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "status").equals(name))		return "" + this.state;
+		if((PREFIX_VALUE + "momentum").equals(name))	return "" + this.lastSpeed;
+		if((PREFIX_VALUE + "defocus").equals(name)) {
+			return this.particle != null ? "" + this.particle.defocus : "0";
+		}
+		if((PREFIX_VALUE + "temperature").equals(name))	return "" + (int) this.temperature;
+		if((PREFIX_VALUE + "pfmcold").equals(name))		return "" + coolantTanks[0].getFill();
+		if((PREFIX_VALUE + "pfm").equals(name))			return "" + coolantTanks[1].getFill();
+		return null;
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+
+		if ((PREFIX_FUNCTION + "cancel").equals(name)) {
+			particle = null;
+			state = PAState.IDLE;
+			return null;
+		}
+		return null;
 	}
 }

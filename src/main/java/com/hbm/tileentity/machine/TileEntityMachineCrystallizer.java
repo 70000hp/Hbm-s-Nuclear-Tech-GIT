@@ -3,6 +3,7 @@ package com.hbm.tileentity.machine;
 import java.util.HashMap;
 import java.util.List;
 
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.extprop.HbmPlayerProps;
 import com.hbm.inventory.UpgradeManagerNT;
@@ -11,11 +12,16 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUICrystallizer;
 import com.hbm.inventory.recipes.CrystallizerRecipes;
-import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
+import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+
+import com.hbm.module.machine.ModuleMachineCrystallizer;
+import com.hbm.main.NTMSounds;
+import com.hbm.sound.AudioWrapper;
+
 import com.hbm.tileentity.*;
 import com.hbm.util.BobMathUtil;
 import com.hbm.util.fauxpointtwelve.DirPos;
@@ -23,7 +29,6 @@ import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.energymk2.IBatteryItem;
 import api.hbm.energymk2.IEnergyReceiverMK2;
-import api.hbm.fluid.IFluidStandardReceiver;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -36,25 +41,33 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineCrystallizer extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
+public class TileEntityMachineCrystallizer extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
 
 	public long power;
-	public static final long maxPower = 1000000;
-	public static final int demand = 1000;
-	public short progress;
-	public short duration = 600;
-	public boolean isOn;
+	public long maxPower = 1000000;
+	public boolean isProgressing;
+	public float progress;
+	public boolean didProcess;
 
 	public float angle;
 	public float prevAngle;
+	private AudioWrapper audio;
 
-	public FluidTank tank;
 
+	public FluidTank inputTank;
+	public FluidTank outputTank;
+
+	public ModuleMachineCrystallizer module;
 	public UpgradeManagerNT upgradeManager = new UpgradeManagerNT(this);
 
 	public TileEntityMachineCrystallizer() {
 		super(8);
-		tank = new FluidTank(Fluids.PEROXIDE, 8000);
+		inputTank = new FluidTank(Fluids.NONE, 24_000);
+		outputTank = new FluidTank(Fluids.NONE, 24_000);
+
+		module = new ModuleMachineCrystallizer(0, this, slots)
+			.itemInput(0).itemOutput(2)
+			.fluidInput(inputTank).fluidOutput(outputTank);
 	}
 
 	@Override
@@ -67,42 +80,42 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 
 		if(!worldObj.isRemote) {
 
-			this.isOn = false;
-
-			this.updateConnections();
-
+			inputTank.setType(7, slots);
+			GenericRecipe recipe = module.getRecipe();
+			if(recipe != null) {
+				this.maxPower = recipe.power * 100;
+			}
 			power = Library.chargeTEFromItems(slots, 1, power, maxPower);
-			tank.setType(7, slots);
-			tank.loadTank(3, 4, slots);
+
+			for(DirPos pos : getConPos()) {
+				this.trySubscribe(worldObj, pos);
+				if(inputTank.getTankType() != Fluids.NONE) this.trySubscribe(inputTank.getTankType(), worldObj, pos);
+				if(outputTank.getFill() > 0) this.tryProvide(outputTank, worldObj, pos);
+			}
+
+			double speed = 1D;
+			double pow = 1D;
+
+			speed += Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3) / 3D;
+			speed += Math.min(upgradeManager.getLevel(UpgradeType.OVERDRIVE), 3);
+
+			pow -= Math.min(upgradeManager.getLevel(UpgradeType.POWER), 3) * 0.25D;
+			pow += Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3) * 1D;
+			pow += Math.min(upgradeManager.getLevel(UpgradeType.OVERDRIVE), 3) * 10D / 3D;
+
+			this.module.update(speed, pow, true, null);
+			this.didProcess = this.module.didProcess;
+			if(this.module.markDirty) this.markDirty();
 
 			upgradeManager.checkSlots(slots, 5, 6);
 
-			for(int i = 0; i < getCycleCount(); i++) {
-
-				if(canProcess()) {
-
-					progress++;
-					power -= getPowerRequired();
-					isOn = true;
-
-					if(progress > getDuration()) {
-						progress = 0;
-						processItem();
-
-						this.markDirty();
-					}
-
-				} else {
-					progress = 0;
-				}
-			}
 
 			this.networkPackNT(25);
 		} else {
 
 			prevAngle = angle;
 
-			if(isOn) {
+			if(didProcess) {
 				angle += 5F * this.getCycleCount();
 
 				if(angle >= 360) {
@@ -112,6 +125,29 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 
 				if(worldObj.rand.nextInt(20) == 0 && MainRegistry.proxy.me().getDistance(xCoord + 0.5, yCoord + 6, zCoord + 0.5) < 50) {
 					worldObj.spawnParticle("cloud", xCoord + worldObj.rand.nextDouble(), yCoord + 6.5D, zCoord + worldObj.rand.nextDouble(), 0.0, 0.1, 0.0);
+				}
+				
+				if(MainRegistry.proxy.me().getDistance(xCoord , yCoord, zCoord) < 25) {
+					if(audio == null) {
+						audio = createAudioLoop();
+						audio.startSound();
+					} else if(!audio.isPlaying()) {
+						audio = rebootAudio(audio);
+					}
+					audio.keepAlive();
+					audio.updateVolume(this.getVolume(1F));
+					audio.updatePitch(0.75F);
+					
+				} else {
+					if(audio != null) {
+						audio.stopSound();
+						audio = null;
+					}
+				}
+			} else {
+				if(audio != null) {
+					audio.stopSound();
+					audio = null;
 				}
 			}
 		}
@@ -126,12 +162,17 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 		}
 	}
 
-	private void updateConnections() {
+	@Override public AudioWrapper createAudioLoop() {
+		return MainRegistry.proxy.getLoopedSound(NTMSounds.CHEMPLANT_LOOP, xCoord, yCoord, zCoord, 1F, 15F, 0.75F, 15);
+	}
 
-		for(DirPos pos : getConPos()) {
-			this.trySubscribe(worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
-			this.trySubscribe(tank.getTankType(), worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
-		}
+	@Override public void onChunkUnload() {
+		if(audio != null) { audio.stopSound(); audio = null; }
+	}
+
+	@Override public void invalidate() {
+		super.invalidate();
+		if(audio != null) { audio.stopSound(); audio = null; }
 	}
 
 	protected DirPos[] getConPos() {
@@ -151,155 +192,74 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 	@Override
 	public void serialize(ByteBuf buf) {
 		super.serialize(buf);
-		buf.writeShort(progress);
-		buf.writeShort(getDuration());
+		this.inputTank.serialize(buf);
+		this.outputTank.serialize(buf);
 		buf.writeLong(power);
-		buf.writeBoolean(isOn);
-		tank.serialize(buf);
+		buf.writeLong(maxPower);
+		buf.writeBoolean(didProcess);
+		this.module.serialize(buf);
 	}
 
 	@Override
 	public void deserialize(ByteBuf buf) {
 		super.deserialize(buf);
-		progress = buf.readShort();
-		duration = buf.readShort();
-		power = buf.readLong();
-		isOn = buf.readBoolean();
-		tank.deserialize(buf);
+
+		this.inputTank.deserialize(buf);
+		this.outputTank.deserialize(buf);
+		this.power = buf.readLong();
+		this.maxPower = buf.readLong();
+		this.didProcess = buf.readBoolean();
+		this.module.deserialize(buf);
 	}
 
-	private void processItem() {
-
-		CrystallizerRecipe result = CrystallizerRecipes.getOutput(slots[0], tank.getTankType());
-
-		if(result == null) //never happens but you can't be sure enough
-			return;
-
-		ItemStack stack = result.output.copy();
-
-		if(slots[2] == null)
-			slots[2] = stack;
-		else if(slots[2].stackSize + stack.stackSize <= slots[2].getMaxStackSize())
-			slots[2].stackSize += stack.stackSize;
-
-		tank.setFill(tank.getFill() - getRequiredAcid(result.acidAmount));
-
-		float freeChance = this.getFreeChance(result);
-
-		if(freeChance == 0 || freeChance < worldObj.rand.nextFloat())
-			this.decrStackSize(0, result.itemAmount);
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
+		super.readFromNBT(nbt);
+		this.inputTank.readFromNBT(nbt, "i");
+		this.outputTank.readFromNBT(nbt, "o");
+		this.power = nbt.getLong("power");
+		this.maxPower = nbt.getLong("maxPower");
+		this.module.readFromNBT(nbt);
 	}
 
-	private boolean canProcess() {
-
-		//Is there no input?
-		if(slots[0] == null)
-			return false;
-
-		if(power < getPowerRequired())
-			return false;
-
-		CrystallizerRecipe result = CrystallizerRecipes.getOutput(slots[0], tank.getTankType());
-
-		//Or output?
-		if(result == null)
-			return false;
-
-		//Not enough of the input item?
-		if(slots[0].stackSize < result.itemAmount)
-			return false;
-
-		if(tank.getFill() < getRequiredAcid(result.acidAmount)) return false;
-
-		ItemStack stack = result.output.copy();
-
-		//Does the output not match?
-		if(slots[2] != null && (slots[2].getItem() != stack.getItem() || slots[2].getItemDamage() != stack.getItemDamage()))
-			return false;
-
-		//Or is the output slot already full?
-		if(slots[2] != null && slots[2].stackSize + stack.stackSize > slots[2].getMaxStackSize())
-			return false;
-
-		return true;
+	@Override
+	public void writeToNBT(NBTTagCompound nbt) {
+		super.writeToNBT(nbt);
+		this.inputTank.writeToNBT(nbt, "i");
+		this.outputTank.writeToNBT(nbt, "o");
+		nbt.setLong("power", power);
+		nbt.setLong("maxPower", maxPower);
+		this.module.writeToNBT(nbt);
 	}
 
-	public int getRequiredAcid(int base) {
-		return base;
-	}
-
+	/*
 	public float getFreeChance(CrystallizerRecipe recipe) {
 		int efficiency = upgradeManager.getLevel(UpgradeType.EFFECT);
 		if(efficiency > 0) {
 			return Math.min(efficiency * recipe.productivity, 0.99F);
 		}
 		return 0;
-	}
-
-	public short getDuration() {
-		CrystallizerRecipe result = CrystallizerRecipes.getOutput(slots[0], tank.getTankType());
-		int base = result != null ? result.duration : 600;
-		int speed = upgradeManager.getLevel(UpgradeType.SPEED);
-		if(speed > 0) {
-			return (short) Math.ceil((base * Math.max(1F - 0.25F * speed, 0.25F)));
-		}
-		return (short) base;
-	}
-
-	public int getPowerRequired() {
-		int speed = upgradeManager.getLevel(UpgradeType.SPEED);
-		int effect = upgradeManager.getLevel(UpgradeType.EFFECT);
-		return (int) (demand + speed * demand + effect * demand * 2);
-	}
+	}*/
 
 	public float getCycleCount() {
 		int speed = upgradeManager.getLevel(UpgradeType.OVERDRIVE);
 		return Math.min(1 + speed * 2, 7);
 	}
 
-	public long getPowerScaled(int i) {
-		return (power * i) / maxPower;
-	}
+	@Override public long getPower() { return power; }
+	@Override public void setPower(long power) { this.power = power; }
+	@Override public long getMaxPower() { return maxPower; }
 
-	public int getProgressScaled(int i) {
-		return (progress * i) / duration;
-	}
+	@Override public FluidTank[] getReceivingTanks() { return new FluidTank[] {inputTank}; }
+	@Override public FluidTank[] getSendingTanks() { return new FluidTank[] {outputTank}; }
+	@Override public FluidTank[] getAllTanks() { return new FluidTank[] {inputTank, outputTank}; }
 
-	@Override
-	public void setPower(long i) {
-		this.power = i;
-	}
+
 
 	@Override
-	public long getPower() {
-		return power;
-	}
-
-	@Override
-	public long getMaxPower() {
-		return maxPower;
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-
-		power = nbt.getLong("power");
-		tank.readFromNBT(nbt, "tank");
-	}
-
-	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-
-		nbt.setLong("power", power);
-		tank.writeToNBT(nbt, "tank");
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemStack) {
-		if(i == 0 && CrystallizerRecipes.getOutput(itemStack, tank.getTankType()) != null) return true;
-		if(i == 1 && itemStack.getItem() instanceof IBatteryItem) return true;
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		if(this.module.isItemValid(slot, stack)) return true;
+		if(slot == 1 && stack.getItem() instanceof IBatteryItem) return true;
 
 		return false;
 	}
@@ -349,16 +309,6 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 	}
 
 	@Override
-	public FluidTank[] getReceivingTanks() {
-		return new FluidTank[] {tank};
-	}
-
-	@Override
-	public FluidTank[] getAllTanks() {
-		return new FluidTank[] { tank };
-	}
-
-	@Override
 	public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new ContainerCrystallizer(player.inventory, this);
 	}
@@ -371,22 +321,21 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 
 	@Override
 	public boolean canProvideInfo(UpgradeType type, int level, boolean extendedInfo) {
-		return type == UpgradeType.SPEED || type == UpgradeType.EFFECT || type == UpgradeType.OVERDRIVE;
+		return type == UpgradeType.SPEED || type == UpgradeType.POWER || type == UpgradeType.OVERDRIVE;
 	}
 
 	@Override
 	public void provideInfo(UpgradeType type, int level, List<String> info, boolean extendedInfo) {
-		info.add(IUpgradeInfoProvider.getStandardLabel(ModBlocks.machine_crystallizer));
+		info.add(IUpgradeInfoProvider.getStandardLabel(ModBlocks.machine_assembly_machine));
 		if(type == UpgradeType.SPEED) {
-			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(this.KEY_DELAY, "-" + (level * 25) + "%"));
-			info.add(EnumChatFormatting.RED + I18nUtil.resolveKey(this.KEY_CONSUMPTION, "+" + (level * 100) + "%"));
+			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(KEY_SPEED, "+" + (level * 100 / 3) + "%"));
+			info.add(EnumChatFormatting.RED + I18nUtil.resolveKey(KEY_CONSUMPTION, "+" + (level * 50) + "%"));
 		}
-		if(type == UpgradeType.EFFECT) {
-			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(this.KEY_EFFICIENCY, "x" + level));
-			info.add(EnumChatFormatting.RED + I18nUtil.resolveKey(this.KEY_CONSUMPTION, "+" + (level * 200) + "%"));
+		if(type == UpgradeType.POWER) {
+			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(KEY_CONSUMPTION, "-" + (level * 25) + "%"));
 		}
 		if(type == UpgradeType.OVERDRIVE) {
-			info.add((BobMathUtil.getBlink() ? EnumChatFormatting.RED : EnumChatFormatting.DARK_GRAY) + "YES");
+			info.add(EnumChatFormatting.GREEN + I18nUtil.resolveKey(KEY_SPEED, "+" + (level * 100) + "%"));
 		}
 	}
 
@@ -401,11 +350,13 @@ public class TileEntityMachineCrystallizer extends TileEntityMachineBase impleme
 
 	@Override
 	public int[] getFluidIDToCopy() {
-		return new int[]{ tank.getTankType().getID()};
+		return new int[]{ inputTank.getTankType().getID(), outputTank.getTankType().getID()};
 	}
 
 	@Override
 	public FluidTank getTankToPaste() {
-		return tank;
+		return inputTank;
 	}
+
+
 }

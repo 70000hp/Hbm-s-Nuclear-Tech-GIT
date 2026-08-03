@@ -1,5 +1,6 @@
 package com.hbm.tileentity.machine.albion;
 
+import com.hbm.handler.CompatHandler;
 import com.hbm.inventory.container.ContainerPAQuadrupole;
 import com.hbm.inventory.gui.GUIPAQuadrupole;
 import com.hbm.items.ModItems;
@@ -12,19 +13,26 @@ import com.hbm.util.EnumUtil;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
 
+import api.hbm.redstoneoverradio.IRORValueProvider;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import li.cil.oc.api.machine.Arguments;
+import li.cil.oc.api.machine.Callback;
+import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUIProvider, IParticleUser {
+@Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
+public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUIProvider, IParticleUser, SimpleComponent, CompatHandler.OCComponent, IRORValueProvider {
 
 	public static final long usage = 100_000;
 	public static final int focusGain = 100;
-	
+
 	public TileEntityPAQuadrupole() {
 		super(2);
 	}
@@ -49,7 +57,7 @@ public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUI
 	@Override
 	public void onEnter(Particle particle, ForgeDirection dir) {
 		EnumCoilType type = null;
-		
+
 		int mult = 1;
 		if(slots[1] != null && slots[1].getItem() == ModItems.pa_coil) {
 			type = EnumUtil.grabEnumSafely(EnumCoilType.class, slots[1].getItemDamage());
@@ -60,7 +68,7 @@ public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUI
 		if(this.power < this.usage * mult)						particle.crash(PAState.CRASH_NOPOWER);
 		if(type == null)										particle.crash(PAState.CRASH_NOCOIL);
 		if(type != null && type.quadMax < particle.momentum)	particle.crash(PAState.CRASH_OVERSPEED);
-		
+
 		if(particle.invalid) return;
 
 		particle.addDistance(3);
@@ -76,19 +84,19 @@ public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUI
 
 	@Override
 	public void updateEntity() {
-		
+
 		if(!worldObj.isRemote) {
 			this.power = Library.chargeTEFromItems(slots, 0, power, this.getMaxPower());
 		}
-		
+
 		super.updateEntity();
 	}
-	
+
 	AxisAlignedBB bb = null;
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-		
+
 		if(bb == null) {
 			bb = AxisAlignedBB.getBoundingBox(
 					xCoord - 1,
@@ -99,10 +107,10 @@ public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUI
 					zCoord + 2
 					);
 		}
-		
+
 		return bb;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared() {
@@ -128,5 +136,74 @@ public class TileEntityPAQuadrupole extends TileEntityCooledBase implements IGUI
 	@Override
 	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIPAQuadrupole(player.inventory, this);
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+			PREFIX_VALUE + "temperature",
+			PREFIX_VALUE + "pfmcold",
+			PREFIX_VALUE + "pfm"
+		};
+	}
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "temperature").equals(name))	return "" + (int) this.temperature;
+		if((PREFIX_VALUE + "pfmcold").equals(name))		return "" + coolantTanks[0].getFill();
+		if((PREFIX_VALUE + "pfm").equals(name))			return "" + coolantTanks[1].getFill();
+		return null;
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String getComponentName() {
+		return "ntm_pa_quad";
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getEnergyInfo(Context context, Arguments args) {
+		return new Object[] {getPower(), getMaxPower()};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getCoolant(Context context, Arguments args) {
+		return new Object[] {
+			coolantTanks[0].getFill(), coolantTanks[0].getMaxFill(),
+			coolantTanks[1].getFill(), coolantTanks[1].getMaxFill(),
+		};
+	}
+
+	@Callback(direct = true)
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] getInfo(Context context, Arguments args) {
+		return new Object[] {
+			getPower(), getMaxPower(),
+
+			coolantTanks[0].getFill(), coolantTanks[0].getMaxFill(),
+			coolantTanks[1].getFill(), coolantTanks[1].getMaxFill(),
+		};
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public String[] methods() {
+		return new String[] {
+			"getEnergyInfo",
+			"getCoolant",
+			"getInfo"
+		};
+	}
+
+	@Override
+	@Optional.Method(modid = "OpenComputers")
+	public Object[] invoke(String method, Context context, Arguments args) throws Exception {
+		switch (method) {
+			case "getEnergyInfo": return getEnergyInfo(context, args);
+			case "getCoolant": return getCoolant(context, args);
+			case "getInfo": return getInfo(context, args);
+		}
+		throw new NoSuchMethodException();
 	}
 }

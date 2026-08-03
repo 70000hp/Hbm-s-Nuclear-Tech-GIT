@@ -9,6 +9,7 @@ import com.hbm.tileentity.TileEntityProxyCombo;
 import com.hbm.tileentity.machine.TileEntityReactorZirnox;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,7 +40,7 @@ public class ReactorZirnox extends BlockDummyable {
 			return true;
 		} else if(!player.isSneaking()) {
 			BossSpawnHandler.markFBI(player);
-			
+
 			int[] pos = this.findCore(world, x, y, z);
 
 			if(pos == null)
@@ -54,14 +55,22 @@ public class ReactorZirnox extends BlockDummyable {
 
 	@Override
 	public int[] getDimensions() {
-		return new int[] {1, 0, 2, 2, 2, 2,}; 
+		return new int[] {1, 0, 2, 2, 2, 2,};
 	}
 
 	@Override
 	public int getOffset() {
 		return 2;
 	}
-
+	@Override
+	public int[][] getAllDimensions() {
+		return new int[][] {
+			new int[] {1, 0, 2, 2, 2, 2,},
+			new int[] {4, -2, 1, 1, 1, 1},
+			new int[] {4, -2, 0, 0, 2, -2},
+			new int[] {4, -2, 0, 0, -2, 2}
+		};
+	}
 	@Override
 	protected boolean checkRequirement(World world, int x, int y, int z, ForgeDirection dir, int o) {
 		return super.checkRequirement(world, x, y, z, dir, o) &&
@@ -85,6 +94,45 @@ public class ReactorZirnox extends BlockDummyable {
 		this.makeExtra(world, x + dir.offsetX * o + rot.offsetX * -2, y + 3, z + dir.offsetZ * o + rot.offsetZ * -2);
 		//i still don't know why the ports were such an issue all those months ago
 		this.makeExtra(world, x + dir.offsetX * o, y + 4, z + dir.offsetZ * o);
+	}
+
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+		super.onNeighborBlockChange(world, x, y, z, neighbor);
+		if (world.isRemote) return;
+		int[] core = this.findCore(world, x, y, z);
+		if (core == null) return;
+		int cx = core[0];
+		int cy = core[1];
+		int cz = core[2];
+		TileEntity te = world.getTileEntity(cx, cy, cz);
+		if (!(te instanceof TileEntityReactorZirnox)) return;
+		TileEntityReactorZirnox reactor = (TileEntityReactorZirnox) te;
+		boolean powered = false;
+		// 2. Scan multiblock
+		for (int dx = -2; dx <= 2 && !powered; dx++) {
+			for (int dy = 0; dy <= 4 && !powered; dy++) {
+				for (int dz = -2; dz <= 2 && !powered; dz++) {
+					// Get only surface blocks
+					if (dx == -2 || dx == 2 ||
+						dy == 0  || dy == 4 ||
+						dz == -2 || dz == 2) {
+
+						int sx = cx + dx;
+						int sy = cy + dy;
+						int sz = cz + dz;
+
+						if (world.isBlockIndirectlyGettingPowered(sx, sy, sz) ||
+							world.getBlockPowerInput(sx, sy, sz) > 0) {
+
+							powered = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		reactor.setRedstonePowered(powered);
 	}
 
 }

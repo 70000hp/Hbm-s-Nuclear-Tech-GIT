@@ -9,8 +9,10 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockPlushie.TileEntityPlushie;
 import com.hbm.config.ClientConfig;
 import com.hbm.config.CustomMachineConfigJSON;
+import com.hbm.handler.nei.AnvilOverlayHandler;
 import com.hbm.handler.nei.CustomMachineHandler;
 import com.hbm.items.ItemEnums.EnumIngotMetal;
+import com.hbm.inventory.gui.GUIAnvil;
 import com.hbm.items.ItemEnums.EnumSecretType;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemBattery;
@@ -23,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class NEIConfig implements IConfigureNEI {
 		for (TemplateRecipeHandler handler: NEIRegistry.listAllHandlers()) {
 			registerHandler(handler);
 		}
+		API.registerGuiOverlayHandler(GUIAnvil.class, new AnvilOverlayHandler(), "ntmAnvil");
 
 		for(CustomMachineConfigJSON.MachineConfiguration conf : CustomMachineConfigJSON.niceList) {
 			registerHandlerBypass(new CustomMachineHandler(conf));
@@ -43,7 +47,7 @@ public class NEIConfig implements IConfigureNEI {
 			for(int i = 0; i < EnumAmmoSecret.values().length; i++) API.hideItem(new ItemStack(ModItems.ammo_secret, 1, i));
 			for(int i = 0; i < EnumSecretType.values().length; i++) API.hideItem(new ItemStack(ModItems.item_secret, 1, i));
 		}
-		
+
 		for(int i = 0; i < EnumIngotMetal.values().length; i++) API.hideItem(new ItemStack(ModItems.ingot_metal, 1, i));
 
 		//Some things are even beyond my control...or are they?
@@ -55,8 +59,6 @@ public class NEIConfig implements IConfigureNEI {
 		API.hideItem(new ItemStack(ModBlocks.machine_rtg_furnace_on));
 		API.hideItem(new ItemStack(ModBlocks.reinforced_lamp_on));
 		API.hideItem(new ItemStack(ModBlocks.statue_elb_f));
-		API.hideItem(new ItemStack(ModBlocks.cheater_virus));
-		API.hideItem(new ItemStack(ModBlocks.cheater_virus_seed));
 		API.hideItem(new ItemStack(ModItems.euphemium_kit));
 		API.hideItem(new ItemStack(ModItems.bobmazon_hidden));
 		API.hideItem(new ItemStack(ModItems.book_lore)); //the broken nbt-less one shouldn't show up in normal play anyway
@@ -66,7 +68,6 @@ public class NEIConfig implements IConfigureNEI {
 			API.hideItem(new ItemStack(ModItems.burnt_bark));
 			API.hideItem(new ItemStack(ModItems.ams_core_thingy));
 		}
-		API.hideItem(new ItemStack(ModBlocks.dummy_block_vault));
 		API.hideItem(new ItemStack(ModBlocks.dummy_block_blast));
 		API.hideItem(new ItemStack(ModBlocks.dummy_port_compact_launcher));
 		API.hideItem(new ItemStack(ModBlocks.dummy_port_launch_table));
@@ -91,6 +92,10 @@ public class NEIConfig implements IConfigureNEI {
 		API.hideItem(new ItemStack(ModBlocks.conveyor_express));
 		API.hideItem(new ItemStack(ModBlocks.conveyor_double));
 		API.hideItem(new ItemStack(ModBlocks.conveyor_triple));
+
+		API.hideItem(new ItemStack(ModBlocks.brick_forgotten, 1, OreDictionary.WILDCARD_VALUE));
+		API.hideItem(new ItemStack(ModBlocks.brick_forgotten_lock, 1, OreDictionary.WILDCARD_VALUE));
+		API.hideItem(new ItemStack(ModItems.coal_eternal));
 
 		API.registerHighlightIdentifier(ModBlocks.plushie, new IHighlightHandler() {
 			@Override public ItemStack identifyHighlight(World world, EntityPlayer player, MovingObjectPosition mop) {

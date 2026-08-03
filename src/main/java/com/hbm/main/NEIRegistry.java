@@ -15,41 +15,47 @@ public class NEIRegistry {
 
 		if(!handlers.isEmpty()) return handlers;
 
+		handlers.add(new ToolingHandler());
+		handlers.add(new ConstructionHandler());
+		handlers.add(new AnnihilatorHandler());
+		handlers.add(new SolderingStationHandler());
+		handlers.add(new BlastFurnaceHandler());
 		handlers.add(new AnvilRecipeHandler());
 		handlers.add(new SmithingRecipeHandler());
-		handlers.add(new AlloyFurnaceRecipeHandler());
-		handlers.add(new ShredderRecipeHandler());
 		handlers.add(new PressRecipeHandler());
+		handlers.add(new ShredderRecipeHandler());
+		handlers.add(new CrucibleSmeltingHandler());
+		handlers.add(new CrucibleAlloyingHandler());
+		handlers.add(new CrucibleCastingHandler());
+		handlers.add(new AssemblyMachineRecipeHandler());
+		handlers.add(new PrecAssRecipeHandler());
+		handlers.add(new ChemicalPlantRecipeHandler());
+		handlers.add(new RefineryRecipeHandler());
 		handlers.add(new CentrifugeRecipeHandler());
 		handlers.add(new GasCentrifugeRecipeHandler());
-		handlers.add(new BreederRecipeHandler());
 		handlers.add(new CyclotronRecipeHandler());
-		handlers.add(new AssemblyMachineRecipeHandler());
-		handlers.add(new RefineryRecipeHandler());
 		handlers.add(new VacuumRecipeHandler());
 		handlers.add(new CrackingHandler());
 		handlers.add(new RadiolysisRecipeHandler());
 		handlers.add(new ReformingHandler());
 		handlers.add(new HydrotreatingHandler());
-		handlers.add(new ChemicalPlantRecipeHandler());
 		handlers.add(new PUREXRecipeHandler());
 		handlers.add(new OreSlopperHandler()); //before acidizing
 		handlers.add(new CrystallizerRecipeHandler());
 		handlers.add(new BookRecipeHandler());
 		handlers.add(new FusionRecipeHandler());
+		handlers.add(new PlasmaForgeRecipeHandler());
 		handlers.add(new SILEXRecipeHandler());
 		handlers.add(new FuelPoolHandler());
 		handlers.add(new RBMKRodDisassemblyHandler());
 		handlers.add(new RBMKWasteDecayHandler());
-		handlers.add(new CrucibleSmeltingHandler());
-		handlers.add(new CrucibleAlloyingHandler());
-		handlers.add(new CrucibleCastingHandler());
-		handlers.add(new ToolingHandler());
-		handlers.add(new ConstructionHandler());
 		handlers.add(new SatelliteHandler());
+		handlers.add(new GrenadeRecipeHandler());
 
 		//universal boyes
 		handlers.add(new ZirnoxRecipeHandler());
+		handlers.add(new PWRRecipeHandler());
+		handlers.add(new WatzRecipeHandler());
 		if(VersatileConfig.rtgDecay()) handlers.add(new RTGRecipeHandler());
 		handlers.add(new LiquefactionHandler());
 		handlers.add(new SolidificationHandler());
@@ -61,11 +67,11 @@ public class NEIRegistry {
 		handlers.add(new SawmillHandler());
 		handlers.add(new MixerHandler());
 		handlers.add(new OutgasserHandler());
+		handlers.add(new FusionBreederHandler());
 		handlers.add(new ElectrolyserFluidHandler());
 		handlers.add(new ElectrolyserMetalHandler());
 		handlers.add(new AshpitHandler());
 		handlers.add(new ArcWelderHandler());
-		handlers.add(new SolderingStationHandler());
 		handlers.add(new ExposureChamberHandler());
 		handlers.add(new ArcFurnaceSolidHandler());
 		handlers.add(new ArcFurnaceFluidHandler());
@@ -75,6 +81,8 @@ public class NEIRegistry {
 		handlers.add(new ParticleAcceleratorHandler());
 		handlers.add(new DeuteriumHandler());
 		handlers.add(new BobmazonArcadeHandler());
+		handlers.add(new RockMillRecipeHandler());
+
 
 		//this shit comes last
 		handlers.add(new FluidRecipeHandler());

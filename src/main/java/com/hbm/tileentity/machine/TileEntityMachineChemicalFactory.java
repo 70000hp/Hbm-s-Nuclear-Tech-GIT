@@ -10,15 +10,16 @@ import com.hbm.inventory.container.ContainerMachineChemicalFactory;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIMachineChemicalFactory;
-import com.hbm.inventory.recipes.ChemicalPlantRecipes;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.module.machine.ModuleMachineChemplant;
 import com.hbm.sound.AudioWrapper;
+import com.hbm.tileentity.IConditionalInvAccess;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
@@ -29,6 +30,7 @@ import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
+import api.hbm.redstoneoverradio.IRORValueProvider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -41,7 +43,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineChemicalFactory extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, IUpgradeInfoProvider, IControlReceiver, IGUIProvider, IProxyDelegateProvider {
+public class TileEntityMachineChemicalFactory extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, IUpgradeInfoProvider, IControlReceiver, IGUIProvider, IProxyDelegateProvider, IConditionalInvAccess, IRORValueProvider {
 
 	public FluidTank[] allTanks;
 	public FluidTank[] inputTanks;
@@ -98,6 +100,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		if(i >= 15 && i <= 17) return true;
 		if(i >= 22 && i <= 24) return true;
 		if(i >= 29 && i <= 31) return true;
+		for(int k = 0; k < 4; k++) if(this.chemplantModule[k].isSlotClogged(i)) return true;
 		return false;
 	}
 
@@ -120,6 +123,27 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		};
 	}
 
+	/// CONDITIONAL ACCESS ///
+	@Override public boolean isItemValidForSlot(int x, int y, int z, int slot, ItemStack stack) { return this.isItemValidForSlot(slot, stack); }
+	@Override public boolean canInsertItem(int x, int y, int z, int slot, ItemStack stack, int side) { return this.canInsertItem(slot, stack, side); }
+	@Override public boolean canExtractItem(int x, int y, int z, int slot, ItemStack stack, int side) { return this.canExtractItem(slot, stack, side); }
+
+	@Override public int[] getAccessibleSlotsFromSide(int x, int y, int z, int side) {
+		DirPos[] io = getIOPos();
+		for(int i = 0; i < io.length; i++) {
+			if(io[i].compare(x + io[i].getDir().offsetX, y, z + io[i].getDir().offsetZ)) {
+				return new int[] {
+						5 + i * 7, 6 + i * 7, 7 + i * 7,
+						8, 9, 10,
+						15, 16, 17,
+						22, 23, 24,
+						29, 30, 31
+				};
+			}
+		}
+		return this.getAccessibleSlotsFromSide(side);
+	}
+
 	@Override
 	public String getName() {
 		return "container.machineChemicalFactory";
@@ -134,7 +158,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 			
 			long nextMaxPower = 0;
 			for(int i = 0; i < 4; i++) {
-				GenericRecipe recipe = ChemicalPlantRecipes.INSTANCE.recipeNameMap.get(chemplantModule[i].recipe);
+				GenericRecipe recipe = chemplantModule[i].getRecipe();
 				if(recipe != null) {
 					nextMaxPower += recipe.power * 100;
 				}
@@ -144,14 +168,6 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 			
 			this.power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			upgradeManager.checkSlots(slots, 1, 3);
-
-			inputTanks[0].loadTank(10, 13, slots);
-			inputTanks[1].loadTank(11, 14, slots);
-			inputTanks[2].loadTank(12, 15, slots);
-
-			outputTanks[0].unloadTank(16, 19, slots);
-			outputTanks[1].unloadTank(17, 20, slots);
-			outputTanks[2].unloadTank(18, 21, slots);
 			
 			for(DirPos pos : getConPos()) {
 				this.trySubscribe(worldObj, pos);
@@ -187,9 +203,11 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 				}
 			}
 			
+			// internal fluid sharing logic
 			for(FluidTank in : inputTanks) if(in.getTankType() != Fluids.NONE) for(FluidTank out : outputTanks) { // up to 144 iterations, but most of them are NOP anyway
 				if(out.getTankType() == Fluids.NONE) continue;
 				if(out.getTankType() != in.getTankType()) continue;
+				if(out.getPressure() != in.getPressure()) continue;
 				int toMove = BobMathUtil.min(in.getMaxFill() - in.getFill(), out.getFill(), 50);
 				if(toMove > 0) {
 					in.setFill(in.getFill() + toMove);
@@ -231,7 +249,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 	}
 
 	@Override public AudioWrapper createAudioLoop() {
-		return MainRegistry.proxy.getLoopedSound("hbm:block.chemicalPlant", xCoord, yCoord, zCoord, 1F, 15F, 1.0F, 20);
+		return MainRegistry.proxy.getLoopedSound(NTMSounds.CHEMPLANT_LOOP, xCoord, yCoord, zCoord, 1F, 15F, 1.0F, 20);
 	}
 
 	@Override public void onChunkUnload() {
@@ -294,6 +312,18 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 				new DirPos(xCoord - rot.offsetX - dir.offsetX * 3, yCoord, zCoord - rot.offsetZ - dir.offsetZ * 3, dir.getOpposite()),
 		};
 	}
+	
+	public DirPos[] getIOPos() {
+		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - 10);
+		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
+		
+		return new DirPos[] {
+				new DirPos(xCoord + dir.offsetX + rot.offsetX * 3, yCoord, zCoord + dir.offsetZ + rot.offsetZ * 3, rot),
+				new DirPos(xCoord - dir.offsetX + rot.offsetX * 3, yCoord, zCoord - dir.offsetZ + rot.offsetZ * 3, rot),
+				new DirPos(xCoord + dir.offsetX - rot.offsetX * 3, yCoord, zCoord + dir.offsetZ - rot.offsetZ * 3, rot.getOpposite()),
+				new DirPos(xCoord - dir.offsetX - rot.offsetX * 3, yCoord, zCoord - dir.offsetZ - rot.offsetZ * 3, rot.getOpposite()),
+		};
+	}
 
 	@Override
 	public void serialize(ByteBuf buf) {
@@ -326,7 +356,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		super.readFromNBT(nbt);
 
 		for(int i = 0; i < inputTanks.length; i++) this.inputTanks[i].readFromNBT(nbt, "i" + i);
-		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].readFromNBT(nbt, "i" + i);
+		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].readFromNBT(nbt, "o" + i);
 
 		this.water.readFromNBT(nbt, "w");
 		this.lps.readFromNBT(nbt, "s");
@@ -341,7 +371,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		super.writeToNBT(nbt);
 
 		for(int i = 0; i < inputTanks.length; i++) this.inputTanks[i].writeToNBT(nbt, "i" + i);
-		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].writeToNBT(nbt, "i" + i);
+		for(int i = 0; i < outputTanks.length; i++) this.outputTanks[i].writeToNBT(nbt, "o" + i);
 
 		this.water.writeToNBT(nbt, "w");
 		this.lps.writeToNBT(nbt, "s");
@@ -370,7 +400,7 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 			int index = data.getInteger("index");
 			String selection = data.getString("selection");
 			if(index >= 0 && index < 4) {
-				this.chemplantModule[index].recipe = selection;
+				this.chemplantModule[index].setRecipe(selection, false);
 				this.markChanged();
 			}
 		}
@@ -449,5 +479,35 @@ public class TileEntityMachineChemicalFactory extends TileEntityMachineBase impl
 		@Override public FluidTank[] getSendingTanks() { return new FluidTank[] {TileEntityMachineChemicalFactory.this.lps}; }
 
 		@Override public FluidTank[] getAllTanks() { return TileEntityMachineChemicalFactory.this.getAllTanks(); }
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "progress1",
+				PREFIX_VALUE + "progress2",
+				PREFIX_VALUE + "progress3",
+				PREFIX_VALUE + "progress4",
+				PREFIX_VALUE + "recipe1",
+				PREFIX_VALUE + "recipe2",
+				PREFIX_VALUE + "recipe3",
+				PREFIX_VALUE + "recipe4",
+				PREFIX_VALUE + "anyactive",
+				PREFIX_VALUE + "active1",
+				PREFIX_VALUE + "active2",
+				PREFIX_VALUE + "active3",
+				PREFIX_VALUE + "active4",
+		};
+	}
+
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "anyactive").equals(name))			return "" + ((this.didProcess[0] || this.didProcess[1] || this.didProcess[2] || this.didProcess[3]) ? 1 : 0);
+		for(int i = 0; i < 4; i++) {
+			if((PREFIX_VALUE + "progress" + i).equals(name))	return "" + (int) Math.round(this.chemplantModule[i].progress * 100);
+			if((PREFIX_VALUE + "recipe" + i).equals(name))		return this.chemplantModule[i].getRecipeName();
+			if((PREFIX_VALUE + "active" + i).equals(name))		return "" + (this.didProcess[i] ? 1 : 0);
+		}
+		return null;
 	}
 }

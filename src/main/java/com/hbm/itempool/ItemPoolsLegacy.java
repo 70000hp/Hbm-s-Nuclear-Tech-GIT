@@ -4,9 +4,15 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.Mats;
 import com.hbm.items.ItemEnums.EnumCasingType;
 import com.hbm.items.ModItems;
+import com.hbm.items.machine.ItemBatteryPack.EnumBatteryPack;
 import com.hbm.items.machine.ItemBreedingRod.BreedingRodType;
 import com.hbm.items.machine.ItemCircuit.EnumCircuitType;
 import com.hbm.items.machine.ItemZirnoxRod.EnumZirnoxType;
+import com.hbm.items.weapon.grenade.ItemGrenadeUniversal;
+import com.hbm.items.weapon.grenade.ItemGrenadeExtra.EnumGrenadeExtra;
+import com.hbm.items.weapon.grenade.ItemGrenadeFilling.EnumGrenadeFilling;
+import com.hbm.items.weapon.grenade.ItemGrenadeFuze.EnumGrenadeFuze;
+import com.hbm.items.weapon.grenade.ItemGrenadeShell.EnumGrenadeShell;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 
 import static com.hbm.lib.HbmChestContents.*;
@@ -52,8 +58,7 @@ public class ItemPoolsLegacy {
 					weighted(ModItems.casing, EnumCasingType.SMALL.ordinal(), 4, 10, 3),
 					weighted(ModItems.casing, EnumCasingType.SHOTSHELL.ordinal(), 4, 10, 3),
 					weighted(ModItems.cordite, 0, 4, 6, 5),
-					weighted(ModItems.battery_generic, 0, 1, 1, 4),
-					weighted(ModItems.battery_advanced, 0, 1, 1, 2),
+					weighted(ModItems.battery_pack, EnumBatteryPack.BATTERY_REDSTONE.ordinal(), 1, 1, 1),
 					weighted(ModItems.scrap, 0, 1, 3, 10),
 					weighted(ModItems.dust, 0, 2, 4, 9),
 					weighted(ModItems.bottle_opener, 0, 1, 1, 2),
@@ -65,7 +70,8 @@ public class ItemPoolsLegacy {
 					weighted(ModItems.canister_full, Fluids.BIOFUEL.getID(), 1, 2, 3),
 					weighted(ModItems.gas_mask_m65, 60, 1, 1, 2),
 					weighted(ModItems.gas_mask_filter, 0, 1, 1, 3),
-					weighted(ModItems.blueprint_folder, 0, 1, 1, 1)
+					weighted(ModItems.blueprint_folder, 0, 1, 1, 1),
+					weighted(ModItems.coin_token, 0, 1, 1, 2)
 			};
 		}};
 
@@ -79,8 +85,7 @@ public class ItemPoolsLegacy {
 					weighted(ModItems.wire_fine, Mats.MAT_MINGRADE.id, 2, 3, 7),
 					weighted(ModItems.circuit, EnumCircuitType.VACUUM_TUBE.ordinal(), 1, 1, 4),
 					weighted(ModItems.circuit, EnumCircuitType.CAPACITOR.ordinal(), 1, 1, 2),
-					weighted(ModItems.battery_generic, 0, 1, 1, 4),
-					weighted(ModItems.battery_advanced, 0, 1, 1, 3),
+					weighted(ModItems.battery_pack, EnumBatteryPack.BATTERY_REDSTONE.ordinal(), 1, 1, 1),
 					weighted(ModItems.powder_iodine, 0, 1, 1, 1),
 					weighted(ModItems.powder_bromine, 0, 1, 1, 1),
 					weighted(ModBlocks.steel_poles, 0, 1, 4, 8),
@@ -112,13 +117,11 @@ public class ItemPoolsLegacy {
 					weighted(ModItems.ammo_standard, EnumAmmo.ROCKET_HE.ordinal(), 1, 4, 5),
 					weighted(ModItems.ammo_standard, EnumAmmo.G26_FLARE_SUPPLY.ordinal(), 1, 1, 5),
 					weighted(ModItems.ammo_standard, EnumAmmo.G26_FLARE_WEAPON.ordinal(), 1, 1, 3),
-					weighted(ModItems.grenade_nuclear, 0, 1, 1, 2),
-					weighted(ModItems.grenade_smart, 0, 1, 3, 3),
-					weighted(ModItems.grenade_mirv, 0, 1, 1, 2),
+					weighted(ItemGrenadeUniversal.make(EnumGrenadeShell.NUKE, EnumGrenadeFilling.NUCLEAR, EnumGrenadeFuze.S7), 1, 1, 2),
+					weighted(ItemGrenadeUniversal.make(EnumGrenadeShell.FRAG, EnumGrenadeFilling.CLUSTER, EnumGrenadeFuze.S7), 1, 3, 3),
+					weighted(ModItems.grenade_extra, EnumGrenadeExtra.TRIPLEX.ordinal(), 1, 1, 1),
 					weighted(ModItems.stealth_boy, 0, 1, 1, 2),
-					weighted(ModItems.battery_advanced, 0, 1, 1, 3),
-					weighted(ModItems.battery_advanced_cell, 0, 1, 1, 2),
-					weighted(ModItems.battery_schrabidium, 0, 1, 1, 1),
+					weighted(ModItems.battery_pack, EnumBatteryPack.BATTERY_LITHIUM.ordinal(), 1, 1, 1),
 					weighted(ModItems.syringe_awesome, 0, 1, 1, 1),
 					weighted(ModItems.fusion_core, 0, 1, 1, 4),
 					weighted(ModItems.bottle_nuka, 0, 1, 3, 6),
@@ -187,11 +190,10 @@ public class ItemPoolsLegacy {
 		//loot found in vertibirds
 		new ItemPool(POOL_VERTIBIRD) {{
 			this.pool = new WeightedRandomChestContent[] {
-					weighted(ModItems.t45_helmet, 0, 1, 1, 15),
-					weighted(ModItems.t45_plate, 0, 1, 1, 15),
-					weighted(ModItems.t45_legs, 0, 1, 1, 15),
-					weighted(ModItems.t45_boots, 0, 1, 1, 15),
-					weighted(ModItems.t45_kit, 0, 1, 1, 3),
+					weighted(ModItems.t51_helmet, 0, 1, 1, 15),
+					weighted(ModItems.t51_plate, 0, 1, 1, 15),
+					weighted(ModItems.t51_legs, 0, 1, 1, 15),
+					weighted(ModItems.t51_boots, 0, 1, 1, 15),
 					weighted(ModItems.fusion_core, 0, 1, 1, 10),
 					weighted(ModItems.gun_light_revolver, 0, 1, 1, 4),
 					weighted(ModItems.gun_kit_1, 0, 2, 3, 4),
@@ -206,7 +208,7 @@ public class ItemPoolsLegacy {
 					weighted(ModItems.stealth_boy, 0, 1, 1, 7),
 					weighted(ModItems.gas_mask_m65, 0, 1, 1, 5),
 					weighted(ModItems.gas_mask_filter, 0, 1, 1, 5),
-					weighted(ModItems.grenade_nuclear, 0, 1, 2, 2),
+					weighted(ItemGrenadeUniversal.make(EnumGrenadeShell.NUKE, EnumGrenadeFilling.NUCLEAR, EnumGrenadeFuze.S7), 1, 2, 2),
 					weighted(ModItems.bomb_caller, 0, 1, 1, 1),
 					weighted(ModItems.bomb_caller, 1, 1, 1, 1),
 					weighted(ModItems.bomb_caller, 2, 1, 1, 2)
@@ -216,17 +218,16 @@ public class ItemPoolsLegacy {
 		//spaceship double chests
 		new ItemPool(POOL_SPACESHIP) {{
 			this.pool = new WeightedRandomChestContent[] {
-					weighted(ModItems.battery_advanced, 0, 1, 1, 5),
-					weighted(ModItems.ingot_advanced_alloy, 0, 2, 16, 5),
-					weighted(ModItems.wire_fine, Mats.MAT_ALLOY.id, 8, 32, 5),
-					weighted(ModItems.coil_advanced_alloy, 0, 2, 16, 5),
+					weighted(ModItems.battery_pack, EnumBatteryPack.BATTERY_LEAD.ordinal(), 1, 1, 2),
+					weighted(ModItems.coil_copper, 0, 2, 16, 5),
+					weighted(ModItems.wire_fine, Mats.MAT_MINGRADE.id, 8, 32, 5),
 					weighted(ModItems.cell_deuterium, 0, 1, 8, 5),
 					weighted(ModItems.cell_tritium, 0, 1, 8, 5),
 					weighted(ModItems.cell_antimatter, 0, 1, 1, 1),
 					weighted(ModItems.powder_neodymium, 0, 1, 1, 1),
 					weighted(ModItems.powder_niobium, 0, 1, 1, 1),
-					weighted(ModBlocks.fusion_conductor, 0, 2, 4, 5),
-					weighted(ModBlocks.fusion_heater, 0, 1, 3, 5),
+					weighted(ModItems.wire_dense, Mats.MAT_MINGRADE.id, 2, 4, 5),
+					weighted(ModItems.wire_dense, Mats.MAT_GOLD.id, 1, 3, 5),
 					weighted(ModBlocks.pwr_fuel, 0, 1, 2, 5),
 					weighted(ModBlocks.block_tungsten, 0, 3, 8, 5),
 					weighted(ModBlocks.red_wire_coated, 0, 4, 8, 5),

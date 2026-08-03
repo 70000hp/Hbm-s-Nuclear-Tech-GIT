@@ -9,6 +9,7 @@ import com.hbm.config.GeneralConfig;
 import com.hbm.interfaces.IBomb;
 import com.hbm.interfaces.IBomb.BombReturnCode;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.util.ChatBuilder;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +25,7 @@ public class ItemMultiDetonator extends Item {
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean bool) {
 		list.add("Shift right-click block to add position,");
 		list.add("right-click to detonate!");
-		list.add("Shift right-click in the air to clear postitions.");
+		list.add("Shift right-click in the air to clear positions.");
 
 		if(itemstack.getTagCompound() == null || getLocations(itemstack) == null) {
 			list.add(EnumChatFormatting.RED + "No position set!");
@@ -55,7 +56,7 @@ public class ItemMultiDetonator extends Item {
 						.next("Position added!").color(EnumChatFormatting.GREEN).flush());
 			}
 
-			world.playSoundAtEntity(player, "hbm:item.techBoop", 2.0F, 1.0F);
+			world.playSoundAtEntity(player, NTMSounds.TECH_BOOP, 2.0F, 1.0F);
 
 			return true;
 		}
@@ -102,7 +103,7 @@ public class ItemMultiDetonator extends Item {
 					}
 				}
 				
-				world.playSoundAtEntity(player, "hbm:item.techBleep", 1.0F, 1.0F);
+				world.playSoundAtEntity(player, NTMSounds.TECH_BLEEP, 1.0F, 1.0F);
 				
 				if(!world.isRemote) {
 					player.addChatMessage(ChatBuilder.start("[").color(EnumChatFormatting.DARK_AQUA)
@@ -117,7 +118,7 @@ public class ItemMultiDetonator extends Item {
 				stack.stackTagCompound.setIntArray("yValues", new int[0]);
 				stack.stackTagCompound.setIntArray("zValues", new int[0]);
 
-				world.playSoundAtEntity(player, "hbm:item.techBoop", 2.0F, 1.0F);
+				world.playSoundAtEntity(player, NTMSounds.TECH_BOOP, 2.0F, 1.0F);
 				
 				if(!world.isRemote) {
 					player.addChatMessage(ChatBuilder.start("[").color(EnumChatFormatting.DARK_AQUA)

@@ -6,6 +6,7 @@ import java.util.List;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.tileentity.IRadarCommandReceiver;
 
+import api.hbm.redstoneoverradio.IRORInteractive;
 import cpw.mods.fml.common.Optional;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -14,7 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class TileEntityTurretBaseArtillery extends TileEntityTurretBaseNT implements IRadarCommandReceiver {
+public abstract class TileEntityTurretBaseArtillery extends TileEntityTurretBaseNT implements IRadarCommandReceiver, IRORInteractive {
 	
 	protected List<Vec3> targetQueue = new ArrayList();
 
@@ -90,5 +91,36 @@ public abstract class TileEntityTurretBaseArtillery extends TileEntityTurretBase
 	@Optional.Method(modid = "OpenComputers")
 	public Object[] getTargetDistance(Context context, Arguments args) {
 		return new Object[] {Math.sqrt(Math.pow(xCoord - args.checkDouble(0), 2)+Math.pow(yCoord - args.checkDouble(1), 2)+Math.pow(zCoord - args.checkDouble(2), 2))};
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_FUNCTION + "setactive" + NAME_SEPARATOR + "active (0 or 1)",
+				PREFIX_FUNCTION + "targetplayers" + NAME_SEPARATOR + "enabled (0 or 1)",
+				PREFIX_FUNCTION + "targetanimals" + NAME_SEPARATOR + "enabled (0 or 1)",
+				PREFIX_FUNCTION + "targetmobs" + NAME_SEPARATOR + "enabled (0 or 1)",
+				PREFIX_FUNCTION + "targetmachines" + NAME_SEPARATOR + "enabled (0 or 1)",
+				PREFIX_FUNCTION + "addwhitelist" + NAME_SEPARATOR + "name",
+				PREFIX_FUNCTION + "removewhitelist" + NAME_SEPARATOR + "name",
+				PREFIX_FUNCTION + "enqueue" + NAME_SEPARATOR + "x" + PARAM_SEPARATOR + "y" + PARAM_SEPARATOR + "z",
+		};
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+		super.runRORFunction(name, params);
+
+		if((PREFIX_FUNCTION + "enqueue").equals(name) && params.length > 2) {
+			try {
+				int x = Integer.parseInt(params[0]);
+				int y = Integer.parseInt(params[1]);
+				int z = Integer.parseInt(params[2]);
+				this.sendCommandPosition(x, y, z);
+				this.markChanged();
+			} catch(NumberFormatException e) {}
+		}
+		
+		return null;
 	}
 }

@@ -99,7 +99,7 @@ public class ItemGlitch extends Item implements IBatteryItem {
 				break;
 			case 14:
 				player.inventory.dropAllItems();
-				ExplosionChaos.burn(world, (int)player.posX, (int)player.posY, (int)player.posZ, 5);
+				ExplosionChaos.igniteAllBlocks(world, (int)player.posX, (int)player.posY, (int)player.posZ, 5);
 				break;
 			case 15:
 				for(int i = 0; i < 36; i++)
@@ -243,6 +243,6 @@ public class ItemGlitch extends Item implements IBatteryItem {
 	@Override public void dischargeBattery(ItemStack stack, long i) { }
 	@Override public long getCharge(ItemStack stack) { return 200; }
 	@Override public long getMaxCharge(ItemStack stack) { return 200; }
-	@Override public long getChargeRate() { return 0; }
-	@Override public long getDischargeRate() { return 200; }
+	@Override public long getChargeRate(ItemStack stack) { return 0; }
+	@Override public long getDischargeRate(ItemStack stack) { return 200; }
 }

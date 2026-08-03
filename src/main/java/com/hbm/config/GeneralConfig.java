@@ -1,6 +1,8 @@
 package com.hbm.config;
 
 import net.minecraftforge.common.config.Configuration;
+
+import com.hbm.inventory.recipes.PrecAssRecipes;
 import com.hbm.lib.RefStrings;
 public class GeneralConfig {
 
@@ -18,7 +20,6 @@ public class GeneralConfig {
 	public static boolean enableMDOres = true;
 	public static boolean enableMines = true;
 	public static boolean enableRad = true;
-	public static boolean enableNITAN = true;
 	public static boolean enableBomberShortMode = false;
 	public static boolean enableVaults = true;
 	public static boolean enableCataclysm = false;
@@ -26,7 +27,6 @@ public class GeneralConfig {
 	public static boolean enableGuns = true;
 	public static boolean enableVirus = true;
 	public static boolean enableCrosshairs = true;
-	public static boolean enableReflectorCompat = false;
 	public static boolean enableRenderDistCheck = true;
 	public static boolean enableSilentCompStackErrors = true;
 	public static boolean enableSkyboxes = true;
@@ -40,21 +40,31 @@ public class GeneralConfig {
 	public static boolean enableMekanismChanges = true;
 	public static boolean enableServerRecipeSync = false;
 	public static boolean enableLoadScreenReplacement = true;
+	public static boolean enableMachineGravity = false;
 	public static int normalSoundChannels = 200;
 
 	public static boolean enableExpensiveMode = false;
+	
+	public static boolean trueExp() {
+		return enableExpensiveMode && !PrecAssRecipes.INSTANCE.modified;
+	}
 
 	public static boolean enable528 = false;
 	public static boolean enable528ReasimBoilers = true;
 	public static boolean enable528ColtanDeposit = true;
 	public static boolean enable528ColtanSpawn = false;
-	public static boolean enable528BedrockDeposit = true;
-	public static boolean enable528BedrockSpawn = false;
 	public static boolean enable528BosniaSimulator = true;
-	public static boolean enable528BedrockReplacement = true;
 	public static boolean enable528NetherBurn = true;
+	public static boolean enable528PressurizedRecipes = true;
+	public static boolean enable528ExplosiveEnergistics = true;
+	public static boolean enable528MachineGravity = true;
 	public static int coltanRate = 2;
-	public static int bedrockRate = 50;
+	
+	public static boolean true528() {
+		return enable528 && enable528ReasimBoilers && !enable528ColtanSpawn && enable528BosniaSimulator &&
+				enable528NetherBurn && enable528PressurizedRecipes && enable528ExplosiveEnergistics &&
+				enable528MachineGravity && coltanRate <= 2;
+	}
 
 	public static boolean enableLBSM = false;
 	public static boolean enableLBSMFullSchrab = true;
@@ -69,9 +79,10 @@ public class GeneralConfig {
 	public static boolean enableLBSMSimpleMedicineRecipes = true;
 	public static boolean enableLBSMSafeCrates = true;
 	public static boolean enableLBSMSafeMEDrives = true;
-	public static boolean enableLBSMIGen = true;
 	public static int schrabRate = 20;
 	public static String[] preferredOutputMod = new String[] {RefStrings.MODID};
+
+	public static boolean enableArcadeHiddenItems = true;
 
 	public static void loadFromConfig(Configuration config) {
 
@@ -96,7 +107,6 @@ public class GeneralConfig {
 		enableMDOres = config.get(CATEGORY_GENERAL, "1.04_enableOresInModdedDimensions", true, "Allows NTM ores to generate in modded dimensions").getBoolean(true);
 		enableMines = config.get(CATEGORY_GENERAL, "1.05_enableLandmineSpawn", true, "Allows landmines to generate").getBoolean(true);
 		enableRad = config.get(CATEGORY_GENERAL, "1.06_enableRadHotspotSpawn", true, "Allows radiation hotspots to generate").getBoolean(true);
-		enableNITAN = config.get(CATEGORY_GENERAL, "1.07_enableNITANChestSpawn", true, "Allows chests to spawn at specific coordinates full of powders").getBoolean(true);
 		enableBomberShortMode = config.get(CATEGORY_GENERAL, "1.14_enableBomberShortMode", false, "Has bomber planes spawn in closer to the target for use with smaller render distances").getBoolean(false);
 		enableVaults = config.get(CATEGORY_GENERAL, "1.15_enableVaultSpawn", true, "Allows locked safes to spawn").getBoolean(true);
 		enableCataclysm = config.get(CATEGORY_GENERAL, "1.17_enableCataclysm", false, "Causes satellites to fall whenever a mob dies").getBoolean(false);
@@ -104,7 +114,6 @@ public class GeneralConfig {
 		enableGuns = config.get(CATEGORY_GENERAL, "1.20_enableGuns", true, "Prevents new system guns to be fired").getBoolean(true);
 		enableVirus = config.get(CATEGORY_GENERAL, "1.21_enableVirus", false, "Allows virus blocks to spread").getBoolean(false);
 		enableCrosshairs = config.get(CATEGORY_GENERAL, "1.22_enableCrosshairs", true, "Shows custom crosshairs when an NTM gun is being held").getBoolean(true);
-		enableReflectorCompat = config.get(CATEGORY_GENERAL, "1.24_enableReflectorCompat", false, "Enable old reflector oredict name (\"plateDenseLead\") instead of new \"plateTungCar\"").getBoolean(false);
 		enableRenderDistCheck = config.get(CATEGORY_GENERAL, "1.25_enableRenderDistCheck", true, "Check invalid render distances (over 16, without OptiFine) and fix it").getBoolean(true);
 		enableSilentCompStackErrors = config.get(CATEGORY_GENERAL, "1.28_enableSilentCompStackErrors", false, "Enabling this will disable log spam created by unregistered items in ComparableStack instances.").getBoolean(false);
 		enableSkyboxes = config.get(CATEGORY_GENERAL, "1.31_enableSkyboxes", true, "If enabled, will try to use NTM's custom skyboxes.").getBoolean(true);
@@ -122,6 +131,7 @@ public class GeneralConfig {
 		preferredOutputMod = CommonConfig.createConfigStringList(config,CATEGORY_GENERAL,"1.42_preferredOutputMod",
 				"The mod which is preferred as output when certain machines autogenerate recipes. Currently used for the shredder", new String[] {RefStrings.MODID});
 		enableLoadScreenReplacement = config.get(CATEGORY_GENERAL, "1.43_enableLoadScreenReplacement", true, "Tries to replace the vanilla load screen with the 'tip of the day' one, may clash with other mods trying to do the same.").getBoolean(true);
+		enableMachineGravity = config.get(CATEGORY_GENERAL, "1.44_enableMachineGravity", false, "Requires large large machines to have a proper foundation, or else they tilt and break. Independent from the 528 version of this config, which does the same, but only works with 528 enabled.").getBoolean(false);
 		enableExpensiveMode = config.get(CATEGORY_GENERAL, "1.99_enableExpensiveMode", false, "It does what the name implies.").getBoolean(false);
 
 		final String CATEGORY_528 = CommonConfig.CATEGORY_528;
@@ -131,18 +141,16 @@ public class GeneralConfig {
 				+ "528-Modus: Lassen Sie Vorsicht walten!\n"
 				+ "способ-528: действовать с осторожностью!");
 
-		enable528 = CommonConfig.createConfigBool(config, CATEGORY_528, "enable528Mode", "The central toggle for 528 mode.", false);
+		enable528 = CommonConfig.createConfigBool(config, CATEGORY_528, "enable528Mode", "The central toggle for 528 mode, required TRUE for most subsequent toggles to work.", false);
 		enable528ReasimBoilers = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_forceReasimBoilers", "Keeps the RBMK dial for ReaSim boilers on, preventing use of non-ReaSim boiler columns and forcing the use of steam in-/outlets", true);
-		enable528ColtanDeposit = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableColtanDepsoit", "Enables the coltan deposit. A large amount of coltan will spawn around a single random location in the world.", true);
+		enable528ColtanDeposit = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableColtanDeposit", "Enables the coltan deposit. A large amount of coltan will spawn around a single random location in the world.", true);
 		enable528ColtanSpawn = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableColtanSpawning", "Enables coltan ore as a random spawn in the world. Unlike the deposit option, coltan will not just spawn in one central location.", false);
-		enable528BedrockDeposit = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableBedrockDepsoit", "Enables bedrock coltan ores in the coltan deposit. These ores can be drilled to extract infinite coltan, albeit slowly.", true);
-		enable528BedrockSpawn = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableBedrockSpawning", "Enables the bedrock coltan ores as a rare spawn. These will be rarely found anywhere in the world.", false);
 		enable528BosniaSimulator = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enableBosniaSimulator", "Enables anti tank mines spawning all over the world.", true);
-		enable528BedrockReplacement = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enable528BedrockReplacement", "Replaces certain bedrock ores with ones that require additional processing.", true);
 		enable528NetherBurn = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enable528NetherBurn", "Whether players burn in the nether", true);
+		enable528PressurizedRecipes = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enable528PressurizedRecipes", "Sets some recipes to require pressurized input fluid", true);
+		enable528ExplosiveEnergistics = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enable528ExplosiveEnergistics", "Renders AE2 unusable.", true);
+		enable528MachineGravity = CommonConfig.createConfigBool(config, CATEGORY_528, "X528_enable528MachineGravity", "Requires most large machines to have a proper foundation, or else they tilt and break.", true);
 		coltanRate = CommonConfig.createConfigInt(config, CATEGORY_528, "X528_oreColtanFrequency", "Determines how many coltan ore veins are to be expected in a chunk. These values do not affect the frequency in deposits, and only apply if random coltan spanwing is enabled.", 2);
-		bedrockRate = CommonConfig.createConfigInt(config, CATEGORY_528, "X528_bedrockColtanFrequency", "Determines how often (1 in X) bedrock coltan ores spawn. Applies for both the bedrock ores in the coltan deposit (if applicable) and the random bedrock ores (if applicable)", 50);
-
 
 		final String CATEGORY_LBSM = CommonConfig.CATEGORY_LBSM;
 
@@ -164,9 +172,20 @@ public class GeneralConfig {
 		enableLBSMSimpleMedicineRecipes = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_recipeSimpleMedicine", "When enabled, makes some medicine recipes (like ones that require bismuth) much more affordable", true);
 		enableLBSMSafeCrates = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_safeCrates", "When enabled, prevents crates from becoming radioactive", true);
 		enableLBSMSafeMEDrives = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_safeMEDrives", "When enabled, prevents ME Drives and Portable Cells from becoming radioactive", true);
-		enableLBSMIGen = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_iGen", "When enabled, restores the industrial generator to pre-nerf power", true);
 		schrabRate = CommonConfig.createConfigInt(config, CATEGORY_LBSM, "LBSM_schrabOreRate", "Changes the amount of uranium ore needed on average to create one schrabidium ore using nukes. Standard mode value is 100", 20);
 
 		if(enable528) enableLBSM = false;
+
+		final String CATEGORY_ARCADE = CommonConfig.CATEGORY_ARCADE;
+		enableArcadeHiddenItems = CommonConfig.createConfigBool(config, CATEGORY_ARCADE, "ARCADE_hiddenItems", "When enabled, restores the unused items from normal NTM that arcade hides for tidyness", true);
+
+		if(!enable528) {
+			enable528ReasimBoilers = false;
+			enable528BosniaSimulator = false;
+			enable528NetherBurn = false;
+			enable528PressurizedRecipes = false;
+			enable528ExplosiveEnergistics = false;
+			enable528MachineGravity = false;
+		}
 	}
 }

@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.RecipesCommon.AStack;
+import com.hbm.util.ItemStackUtil;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -38,6 +39,8 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 	public static final String POOL_PREFIX_DISCOVER = "discover.";
 	/** Secret recipes, self-explantory. Why even have this comment? */
 	public static final String POOL_PREFIX_SECRET = "secret.";
+	/** 528 greyprints */
+	public static final String POOL_PREFIX_528 = "528.";
 
 	public List<T> recipeOrderedList = new ArrayList();
 	public HashMap<String, T> recipeNameMap = new HashMap();
@@ -45,7 +48,10 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 	/** Blueprint pool name to list of recipe names that are part of this pool */
 	public static HashMap<String, List<String>> blueprintPools = new HashMap();
 	/** Name to recipe map for all recipes that are part of pools for lookup */
-	public static HashMap<String, GenericRecipe> pooledBlueprints = new HashMap();
+	public static HashMap<String, GenericRecipe> nameToRecipeGlobal = new HashMap();
+	
+	/** Groups for auto switch functionality (changes recipe automatically based on first solid input) */
+	public HashMap<String, List<GenericRecipe>> autoSwitchGroups = new HashMap();
 
 	public abstract int inputItemLimit();
 	public abstract int inputFluidLimit();
@@ -54,6 +60,7 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 	public boolean hasDuration() { return true; }
 	public boolean hasPower() { return true; }
 	
+	/** Adds a recipe to a blueprint pool (i.e. a blueprint item's recipe list) */
 	public static void addToPool(String pool, GenericRecipe recipe) {
 		List<String> list = blueprintPools.get(pool);
 		if(list == null) {
@@ -61,12 +68,19 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 			blueprintPools.put(pool, list);
 		}
 		list.add(recipe.name);
-		pooledBlueprints.put(recipe.name, recipe);
+	}
+	
+	/** Adds a recipe to an auto switch group (recipe can switch based on first solid input) */
+	public void addToGroup(String group, GenericRecipe recipe) {
+		List<GenericRecipe> list = autoSwitchGroups.get(group);
+		if(list == null) list = new ArrayList();
+		list.add(recipe);
+		autoSwitchGroups.put(group, list);
 	}
 	
 	public static void clearPools() {
 		blueprintPools.clear();
-		pooledBlueprints.clear();
+		nameToRecipeGlobal.clear();
 	}
 
 	@Override
@@ -78,12 +92,14 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 	public void deleteRecipes() {
 		this.recipeOrderedList.clear();
 		this.recipeNameMap.clear();
+		this.autoSwitchGroups.clear();
 	}
 	
 	public void register(T recipe) {
 		this.recipeOrderedList.add(recipe);
 		if(recipeNameMap.containsKey(recipe.name)) throw new IllegalStateException("Recipe " + recipe.name + " has been registered with a duplicate ID!");
 		this.recipeNameMap.put(recipe.name, recipe);
+		nameToRecipeGlobal.put(recipe.name, recipe);
 	}
 
 	@Override
@@ -102,8 +118,9 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 		
 		if(obj.has("icon")) recipe.setIcon(this.readItemStack(obj.get("icon").getAsJsonArray()));
 		if(obj.has("named") && obj.get("named").getAsBoolean()) recipe.setNamed();
-		if(obj.has("blueprintpool")) recipe.setPools(obj.get("blueprintpool").getAsString().split(":"));
+		if(obj.has("blueprintpool")) recipe.setPoolsAllow528(obj.get("blueprintpool").getAsString().split(":"));
 		if(obj.has("nameWrapper")) recipe.setNameWrapper(obj.get("nameWrapper").getAsString());
+		if(obj.has("autoSwitchGroup")) recipe.setGroup(obj.get("autoSwitchGroup").getAsString(), this);
 		
 		readExtraData(element, recipe);
 		
@@ -154,11 +171,12 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 		if(recipe.customLocalization) writer.name("named").value(true);
 		if(recipe.nameWrapper != null) writer.name("nameWrapper").value(recipe.nameWrapper);
 		if(recipe.blueprintPools != null && recipe.blueprintPools.length > 0) writer.name("blueprintpool").value(String.join(":", recipe.blueprintPools));
+		if(recipe.autoSwitchGroup != null) writer.name("autoSwitchGroup").value(recipe.autoSwitchGroup);
 		
 		writeExtraData(recipe, writer);
 	}
 	
-	public void writeExtraData(T recipe, JsonWriter writer) { }
+	public void writeExtraData(T recipe, JsonWriter writer) throws IOException { }
 	
 	public IOutput[] readOutputArray(JsonArray array) {
 		IOutput[] output = new IOutput[array.size()];
@@ -220,13 +238,19 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 
 		@Override 
 		public ItemStack collapse() {
-			if(this.chance >= 1F) return getSingle().copy();
-			return RNG.nextFloat() <= chance ? getSingle().copy() : null;
+			if(this.chance >= 1F) return getSingle();
+			int finalSize = 0;
+			for(int i = 0; i < this.stack.stackSize; i++) if(RNG.nextFloat() <= chance) finalSize++; 
+			if(finalSize <= 0) return null;
+			ItemStack finalStack = getSingle();
+			finalStack.stackSize = finalSize;
+			return finalStack;
 		}
 		
-		@Override public ItemStack getSingle() { return this.stack; }
+		@Override public ItemStack getSingle() { return this.stack.copy(); }
 		@Override public boolean possibleMultiOutput() { return false; }
-		@Override public ItemStack[] getAllPossibilities() { return new ItemStack[] {getSingle()}; }
+		/** For NEI, includes tooltip labels */
+		@Override public ItemStack[] getAllPossibilities() { return new ItemStack[] {this.chance >= 1F ? getSingle() : ItemStackUtil.addTooltipToStack(getSingle(), EnumChatFormatting.RED + "" + (int)(this.chance * 1000) / 10F + "%")}; }
 		
 		@Override
 		public void serialize(JsonWriter writer) throws IOException {
@@ -272,13 +296,23 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 		
 		public List<ChanceOutput> pool = new ArrayList();
 		
+		public ChanceOutputMulti(ChanceOutput... out) {
+			for(ChanceOutput output : out) pool.add(output);
+		}
+		
 		@Override public ItemStack collapse() { return ((ChanceOutput) WeightedRandom.getRandomItem(RNG, pool)).collapse(); }
 		@Override public boolean possibleMultiOutput() { return pool.size() > 1; }
 		@Override public ItemStack getSingle() { return possibleMultiOutput() ? null : pool.get(0).getSingle(); }
 		
 		@Override public ItemStack[] getAllPossibilities() {
 			ItemStack[] outputs = new ItemStack[pool.size()];
-			for(int i = 0; i < outputs.length; i++) outputs[i] = pool.get(i).getAllPossibilities()[0];
+			int totalWeight = WeightedRandom.getTotalWeight(pool);
+			for(int i = 0; i < outputs.length; i++) {
+				ChanceOutput out = pool.get(i);
+				float chance = (float) out.itemWeight / (float) totalWeight;
+				outputs[i] = chance >= 1 ? out.getAllPossibilities()[0] : 
+					ItemStackUtil.addTooltipToStack(out.getAllPossibilities()[0], EnumChatFormatting.RED + "" + (int)(chance * 1000) / 10F + "%");
+			}
 			return outputs;
 		}
 		
@@ -293,6 +327,7 @@ public abstract class GenericRecipes<T extends GenericRecipe> extends Serializab
 		@Override
 		public void deserialize(JsonArray array) {
 			for(JsonElement element : array) {
+				if(element.isJsonPrimitive()) continue; // the array we get includes the "multi" tag, which is also the only primitive
 				ChanceOutput output = new ChanceOutput();
 				output.deserialize(element.getAsJsonArray());
 				pool.add(output);

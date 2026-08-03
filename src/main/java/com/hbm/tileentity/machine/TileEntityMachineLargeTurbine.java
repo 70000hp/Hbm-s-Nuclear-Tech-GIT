@@ -1,10 +1,7 @@
 package com.hbm.tileentity.machine;
 
 import java.util.Random;
-import java.io.IOException;
 
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.handler.CompatHandler;
 import com.hbm.inventory.container.ContainerMachineLargeTurbine;
@@ -18,7 +15,6 @@ import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IFluidCopiable;
-import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.CompatEnergyControl;
@@ -44,7 +40,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityMachineLargeTurbine extends TileEntityMachineBase implements IEnergyProviderMK2, IFluidStandardTransceiver, IGUIProvider, SimpleComponent, IInfoProviderEC, CompatHandler.OCComponent, IConfigurableMachine, IFluidCopiable {
+public class TileEntityMachineLargeTurbine extends TileEntityMachineBase implements IEnergyProviderMK2, IFluidStandardTransceiver, IGUIProvider, SimpleComponent, IInfoProviderEC, CompatHandler.OCComponent, IFluidCopiable {
 
 	public long power;
 	public FluidTank[] tanks;
@@ -77,28 +73,6 @@ public class TileEntityMachineLargeTurbine extends TileEntityMachineBase impleme
 	}
 
 	@Override
-	public String getConfigName() {
-		return "steamturbineIndustrial";
-	}
-
-	@Override
-	public void readIfPresent(JsonObject obj) {
-		maxPower = IConfigurableMachine.grab(obj, "L:maxPower", maxPower);
-		inputTankSize = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSize);
-		outputTankSize = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSize);
-		efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
-	}
-
-	@Override
-	public void writeConfig(JsonWriter writer) throws IOException {
-		writer.name("L:maxPower").value(maxPower);
-		writer.name("INFO").value("industrial steam turbine consumes 20% of availible steam per tick");
-		writer.name("I:inputTankSize").value(inputTankSize);
-		writer.name("I:outputTankSize").value(outputTankSize);
-		writer.name("D:efficiency").value(efficiency);
-	}
-
-	@Override
 	public String getName() {
 		return "container.machineLargeTurbine";
 	}
@@ -120,6 +94,8 @@ public class TileEntityMachineLargeTurbine extends TileEntityMachineBase impleme
 			tanks[0].setType(0, 1, slots);
 			tanks[0].loadTank(2, 3, slots);
 			power = Library.chargeItemsFromTE(slots, 4, power, maxPower);
+			
+			this.power *= 0.95;
 
 			FluidType in = tanks[0].getTankType();
 			boolean valid = false;
@@ -163,13 +139,15 @@ public class TileEntityMachineLargeTurbine extends TileEntityMachineBase impleme
 				this.fanAcceleration = Math.max(0F, Math.min(15F, this.fanAcceleration += 0.075F + audioDesync));
 
 				if(audio == null) {
-					audio = MainRegistry.proxy.getLoopedSound("hbm:block.largeTurbineRunning", xCoord, yCoord, zCoord, 1.0F, 10F, 1.0F);
+					audio = MainRegistry.proxy.getLoopedSound("hbm:block.largeTurbineRunning", xCoord, yCoord, zCoord, 1.0F, 10F, 1.0F, 20);
 					audio.startSound();
 				}
 
 				float turbineSpeed = this.fanAcceleration / 15F;
 				audio.updateVolume(getVolume(0.4f * turbineSpeed));
 				audio.updatePitch(0.25F + 0.75F * turbineSpeed);
+				audio.keepAlive();
+				
 			} else {
 				this.fanAcceleration = Math.max(0F, Math.min(15F, this.fanAcceleration -= 0.1F));
 

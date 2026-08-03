@@ -4,11 +4,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.hbm.items.ModItems;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -19,7 +20,7 @@ public class ItemRenderHeavyRevolver extends ItemRenderWeaponBase {
 	public ItemRenderHeavyRevolver(ResourceLocation texture) {
 		this.texture = texture;
 	}
-
+	
 	@Override
 	protected float getTurnMagnitude(ItemStack stack) { return ItemGunBaseNT.getIsAiming(stack) ? 2.5F : -0.25F; }
 
@@ -153,7 +154,7 @@ public class ItemRenderHeavyRevolver extends ItemRenderWeaponBase {
 	}
 
 	@Override
-	public void renderOther(ItemStack stack, ItemRenderType type) {
+	public void renderOther(ItemStack stack, ItemRenderType type, Object... data) {
 
 		GL11.glRotated(90, 0, 1, 0);
 		GL11.glEnable(GL11.GL_LIGHTING);
@@ -173,9 +174,26 @@ public class ItemRenderHeavyRevolver extends ItemRenderWeaponBase {
 			ResourceManager.lilmac.renderPart("Scope");
 		}
 		GL11.glShadeModel(GL11.GL_FLAT);
+		
+		if(type == ItemRenderType.EQUIPPED) {
+			EntityLivingBase ent = (EntityLivingBase) data[1];
+			long shot;
+			if(ent == Minecraft.getMinecraft().thePlayer) {
+				ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+				shot = gun.lastShot[0];
+			} else {
+				shot = ItemRenderWeaponBase.flashMap.getOrDefault(ent, (long) -1);
+				if(shot < 0) return;
+			}
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0.125, 2.5, 0);
+			this.renderGapFlash(shot);
+			GL11.glPopMatrix();
+		}
 	}
 	
 	public boolean isScoped(ItemStack stack) {
-		return stack.getItem() == ModItems.gun_heavy_revolver_lilmac || WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SCOPE);
+		return stack.getItem() == ModItems.gun_heavy_revolver_lilmac || XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE);
 	}
 }

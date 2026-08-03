@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -42,15 +43,17 @@ public class ItemConserve extends ItemEnumMulti {
 		EnumFoodType num = EnumUtil.grabEnumSafely(theEnum, stack.getItemDamage());
 		
 		if(num == EnumFoodType.BHOLE && !world.isRemote) {
-			EntityVortex vortex = new EntityVortex(world, 0.5F);
-    		vortex.posX = player.posX;
-    		vortex.posY = player.posY;
-    		vortex.posZ = player.posZ;
-    		world.spawnEntityInWorld(vortex);
-    		
+			EntityVortex vortex = (EntityVortex) new EntityVortex(world, 0.5F).setShrinkRate(0.01F).noBreak();
+			vortex.posX = player.posX;
+			vortex.posY = player.posY;
+			vortex.posZ = player.posZ;
+			world.spawnEntityInWorld(vortex);
+
 		} else if(num == EnumFoodType.RECURSION && world.rand.nextInt(10) > 0) {
-			
 			player.inventory.addItemStackToInventory(stackFromEnum(EnumFoodType.RECURSION));
+			
+		} else if(num == EnumFoodType.FIST) {
+			player.attackEntityFrom(DamageSource.magic, 2F);
 		}
 	}
 	
@@ -110,7 +113,7 @@ public class ItemConserve extends ItemEnumMulti {
 		MYSTERY(6, 0.5F),
 		PASHTET(4, 0.5F),
 		CHEESE(3, 1F),
-		JIZZ(15, 5F), // :3
+		SLIME(15, 5F),
 		MILK(5, 0.25F),
 		ASS(6, 0.75F), // :3
 		PIZZA(8, 075F),

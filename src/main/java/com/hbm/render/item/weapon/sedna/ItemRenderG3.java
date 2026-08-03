@@ -4,11 +4,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.hbm.items.ModItems;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -180,7 +181,7 @@ public class ItemRenderG3 extends ItemRenderWeaponBase {
 	}
 
 	@Override
-	public void renderOther(ItemStack stack, ItemRenderType type) {
+	public void renderOther(ItemStack stack, ItemRenderType type, Object... data) {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		
 		boolean silenced = hasSilencer(stack);
@@ -209,23 +210,45 @@ public class ItemRenderG3 extends ItemRenderWeaponBase {
 			if(isScoped) ResourceManager.g3.renderPart("Scope");
 		}
 		GL11.glShadeModel(GL11.GL_FLAT);
+		//third-person muzzle flashes
+		if(type == ItemRenderType.EQUIPPED && !silenced) {
+			EntityLivingBase ent = (EntityLivingBase) data[1];
+			long shot;
+			double shotRand = 0;
+			if(ent == Minecraft.getMinecraft().thePlayer) {
+				ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+				shot = gun.lastShot[0];
+				shotRand = gun.shotRand;
+			} else {
+				shot = ItemRenderWeaponBase.flashMap.getOrDefault(ent, (long) -1);
+				if(shot < 0) return;
+			}
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0, 12);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(-25 + shotRand * 10, 1, 0, 0);
+			GL11.glScaled(0.75, 0.75, 0.75);
+			this.renderMuzzleFlash(shot, 75, 10);
+			GL11.glPopMatrix();
+		}
 	}
 	
 	public boolean hasStock(ItemStack stack) {
-		return !WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_NO_STOCK);
+		return !XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_NO_STOCK);
 	}
 	
 	public boolean hasSilencer(ItemStack stack) {
-		return stack.getItem() == ModItems.gun_g3_zebra || WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SILENCER);
+		return stack.getItem() == ModItems.gun_g3_zebra || XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SILENCER);
 	}
 	
 	public boolean isScoped(ItemStack stack) {
-		return stack.getItem() == ModItems.gun_g3_zebra || WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SCOPE);
+		return stack.getItem() == ModItems.gun_g3_zebra || XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE);
 	}
 	
 	public ResourceLocation getTexture(ItemStack stack) {
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_FURNITURE_GREEN)) return ResourceManager.g3_green_tex;
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_FURNITURE_BLACK)) return ResourceManager.g3_black_tex;
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_FURNITURE_GREEN)) return ResourceManager.g3_green_tex;
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_FURNITURE_BLACK)) return ResourceManager.g3_black_tex;
 		return texture;
 	}
 }

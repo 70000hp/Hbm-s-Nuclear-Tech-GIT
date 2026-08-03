@@ -29,8 +29,8 @@ public class GUIPADetector extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		source.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 36, 16, 52);
-		source.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 36, 16, 52);
+		source.coolantTanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 36, 16, 52);
+		source.coolantTanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 36, 16, 52);
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 18, 16, 52, source.power, source.getMaxPower());
 	}
 
@@ -38,7 +38,7 @@ public class GUIPADetector extends GuiInfoContainer {
 	protected void drawGuiContainerForegroundLayer( int i, int j) {
 		
 		String name = this.source.hasCustomInventoryName() ? this.source.getInventoryName() : I18n.format(this.source.getInventoryName());
-		this.fontRendererObj.drawString(name, this.xSize / 2 - this.fontRendererObj.getStringWidth(name) / 2 - 9, 4, 4210752);
+		this.fontRendererObj.drawString(name, this.xSize / 2 - this.fontRendererObj.getStringWidth(name) / 2 - 8, 5, 0xffffff);
 		this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
 
 		this.fontRendererObj.drawString(EnumChatFormatting.AQUA + "/123K", 136, 22, 4210752);
@@ -57,10 +57,10 @@ public class GUIPADetector extends GuiInfoContainer {
 		drawTexturedModalRect(guiLeft + 8, guiTop + 70 - j, 184, 52 - j, 16, j);
 
 		int heat = (int) Math.ceil(source.temperature);
-		if(heat <= 123) drawTexturedModalRect(guiLeft + 44, guiTop + 18, 176, 8, 8, 8);
-		if(source.power >= source.usage) drawTexturedModalRect(guiLeft + 44, guiTop + 43, 176, 8, 8, 8);
+		if(heat <= 123) drawTexturedModalRect(guiLeft + 43, guiTop + 18, 176, 8, 8, 8);
+		if(source.power >= source.usage) drawTexturedModalRect(guiLeft + 43, guiTop + 43, 176, 8, 8, 8);
 
-		source.tanks[0].renderTank(guiLeft + 134, guiTop + 88, this.zLevel, 16, 52);
-		source.tanks[1].renderTank(guiLeft + 152, guiTop + 88, this.zLevel, 16, 52);
+		source.coolantTanks[0].renderTank(guiLeft + 134, guiTop + 88, this.zLevel, 16, 52);
+		source.coolantTanks[1].renderTank(guiLeft + 152, guiTop + 88, this.zLevel, 16, 52);
 	}
 }

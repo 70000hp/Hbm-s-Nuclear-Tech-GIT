@@ -1,16 +1,11 @@
 package com.hbm.tileentity;
 
-import net.minecraftforge.fluids.FluidTank;
+import com.hbm.interfaces.NotableComments;
 
+@NotableComments
 public abstract class TileEntityTickingBase extends TileEntityLoadedBase {
 
 	public TileEntityTickingBase() { }
-
-	public abstract String getInventoryName();
-
-	public int getGaugeScaled(int i, FluidTank tank) {
-		return tank.getFluidAmount() * i / tank.getCapacity();
-	}
 
 	//abstracting this method forces child classes to implement it
 	//so i don't have to remember the fucking method name
@@ -18,8 +13,5 @@ public abstract class TileEntityTickingBase extends TileEntityLoadedBase {
 	//shit i don't know man
 	@Override
 	public abstract void updateEntity();
-
-	@Deprecated
-	public void handleButtonPacket(int value, int meta) { }
 
 }

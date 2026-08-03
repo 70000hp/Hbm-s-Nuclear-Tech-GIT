@@ -14,7 +14,6 @@ import static com.hbm.inventory.material.MaterialShapes.*;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockOreBasalt.EnumBasaltOreType;
 import com.hbm.blocks.BlockEnums.EnumStoneType;
-import com.hbm.config.GeneralConfig;
 import com.hbm.crafting.MineralRecipes;
 import com.hbm.hazard.HazardData;
 import com.hbm.hazard.HazardEntry;
@@ -70,6 +69,7 @@ public class OreDictManager {
 	public static final String KEY_LEAVES = "treeLeaves";
 	public static final String KEY_SAPLING = "treeSapling";
 	public static final String KEY_SAND = "sand";
+	public static final String KEY_STONE = "stone";
 	public static final String KEY_COBBLESTONE = "cobblestone";
 
 	public static final String KEY_BLACK = "dyeBlack";
@@ -167,9 +167,9 @@ public class OreDictManager {
 	/** COPPER */
 	public static final DictFrame CU = new DictFrame("Copper");
 	public static final DictFrame MINGRADE = new DictFrame("Mingrade");
-	public static final DictFrame ALLOY = new DictFrame("AdvancedAlloy");
 	/** TUNGSTEN */
 	public static final DictFrame W = new DictFrame("Tungsten");
+	public static final DictFrame WC = new DictFrame("TungstenCarbide");
 	/** ALUMINUM */
 	public static final DictFrame AL = new DictFrame("Aluminum");
 	public static final DictFrame STEEL = new DictFrame("Steel");
@@ -266,11 +266,6 @@ public class OreDictManager {
 	 * RARE METALS
 	 */
 	public static final DictFrame AUSTRALIUM = new DictFrame("Australium");
-	public static final DictFrame REIIUM = new DictFrame("Reiium");
-	public static final DictFrame WEIDANIUM = new DictFrame("Weidanium");
-	public static final DictFrame UNOBTAINIUM = new DictFrame("Unobtainium");
-	public static final DictFrame VERTICIUM = new DictFrame("Verticium");
-	public static final DictFrame DAFFERGON = new DictFrame("Daffergon");
 	/*
 	 * RARE EARTHS
 	 */
@@ -333,7 +328,7 @@ public class OreDictManager {
 	public static final DictFrame ANY_CONCRETE = new DictFrame("Concrete");			//no any prefix means that any has to be appended with the any() or anys() getters, registering works with the any (i.e. no shape) setter
 	public static final DictGroup ANY_TAR = new DictGroup("Tar", KEY_OIL_TAR, KEY_COAL_TAR, KEY_CRACK_TAR, KEY_WOOD_TAR);
 	/** Any special post-RBMK gating material, namely bismuth and arsenic */
-	public static final DictFrame ANY_BISMOID = new DictFrame("AnyBismoid");
+	public static final DictGroup ANY_BISMOID = new DictGroup("AnyBismoid", BI, AS);
 	public static final DictFrame ANY_ASH = new DictFrame("Ash");
 
 
@@ -389,8 +384,8 @@ public class OreDictManager {
 		TI																	.ingot(ingot_titanium)												.dust(powder_titanium)			.plate(plate_titanium)			.block(block_titanium)		.ore(ore_titanium);
 		CU																	.ingot(ingot_copper)												.dust(powder_copper)			.plate(plate_copper)			.block(block_copper)		.ore(ore_copper, ore_gneiss_copper);
 		MINGRADE															.ingot(ingot_red_copper)											.dust(powder_red_copper)										.block(block_red_copper);
-		ALLOY																.ingot(ingot_advanced_alloy)										.dust(powder_advanced_alloy)	.plate(plate_advanced_alloy)	.block(block_advanced_alloy);
 		W																	.ingot(ingot_tungsten)												.dust(powder_tungsten)											.block(block_tungsten)		.ore(ore_tungsten, ore_nether_tungsten)	.oreNether(ore_nether_tungsten);
+		WC																	.ingot(ingot_tungsten_carbide);
 		AL																	.ingot(ingot_aluminium)												.dust(powder_aluminium)			.plate(plate_aluminium)			.block(block_aluminium)		.ore(ore_aluminium);
 		STEEL																.ingot(ingot_steel)				.dustSmall(powder_steel_tiny)		.dust(powder_steel)				.plate(plate_steel)				.block(block_steel);
 		TCALLOY																.ingot(ingot_tcalloy)												.dust(powder_tcalloy)											.block(block_tcalloy);
@@ -453,7 +448,7 @@ public class OreDictManager {
 		HEMATITE																														.ore(fromOne(stone_resource, EnumStoneType.HEMATITE));
 		MALACHITE						.ingot(DictFrame.fromOne(chunk_ore, EnumChunkType.MALACHITE))									.ore(fromOne(stone_resource, EnumStoneType.MALACHITE));
 		LIMESTONE																		.dust(powder_limestone)							.ore(fromOne(stone_resource, EnumStoneType.LIMESTONE));
-		BAUXITE																															.gem(fromOne(stone_resource, EnumStoneType.BAUXITE));
+		BAUXITE																								.ore(fromOne(stone_resource, EnumStoneType.BAUXITE))							.gem(fromOne(stone_resource, EnumStoneType.BAUXITE));
 		CRYOLITE	.crystal(fromOne(chunk_ore, EnumChunkType.CRYOLITE))			.gem(fromOne(chunk_ore, EnumChunkType.CRYOLITE));
 		SLAG																									.block(block_slag);
 
@@ -461,23 +456,18 @@ public class OreDictManager {
 		 * HAZARDS, MISC
 		 */
 		LI	.hydro(1F)	.ingot(lithium)	.dustSmall(powder_lithium_tiny)	.dust(powder_lithium)	.block(block_lithium)	.ore(ore_gneiss_lithium);
-		NA	.hydro(1F)													.dust(powder_sodium);
+		NA	.hydro(1F)	.hazIngot()										.dust(powder_sodium);
 
 		/*
 		 * PHOSPHORUS
 		 */
 		P_WHITE	.hot(5)	.ingot(ingot_phosphorus)	.block(block_white_phosphorus);
-		P_RED			.dust(powder_fire)			.block(block_red_phosphorus);
+		P_RED	.ore(ore_nether_fire)		.dust(powder_fire)			.block(block_red_phosphorus);
 
 		/*
 		 * RARE METALS
 		 */
 		AUSTRALIUM	.nugget(nugget_australium)	.billet(billet_australium)	.ingot(ingot_australium)	.dust(powder_australium)	.block(block_australium)	.ore(ore_australium);
-		REIIUM		.block(block_reiium);
-		WEIDANIUM	.block(block_weidanium);
-		UNOBTAINIUM	.block(block_unobtainium);
-		VERTICIUM	.block(block_verticium);
-		DAFFERGON	.block(block_daffergon);
 
 		/*
 		 * RARE EARTHS
@@ -501,7 +491,7 @@ public class OreDictManager {
 		/*
 		 * FISSION FRAGMENTS
 		 */
-		SR									.hot(1F)	.hydro(1F)									.dust(powder_strontium);
+		SR									.hot(1F)	.hydro(1F)	.hazIngot()						.dust(powder_strontium);
 		SR90	.rad(HazardRegistry.sr90)	.hot(1F)	.hydro(1F)	.dustSmall(powder_sr90_tiny)	.dust(powder_sr90)	.ingot(ingot_sr90)	.billet(billet_sr90)	.nugget(nugget_sr90);
 		I131	.rad(HazardRegistry.i131)	.hot(1F)				.dustSmall(powder_i131_tiny)	.dust(powder_i131);
 		XE135	.rad(HazardRegistry.xe135)	.hot(10F)				.dustSmall(powder_xe135_tiny)	.dust(powder_xe135);
@@ -519,7 +509,6 @@ public class OreDictManager {
 		for(int i = 0; i < 16; i++) { ANY_CONCRETE.any(new ItemStack(ModBlocks.concrete_colored, 1, i)); }
 		for(int i = 0; i < 16; i++) { ANY_CONCRETE.any(new ItemStack(ModBlocks.concrete_colored_ext, 1, i)); }
 		ANY_COKE				.gem(fromAll(coke, EnumCokeType.class)).block(fromAll(block_coke, EnumCokeType.class));
-		ANY_BISMOID				.ingot(ingot_bismuth, ingot_arsenic).nugget(nugget_bismuth, nugget_arsenic).block(block_bismuth);
 		ANY_ASH					.any(fromOne(ModItems.powder_ash, EnumAshType.WOOD), fromOne(ModItems.powder_ash, EnumAshType.COAL), fromOne(ModItems.powder_ash, EnumAshType.MISC), fromOne(ModItems.powder_ash, EnumAshType.FLY), fromOne(ModItems.powder_ash, EnumAshType.SOOT));
 
 		/*
@@ -575,7 +564,6 @@ public class OreDictManager {
 			if(mat.smeltable == SmeltingBehavior.SMELTABLE) {
 				if(mat.autogen.contains(MaterialShapes.CASTPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.CASTPLATE.name() + name, new ItemStack(ModItems.plate_cast, 1, mat.id));
 				if(mat.autogen.contains(MaterialShapes.WELDEDPLATE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.WELDEDPLATE.name() + name, new ItemStack(ModItems.plate_welded, 1, mat.id));
-				if(mat.autogen.contains(MaterialShapes.HEAVY_COMPONENT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.HEAVY_COMPONENT.name() + name, new ItemStack(ModItems.heavy_component, 1, mat.id));
 				if(mat.autogen.contains(MaterialShapes.DENSEWIRE)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.DENSEWIRE.name() + name, new ItemStack(ModItems.wire_dense, 1, mat.id));
 			}
 			if(mat.autogen.contains(MaterialShapes.BOLT)) for(String name : mat.names) OreDictionary.registerOre(MaterialShapes.BOLT.name() + name, new ItemStack(ModItems.bolt, 1, mat.id));
@@ -611,8 +599,6 @@ public class OreDictManager {
 		OreDictionary.registerOre("briquetteCoal", fromOne(briquette, EnumBriquetteType.COAL));
 		OreDictionary.registerOre("briquetteLignite", fromOne(briquette, EnumBriquetteType.LIGNITE));
 		OreDictionary.registerOre("briquetteWood", fromOne(briquette, EnumBriquetteType.WOOD));
-
-		OreDictionary.registerOre(getReflector(), neutron_reflector);
 
 		OreDictionary.registerOre("logWood", pink_log);
 		OreDictionary.registerOre("logWoodPink", pink_log);
@@ -682,11 +668,11 @@ public class OreDictManager {
 		for(NTMMaterial mat : Mats.orderedList) {
 			if(mat.autogen.contains(MaterialShapes.FRAGMENT)) {
 				String name = mat.names[0];
-				if(!OreDictionary.getOres(MaterialShapes.DUST.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.DUST.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.GEM.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.GEM.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.INGOT.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.INGOT.name() + name).get(0));
-				else if(!OreDictionary.getOres(MaterialShapes.BILLET.name() + name).isEmpty()) MineralRecipes.addBilletFragment(OreDictionary.getOres(MaterialShapes.BILLET.name() + name).get(0), mat.make(ModItems.bedrock_ore_fragment));
+				if(!OreDictionary.getOres(MaterialShapes.DUST.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.DUST.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.GEM.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.GEM.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.CRYSTAL.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.INGOT.name() + name).isEmpty()) MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), OreDictionary.getOres(MaterialShapes.INGOT.name() + name).get(0).copy());
+				else if(!OreDictionary.getOres(MaterialShapes.BILLET.name() + name).isEmpty()) MineralRecipes.addBilletFragment(OreDictionary.getOres(MaterialShapes.BILLET.name() + name).get(0).copy(), mat.make(ModItems.bedrock_ore_fragment));
 				else MineralRecipes.add9To1(mat.make(ModItems.bedrock_ore_fragment), new ItemStack(ModItems.nothing));
 			}
 		}
@@ -695,18 +681,15 @@ public class OreDictManager {
 		compensateMojangSpaghettiBullshit();
 	}
 
-	public static String getReflector() {
-		return GeneralConfig.enableReflectorCompat ? "plateDenseLead" : "plateTungCar"; //let's just mangle the name into "tungCar" so that it can't conflict with anything ever
-	}
-
 	public static void registerGroups() {
 		ANY_RUBBER.addPrefix(INGOT, true);
 		ANY_PLASTIC.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(BLOCK, true).addPrefix(GRIP, true).addPrefix(STOCK, true);
 		ANY_HARDPLASTIC.addPrefix(INGOT, true).addPrefix(STOCK, true).addPrefix(GRIP, true);
-		ANY_RESISTANTALLOY.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(CASTPLATE, true).addPrefix(WELDEDPLATE, true).addPrefix(HEAVY_COMPONENT, true).addPrefix(BLOCK, true)
+		ANY_RESISTANTALLOY.addPrefix(INGOT, true).addPrefix(DUST, true).addPrefix(CASTPLATE, true).addPrefix(WELDEDPLATE, true).addPrefix(BLOCK, true)
 		.addPrefix(LIGHTBARREL, true).addPrefix(HEAVYBARREL, true).addPrefix(LIGHTRECEIVER, true).addPrefix(HEAVYRECEIVER, true);
 		ANY_BISMOIDBRONZE.addPrefix(INGOT, true).addPrefix(CASTPLATE, true).addPrefix(LIGHTBARREL, true).addPrefix(HEAVYBARREL, true).addPrefix(LIGHTRECEIVER, true).addPrefix(HEAVYRECEIVER, true);
 		ANY_TAR.addPrefix(ANY, false);
+		ANY_BISMOID.addPrefix(NUGGET, true).addPrefix(INGOT, true).addPrefix(BLOCK, true);
 	}
 
 	private static boolean recursionBrake = false;
@@ -782,7 +765,7 @@ public class OreDictManager {
 		public String plate() {			return PLATE.name()				+ mats[0]; }
 		public String plateCast() {		return CASTPLATE.name()			+ mats[0]; }
 		public String plateWelded() {	return WELDEDPLATE.name()		+ mats[0]; }
-		public String heavyComp() {		return HEAVY_COMPONENT.name()	+ mats[0]; }
+		@Deprecated public String heavyComp() { return WELDEDPLATE.name() + mats[0]; }
 		public String wireFine() {		return WIRE.name()				+ mats[0]; }
 		public String wireDense() {		return DENSEWIRE.name()			+ mats[0]; }
 		public String shell() {			return SHELL.name()				+ mats[0]; }
@@ -799,9 +782,6 @@ public class OreDictManager {
 		public String stock() {			return STOCK.name()				+ mats[0]; }
 		public String grip() {			return GRIP.name()				+ mats[0]; }
 		public String[] all(MaterialShapes shape) {				return appendToAll(shape.prefixes); }
-
-		/** Returns cast (triple) plates if 528 mode is enabled or normal plates if not */
-		public String plate528() { return GeneralConfig.enable528 ? plateCast() : plate(); }
 
 		private String[] appendToAll(String... prefix) {
 
@@ -937,6 +917,21 @@ public class OreDictManager {
 			return this;
 		}
 
+		public DictFrame hazIngot() {
+			hazMult = HazardRegistry.ingot;
+			return autoRegHazard(INGOT);
+		}
+
+		// TODO: rethink this. currently, keys are only registered on-demand if the dict frame has a valid entry, even though we can maximize compatibility
+		// by simply registereing all known shapes in the haz reg, whether it exists or not
+		public DictFrame autoRegHazard(MaterialShapes shape) {
+			String tag = shape.name();
+			for(String mat : mats) {
+				registerHazards(hazards, hazMult, tag + mat);
+			}
+			return this;
+		}
+
 		public static void registerHazards(List<HazardEntry> hazards, float hazMult, String dictKey) {
 
 			if(!hazards.isEmpty() && hazMult > 0F) {
@@ -1036,7 +1031,7 @@ public class OreDictManager {
 		public String plate() {			return PLATE.name()				+ groupName; }
 		public String plateCast() {		return CASTPLATE.name()			+ groupName; }
 		public String plateWelded() {	return WELDEDPLATE.name()		+ groupName; }
-		public String heavyComp() {		return HEAVY_COMPONENT.name()	+ groupName; }
+		@Deprecated public String heavyComp() { return WELDEDPLATE.name() + groupName; }
 		public String wireFine() {		return WIRE.name()				+ groupName; }
 		public String wireDense() {		return DENSEWIRE.name()			+ groupName; }
 		public String billet() {		return BILLET.name()			+ groupName; }

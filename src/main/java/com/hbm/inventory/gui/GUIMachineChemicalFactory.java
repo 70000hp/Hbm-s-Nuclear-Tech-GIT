@@ -3,11 +3,13 @@ package com.hbm.inventory.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.inventory.container.ContainerMachineChemicalFactory;
+import com.hbm.inventory.gui.element.GUIElements;
 import com.hbm.inventory.recipes.ChemicalPlantRecipes;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.items.machine.ItemBlueprints;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineChemicalFactory;
+import com.hbm.util.i18n.I18nUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -45,11 +47,11 @@ public class GUIMachineChemicalFactory extends GuiInfoContainer {
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 224, guiTop + 18, 16, 68, chemplant.power, chemplant.maxPower);
 
 		for(int i = 0; i < 4; i++) if(guiLeft + 74 <= mouseX && guiLeft + 74 + 18 > mouseX && guiTop + 19 + i * 22 < mouseY && guiTop + 19 + i * 22 + 18 >= mouseY) {
-			if(this.chemplant.chemplantModule[i].recipe != null && ChemicalPlantRecipes.INSTANCE.recipeNameMap.containsKey(this.chemplant.chemplantModule[i].recipe)) {
-				GenericRecipe recipe = (GenericRecipe) ChemicalPlantRecipes.INSTANCE.recipeNameMap.get(this.chemplant.chemplantModule[i].recipe);
-				this.func_146283_a(recipe.print(), mouseX, mouseY);
+			if(this.chemplant.chemplantModule[i].getRecipeName() != null && ChemicalPlantRecipes.INSTANCE.recipeNameMap.containsKey(this.chemplant.chemplantModule[i].getRecipeName())) {
+				GenericRecipe recipe = this.chemplant.chemplantModule[i].getRecipe();
+				GUIElements.drawHoveringTextRecipe(recipe.print(), mouseX, mouseY, this.fontRendererObj, itemRender, this.width, this.height);
 			} else {
-				this.drawCreativeTabHoveringText(EnumChatFormatting.YELLOW + "Click to set recipe", mouseX, mouseY);
+				this.drawCreativeTabHoveringText(EnumChatFormatting.YELLOW + I18nUtil.resolveKey("gui.recipe.setRecipe"), mouseX, mouseY);
 			}
 		}
 	}
@@ -58,7 +60,7 @@ public class GUIMachineChemicalFactory extends GuiInfoContainer {
 	protected void mouseClicked(int x, int y, int button) {
 		super.mouseClicked(x, y, button);
 		
-		for(int i = 0; i < 4; i++) if(this.checkClick(x, y, 74, 19 + i * 22, 18, 18)) GUIScreenRecipeSelector.openSelector(ChemicalPlantRecipes.INSTANCE, chemplant, chemplant.chemplantModule[i].recipe, i, ItemBlueprints.grabPool(chemplant.slots[4 + i * 7]), this);
+		for(int i = 0; i < 4; i++) if(this.checkClick(x, y, 74, 19 + i * 22, 18, 18)) GUIScreenRecipeSelector.openSelector(ChemicalPlantRecipes.INSTANCE, chemplant, chemplant.chemplantModule[i].getRecipeName(), i, ItemBlueprints.grabPool(chemplant.slots[4 + i * 7]), this);
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class GUIMachineChemicalFactory extends GuiInfoContainer {
 		}
 		
 		for(int g = 0; g < 4; g++) {
-			GenericRecipe recipe = ChemicalPlantRecipes.INSTANCE.recipeNameMap.get(chemplant.chemplantModule[g].recipe);
+			GenericRecipe recipe = chemplant.chemplantModule[g].getRecipe();
 			
 			/// LEFT LED
 			if(chemplant.didProcess[g]) {
@@ -103,7 +105,7 @@ public class GUIMachineChemicalFactory extends GuiInfoContainer {
 		}
 		
 		for(int g = 0; g < 4; g++) { // not a great way of doing it but at least we eliminate state leak bullshit
-			GenericRecipe recipe = ChemicalPlantRecipes.INSTANCE.recipeNameMap.get(chemplant.chemplantModule[g].recipe);
+			GenericRecipe recipe = chemplant.chemplantModule[g].getRecipe();
 			
 			this.renderItem(recipe != null ? recipe.getIcon() : TEMPLATE_FOLDER, 75, 20 + g * 22);
 			

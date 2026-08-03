@@ -1,32 +1,16 @@
 package com.hbm.inventory.recipes;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
-import com.hbm.inventory.RecipesCommon.OreDictStack;
-import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
 import com.hbm.items.ItemEnums;
 import com.hbm.items.ModItems;
-import com.hbm.items.machine.ItemFluidIcon;
-import com.hbm.items.machine.ItemScraps;
-import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreOutput;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
-import com.hbm.util.ItemStackUtil;
 
-import com.hbm.util.Tuple.*;
 import net.minecraft.item.ItemStack;
 
 public class ElectrolyserMetalRecipes extends SerializableRecipe {
@@ -135,7 +119,7 @@ public class ElectrolyserMetalRecipes extends SerializableRecipe {
 				new ItemStack(ModItems.powder_copper, 4),
 				new ItemStack(ModItems.powder_lithium_tiny, 3)));
 
-		for(BedrockOreType type : BedrockOreType.values()) {
+		/*for(BedrockOreType type : BedrockOreType.values()) {
 			ArrayList<Pair<Object, Integer>> productsF = new ArrayList<>();
 			productsF.add(new Pair(type.primary1, 8));
 			productsF.add(new Pair(type.primary2, 4));
@@ -154,10 +138,10 @@ public class ElectrolyserMetalRecipes extends SerializableRecipe {
 			productsC.add(new Pair(type.primary2, 2));
 
 			recipes.put(new ComparableStack(ItemBedrockOreNew.make(BedrockOreGrade.CRUMBS, type)), makeBedrockOreProduct(productsC));
-		}
+		}*/
 	}
 
-	public static ElectrolysisMetalRecipe makeBedrockOreProduct(ArrayList<Pair<Object, Integer>> products){
+	/*public static ElectrolysisMetalRecipe makeBedrockOreProduct(ArrayList<Pair<Object, Integer>> products){
 		ArrayList<MaterialStack> moltenProducts = new ArrayList();
 		ArrayList<ItemStack> solidProducts = new ArrayList();
 

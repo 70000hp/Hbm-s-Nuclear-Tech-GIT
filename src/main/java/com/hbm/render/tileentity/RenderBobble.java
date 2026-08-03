@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL12;
 import com.hbm.blocks.generic.BlockBobble.BobbleType;
 import com.hbm.blocks.generic.BlockBobble.TileEntityBobble;
 import com.hbm.items.ModItems;
+import com.hbm.items.weapon.sedna.factory.GunFactory.EnumModSpecial;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.ResourceManager;
 
@@ -201,6 +202,8 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 		case FRIZZLE:
 			rotLeftArm = new double[]{0, 15, 45};
 			rotRightArm = new double[]{0, 0, 80};
+			rotLeftLeg = new double[]{0, 0, 2};
+			rotRightLeg = new double[]{0, 0, -2};
 			break;
 		case ADAM29:
 			rotRightArm = new double[]{0, 0, 60};
@@ -410,19 +413,24 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 			break;
 		case FRIZZLE:
 			GL11.glPushMatrix();
-			GL11.glTranslated(0.7, 1.7, 0.4);
-			GL11.glScaled(0.5, 0.5, 0.5);
-			GL11.glRotated(-90, 0, 1, 0);
-			GL11.glRotated(-10, 1, 0, 0);
-			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.ff_gun_dark); ResourceManager.ff_nightmare.renderPart("Grip");
-			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.ff_gun_normal); ResourceManager.ff_nightmare.renderPart("Dark");
-			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.ff_gun_bright); ResourceManager.ff_nightmare.renderPart("Light");
+			GL11.glTranslated(0.8, 1.6, 0.4);
+			GL11.glScaled(0.125, 0.125, 0.125);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(10, 1, 0, 0);
+			this.bindTexture(ResourceManager.n_i_4_n_i_tex);
+			GL11.glShadeModel(GL11.GL_SMOOTH);
+			ResourceManager.n_i_4_n_i.renderPart("FrameDark");
+			ResourceManager.n_i_4_n_i.renderPart("Grip");
+			ResourceManager.n_i_4_n_i.renderPart("FrameLight");
+			ResourceManager.n_i_4_n_i.renderPart("Cylinder");
+			ResourceManager.n_i_4_n_i.renderPart("Barrel");
+			GL11.glShadeModel(GL11.GL_FLAT);
 			GL11.glPopMatrix();
 			
 			GL11.glTranslated(0.3, 1.4, -0.2);
 			GL11.glRotated(-100, 1, 0, 0);
 			GL11.glScaled(0.5, 0.5, 0.5);
-			renderItem(new ItemStack(ModItems.coin_maskman, 1, 5));
+			renderItem(new ItemStack(ModItems.weapon_mod_special, 1, EnumModSpecial.DOUBLOONS.ordinal()));
 			break;
 		case ADAM29:
 			GL11.glTranslated(0.4, 1.15, 0.4);
@@ -438,20 +446,28 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 			break;
 		case BOB:
 			GL11.glShadeModel(GL11.GL_SMOOTH);
-			this.bindTexture(ResourceManager.mini_nuke_tex);
-			GL11.glScaled(0.5, 0.5, 0.5);
 			GL11.glPushMatrix();
-			GL11.glTranslated(0.75, 1, 0.9);
-			for(int i = 0; i < 3; i++) {
-				ResourceManager.projectiles.renderPart("MiniNuke");
-				GL11.glTranslated(-0.75, 0, 0);
+			GL11.glTranslatef(0, 0.6875F, 0.625F);
+			GL11.glRotated(-90, 1, 0, 0);
+			GL11.glScaled(0.125, 0.125, 0.125);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(ResourceManager.fatman_mininuke_tex);
+			GL11.glTranslatef(-6, 0, 0);
+			for(int i = -1; i <= 1; i++) {
+				GL11.glTranslatef(3, 0, 0);
+				ResourceManager.fatman.renderPart("MiniNuke");
 			}
 			GL11.glPopMatrix();
-			this.bindTexture(ResourceManager.mini_mirv_tex);
-			GL11.glTranslated(0, 0.75, -0.9);
+			GL11.glPushMatrix();
+			GL11.glTranslatef(0.25F, 0.3125F, -0.5F);
+			GL11.glRotated(-90, 1, 0, 0);
 			GL11.glRotated(90, 0, 1, 0);
-			GL11.glRotated(90, 1, 0, 0);
-			ResourceManager.projectiles.renderPart("MiniMIRV");
+			GL11.glScaled(0.1, 0.1, 0.1);
+			Minecraft.getMinecraft().renderEngine.bindTexture(ResourceManager.double_barrel_sacred_dragon_tex);
+			ResourceManager.double_barrel.renderPart("Stock");
+			ResourceManager.double_barrel.renderPart("BarrelShort");
+			ResourceManager.double_barrel.renderPart("Buckle");
+			ResourceManager.double_barrel.renderPart("Lever");
+			GL11.glPopMatrix();
 			GL11.glShadeModel(GL11.GL_FLAT);
 			break;
 		case VAER:

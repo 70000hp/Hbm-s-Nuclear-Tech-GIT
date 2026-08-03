@@ -3,16 +3,17 @@ package com.hbm.render.item.weapon.sedna;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.anim.HbmAnimations;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 	
-	@Override public boolean isAkimbo() { return true; }
+	@Override public boolean isAkimbo(EntityLivingBase entity) { return true; }
 
 	@Override
 	protected float getTurnMagnitude(ItemStack stack) { return ItemGunBaseNT.getIsAiming(stack) ? 2.5F : -0.25F; }
@@ -153,7 +154,7 @@ public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 	}
 
 	@Override
-	public void renderEquipped(ItemStack stack) {
+	public void renderEquipped(ItemStack stack, Object... data) {
 
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		Minecraft.getMinecraft().renderEngine.bindTexture(isSaturnite(stack, 1) ? ResourceManager.uzi_saturnite_tex : ResourceManager.uzi_tex);
@@ -162,12 +163,34 @@ public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 		ResourceManager.uzi.renderPart("StockFront");
 		ResourceManager.uzi.renderPart("Slide");
 		ResourceManager.uzi.renderPart("Magazine");
-		if(hasSilencer(stack, 1)) ResourceManager.uzi.renderPart("Silencer");
+		boolean silenced = hasSilencer(stack, 1);
+		if(silenced) ResourceManager.uzi.renderPart("Silencer");
 		GL11.glShadeModel(GL11.GL_FLAT);
+		
+		if(!silenced) {
+			EntityLivingBase ent = (EntityLivingBase) data[1]; //Entity is second obj. passed 
+			long shot;
+			double shotRand = 0;
+			if(ent == Minecraft.getMinecraft().thePlayer) {
+				ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+				shot = gun.lastShot[1];
+				shotRand = gun.shotRand;
+			} else {
+				shot = ItemRenderWeaponBase.flashMap.getOrDefault(ent, (long) -1);
+				if(shot < 0) return;
+			}
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0.75, 8.5);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(90 * shotRand, 1, 0, 0);
+			this.renderMuzzleFlash(shot, 75, 7.5);
+			GL11.glPopMatrix();
+		}
 	}
 
 	@Override
-	public void renderEquippedAkimbo(ItemStack stack) {
+	public void renderEquippedAkimbo(ItemStack stack, EntityLivingBase ent) {
 
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		Minecraft.getMinecraft().renderEngine.bindTexture(isSaturnite(stack, 0) ? ResourceManager.uzi_saturnite_tex : ResourceManager.uzi_tex);
@@ -176,8 +199,29 @@ public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 		ResourceManager.uzi.renderPart("StockFront");
 		ResourceManager.uzi.renderPart("Slide");
 		ResourceManager.uzi.renderPart("Magazine");
-		if(hasSilencer(stack, 0)) ResourceManager.uzi.renderPart("Silencer");
+		boolean silenced = hasSilencer(stack, 0);
+		if(silenced) ResourceManager.uzi.renderPart("Silencer");
 		GL11.glShadeModel(GL11.GL_FLAT);
+		
+		if(!silenced) {
+			long shot;
+			double shotRand = 0;
+			if(ent == Minecraft.getMinecraft().thePlayer) {
+				ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+				shot = gun.lastShot[0];
+				shotRand = gun.shotRand;
+			} else {
+				shot = ItemRenderWeaponBase.flashMap.getOrDefault(ent, (long) -1);
+				if(shot < 0) return;
+			}
+			
+			GL11.glPushMatrix();
+			GL11.glTranslated(0, 0.75, 8.5);
+			GL11.glRotated(90, 0, 1, 0);
+			GL11.glRotated(90 * shotRand, 1, 0, 0);
+			this.renderMuzzleFlash(shot, 75, 7.5);
+			GL11.glPopMatrix();
+		}
 	}
 
 	@Override
@@ -194,9 +238,47 @@ public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 		if(hasSilencer(stack, index)) ResourceManager.uzi.renderPart("Silencer");
 		GL11.glShadeModel(GL11.GL_FLAT);
 	}
+	
+	@Override
+	public void renderEntity(ItemStack stack) {
+		GL11.glEnable(GL11.GL_LIGHTING);
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+
+		boolean silencer0 = hasSilencer(stack, 1);
+		boolean silencer1 = hasSilencer(stack, 0);
+		boolean anySilenced = silencer0 || silencer1;
+		
+		if(anySilenced) {
+			GL11.glScaled(0.75, 0.75, 0.75);
+		}
+		
+		GL11.glPushMatrix();
+		GL11.glTranslated(-1, 1, 0);
+		Minecraft.getMinecraft().renderEngine.bindTexture(isSaturnite(stack, 1) ? ResourceManager.uzi_saturnite_tex : ResourceManager.uzi_tex);
+		ResourceManager.uzi.renderPart("Gun");
+		ResourceManager.uzi.renderPart("StockBack");
+		ResourceManager.uzi.renderPart("StockFront");
+		ResourceManager.uzi.renderPart("Slide");
+		ResourceManager.uzi.renderPart("Magazine");
+		if(silencer0) ResourceManager.uzi.renderPart("Silencer");
+		GL11.glPopMatrix();
+		
+		GL11.glPushMatrix();
+		GL11.glTranslated(1, 1, 0);
+		Minecraft.getMinecraft().renderEngine.bindTexture(isSaturnite(stack, 0) ? ResourceManager.uzi_saturnite_tex : ResourceManager.uzi_tex);
+		ResourceManager.uzi.renderPart("GunMirror");
+		ResourceManager.uzi.renderPart("StockBack");
+		ResourceManager.uzi.renderPart("StockFront");
+		ResourceManager.uzi.renderPart("Slide");
+		ResourceManager.uzi.renderPart("Magazine");
+		if(silencer1) ResourceManager.uzi.renderPart("Silencer");
+		GL11.glPopMatrix();
+		
+		GL11.glShadeModel(GL11.GL_FLAT);
+	}
 
 	@Override
-	public void renderOther(ItemStack stack, ItemRenderType type) {
+	public void renderOther(ItemStack stack, ItemRenderType type, Object... data) {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 
@@ -251,10 +333,10 @@ public class ItemRenderUziAkimbo extends ItemRenderWeaponBase {
 	}
 	
 	public boolean hasSilencer(ItemStack stack, int cfg) {
-		return WeaponModManager.hasUpgrade(stack, cfg, WeaponModManager.ID_SILENCER);
+		return XWeaponModManager.hasUpgrade(stack, cfg, XWeaponModManager.ID_SILENCER);
 	}
 	
 	public boolean isSaturnite(ItemStack stack, int cfg) {
-		return WeaponModManager.hasUpgrade(stack, cfg, WeaponModManager.ID_UZI_SATURN);
+		return XWeaponModManager.hasUpgrade(stack, cfg, XWeaponModManager.ID_UZI_SATURN);
 	}
 }

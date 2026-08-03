@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockDepth;
 import com.hbm.blocks.generic.BlockBedrockOreTE.TileEntityBedrockOre;
 import com.hbm.blocks.network.CraneInserter;
 import com.hbm.entity.item.EntityMovingItem;
@@ -19,7 +20,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemDrillbit;
 import com.hbm.items.machine.ItemDrillbit.EnumDrillType;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
-import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.lib.Library;
 import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
@@ -270,7 +271,12 @@ public class TileEntityMachineExcavator extends TileEntityMachineBase implements
 							break;
 						}
 
-						if(shouldIgnoreBlock(b, x, y ,z)) continue;
+						// if hitting depth rock, turn off the drill
+						if(b instanceof BlockDepth) {
+							this.enableDrill = false;
+						}
+
+						if(shouldIgnoreBlock(b, x, y, z)) continue;
 
 						ignoreAll = false;
 
@@ -328,7 +334,7 @@ public class TileEntityMachineExcavator extends TileEntityMachineBase implements
 			stacks.add(stack);
 
 			if(stack.getItem() == ModItems.bedrock_ore_base) {
-				ItemBedrockOreBase.setOreAmount(stack, pos.getX(), pos.getZ());
+				ItemBedrockFormationBase.setOreAmount(stack, pos.getX(), pos.getZ(), 1D + this.getInstalledDrill().fortune * 0.1D);
 			}
 
 			ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - 10);
@@ -656,6 +662,7 @@ public class TileEntityMachineExcavator extends TileEntityMachineBase implements
 
 					if(stack.stackSize <= 0) {
 						item.setDead();
+						item.delayBeforeCanPickup = 60; // seems fucking stupid, but prevents frame-perfect dupe exploit
 						continue outer;
 					}
 				}
@@ -670,6 +677,7 @@ public class TileEntityMachineExcavator extends TileEntityMachineBase implements
 
 					slots[i] = stack.copy();
 					item.setDead();
+					item.delayBeforeCanPickup = 60;
 					break;
 				}
 			}

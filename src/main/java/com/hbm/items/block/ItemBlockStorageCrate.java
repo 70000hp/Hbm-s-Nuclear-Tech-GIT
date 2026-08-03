@@ -20,6 +20,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
+import java.util.Random;
+
 import javax.annotation.Nonnull;
 
 public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider {
@@ -32,6 +34,16 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 	@Override
 	public int getMaxItemUseDuration(ItemStack stack) {
 		return 1;
+	}
+
+	@Override
+	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+		// If crates can be opened from hand, prioritize this and require sneaking to place them
+		if (ServerConfig.CRATE_OPEN_HELD.get() && !player.isSneaking() && Block.getBlockFromItem(stack.getItem()) != ModBlocks.mass_storage) {
+			return false;
+		}
+
+		return super.onItemUse(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
 	}
 
 	@Override
@@ -70,7 +82,6 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 		if(block == ModBlocks.crate_steel) return new ContainerCrateSteel(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.crate_desh) return new ContainerCrateDesh(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.crate_tungsten) return new ContainerCrateTungsten(player.inventory, new InventoryCrate(player, player.getHeldItem()));
-		if(block == ModBlocks.crate_template) return new ContainerCrateTemplate(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.safe) return new ContainerSafe(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		throw new NullPointerException();
 	}
@@ -83,12 +94,13 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 		if(block == ModBlocks.crate_steel) return new GUICrateSteel(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.crate_desh) return new GUICrateDesh(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.crate_tungsten) return new GUICrateTungsten(player.inventory, new InventoryCrate(player, player.getHeldItem()));
-		if(block == ModBlocks.crate_template) return new GUICrateTemplate(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		if(block == ModBlocks.safe) return new GUISafe(player.inventory, new InventoryCrate(player, player.getHeldItem()));
 		throw new NullPointerException();
 	}
 
 	public static class InventoryCrate extends ItemInventory {
+		
+		public static Random rand = new Random();
 
 		public InventoryCrate(EntityPlayer player, ItemStack crate) {
 			this.player = player;
@@ -97,6 +109,7 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 			this.slots = new ItemStack[this.getSizeInventory()];
 			if(target.stackTagCompound == null) {
 				target.stackTagCompound = new NBTTagCompound();
+				target.stackTagCompound.setLong("stacklock", rand.nextLong());
 			}
 
 			for(int i = 0; i < slots.length; i++)
@@ -110,7 +123,6 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 			if(block == ModBlocks.crate_steel) return new TileEntityCrateSteel();
 			if(block == ModBlocks.crate_desh) return new TileEntityCrateDesh();
 			if(block == ModBlocks.crate_tungsten) return new TileEntityCrateTungsten();
-			if(block == ModBlocks.crate_template) return new TileEntityCrateTemplate();
 			if(block == ModBlocks.safe) return new TileEntitySafe();
 			throw new NullPointerException();
 		}
@@ -133,6 +145,11 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 		public boolean hasCustomInventoryName() {
 			return target.hasDisplayName();
 		}
+		
+		@Override
+		public boolean isUseableByPlayer(EntityPlayer player) {
+			return player.getHeldItem() == this.target;
+		}
 
 		@Override
 		public void markDirty() { // You have been blessed by the unfuck
@@ -140,6 +157,8 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 			// Preserve existing NBT so we keep lock data and piders
 			NBTTagCompound nbt = target.stackTagCompound != null ? target.stackTagCompound : new NBTTagCompound();
 			int invSize = this.getSizeInventory();
+			
+			nbt.removeTag("stacklock");
 
 			for(int i = 0; i < invSize; i++) {
 
@@ -153,10 +172,9 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 				stack.writeToNBT(slot);
 				nbt.setTag("slot" + i, slot);
 			}
-
-			if (nbt.hasNoTags()) {
-				nbt = null;
-			}
+			
+			// never, ever fucking ever remove the tag compound here, lack of tack compound makes the crate stackable
+			nbt.setLong("stacklock", rand.nextLong()); // add shit that prevents crates from stacking
 
 			target.setTagCompound(nbt);
 		}
@@ -168,6 +186,16 @@ public class ItemBlockStorageCrate extends ItemBlockBase implements IGUIProvider
 			// Check for 6kb item vomit
 			target.setTagCompound(checkNBT(target.getTagCompound()));
 			player.inventoryContainer.detectAndSendChanges();
+			
+			if(target.stackTagCompound != null) {
+				target.stackTagCompound.removeTag("stacklock");
+				
+				if(target.stackTagCompound.hasNoTags()) {
+					target.setTagCompound(null); // if there's no tags left, clear compound to make the crate stackable again
+				} else {
+					target.stackTagCompound.setLong("stacklock", rand.nextLong()); // add shit that prevents crates from stacking
+				}
+			}
 		}
 	}
 }

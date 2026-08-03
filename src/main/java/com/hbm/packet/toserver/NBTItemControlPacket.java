@@ -27,7 +27,7 @@ public class NBTItemControlPacket implements IMessage {
 		try {
 			buffer.writeNBTTagCompoundToBuffer(nbt);
 
-		} catch (IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -35,7 +35,7 @@ public class NBTItemControlPacket implements IMessage {
 	@Override
 	public void fromBytes(ByteBuf buf) {
 
-		if (buffer == null) {
+		if(buffer == null) {
 			buffer = new PacketBuffer(Unpooled.buffer());
 		}
 		buffer.writeBytes(buf);
@@ -44,7 +44,7 @@ public class NBTItemControlPacket implements IMessage {
 	@Override
 	public void toBytes(ByteBuf buf) {
 
-		if (buffer == null) {
+		if(buffer == null) {
 			buffer = new PacketBuffer(Unpooled.buffer());
 		}
 		buf.writeBytes(buffer);
@@ -65,7 +65,7 @@ public class NBTItemControlPacket implements IMessage {
 					ItemStack held = p.getHeldItem();
 
 					if(held != null && held.getItem() instanceof IItemControlReceiver) {
-						((IItemControlReceiver) held.getItem()).receiveControl(held, nbt);
+						((IItemControlReceiver) held.getItem()).receiveControl(p, held, nbt);
 					}
 				}
 

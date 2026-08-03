@@ -15,11 +15,14 @@ import com.hbm.inventory.container.ContainerRBMKRod;
 import com.hbm.inventory.gui.GUIRBMKRod;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemRBMKRod;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
+import com.hbm.saveddata.satellites.SatelliteRayScan.RayEvent;
 import com.hbm.tileentity.machine.rbmk.TileEntityRBMKConsole.ColumnType;
 import com.hbm.util.BufferUtil;
 import com.hbm.util.CompatEnergyControl;
 import com.hbm.util.ParticleUtil;
 
+import api.hbm.redstoneoverradio.IRORValueProvider;
 import api.hbm.tile.IInfoProviderEC;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import cpw.mods.fml.common.Optional;
@@ -43,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers")})
-public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBMKFluxReceiver, IRBMKLoadable, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent {
+public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBMKFluxReceiver, IRBMKLoadable, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent, IRORValueProvider {
 
 	// New system!!
 	// Used for receiving flux (calculating outbound flux/burning rods)
@@ -53,6 +56,7 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 	public double lastFluxRatio;
 
 	public boolean hasRod;
+	public int rodColor = 0;
 
 	// Fuel rod item data client sync
 	private String fuelYield;
@@ -87,14 +91,40 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 		fluxFastRatio = (fastFlux + fastFluxIn) / fluxQuantity;
 	}
 
+	public boolean coldEnoughForAutoloader() {
+		if(slots[0] != null && slots[0].getItem() instanceof ItemRBMKRod) {
+			return ItemRBMKRod.getHullHeat(slots[0]) <= 1_000;
+		}
+		return true;
+	}
+	public boolean coldEnoughForManual() {
+		if(slots[0] != null && slots[0].getItem() instanceof ItemRBMKRod) {
+			return ItemRBMKRod.getHullHeat(slots[0]) <= 200;
+		}
+		return true;
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		
+		if(slots[0] != null && slots[0].getItem() instanceof ItemRBMKRod && ItemRBMKRod.getHullHeat(slots[0]) >= 1500 && !RBMKDials.getMeltdownsDisabled(worldObj)) {
+			this.meltdown();
+		}
+	}
+
 	@Override
 	public void updateEntity() {
 
 		if(!worldObj.isRemote) {
 
 			if(slots[0] != null && slots[0].getItem() instanceof ItemRBMKRod) {
+				
+				if(this.fluxQuantity > 0 && worldObj.getTotalWorldTime() % 200 == 0)
+					SatelliteRayScan.reportEvent(worldObj, xCoord, yCoord, zCoord, RayEvent.INFO_NUCLEAR, 300);
 
 				ItemRBMKRod rod = ((ItemRBMKRod)slots[0].getItem());
+				this.rodColor = rod.colorTint;
 
 				double fluxRatioOut;
 				double fluxQuantityOut;
@@ -102,13 +132,8 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 				// Experimental flux ratio curve rods!
 				// Again, nothing really uses this so its just idle code at the moment.
 				if(rod.specialFluxCurve) {
-
 					fluxRatioOut = rod.fluxRatioOut(this.fluxFastRatio, ItemRBMKRod.getEnrichment(slots[0]));
-
-					double fluxIn;
-
-					fluxIn = rod.fluxFromRatio(this.fluxQuantity, this.fluxFastRatio);
-
+					double fluxIn = rod.fluxFromRatio(this.fluxQuantity, this.fluxFastRatio);
 					fluxQuantityOut = rod.burn(worldObj, slots[0], fluxIn);
 				} else {
 					NType rType = rod.rType;
@@ -260,12 +285,15 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 		buf.writeDouble(this.lastFluxQuantity);
 		buf.writeDouble(this.lastFluxRatio);
 		buf.writeBoolean(this.hasRod);
+		buf.writeInt(this.rodColor);
 		if(this.hasRod) {
 			ItemRBMKRod rod = ((ItemRBMKRod)slots[0].getItem());
 			BufferUtil.writeString(buf, ItemRBMKRod.getYield(slots[0]) + " / " + rod.yield + " (" + (ItemRBMKRod.getEnrichment(slots[0]) * 100) + "%)");
 			BufferUtil.writeString(buf, ItemRBMKRod.getPoison(slots[0]) + "%");
-			BufferUtil.writeString(buf, ItemRBMKRod.getCoreHeat(slots[0]) + " / " + ItemRBMKRod.getHullHeat(slots[0])  + " / " + rod.meltingPoint);
-		}
+			//Heat is too long! Reduce it to 6 numbers is enough.
+			BufferUtil.writeString(buf, String.format("%.6f", ItemRBMKRod.getCoreHeat(slots[0]))
+				+ " / " + String.format("%.6f", ItemRBMKRod.getHullHeat(slots[0]))
+				+ " / " + String.format("%.2f", rod.meltingPoint));		}
 	}
 
 	@Override
@@ -274,6 +302,7 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 		this.fluxQuantity = buf.readDouble();
 		this.fluxFastRatio = buf.readDouble();
 		this.hasRod = buf.readBoolean();
+		this.rodColor = buf.readInt();
 		if(this.hasRod) {
 			fuelYield = BufferUtil.readString(buf);
 			fuelXenon = BufferUtil.readString(buf);
@@ -419,7 +448,7 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 	@Callback(direct = true)
 	@Optional.Method(modid = "OpenComputers")
 	public Object[] getFluxRatio(Context context, Arguments args) {
-		return new Object[] {fluxFastRatio};
+		return new Object[] {lastFluxRatio};
 	}
 
 	@Callback(direct = true)
@@ -483,7 +512,7 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 
 		return new Object[] {
 			heat, returnValues.get(0), returnValues.get(1),
-			fluxQuantity, fluxFastRatio, returnValues.get(2), returnValues.get(3), returnValues.get(4),
+			lastFluxQuantity, lastFluxRatio, returnValues.get(2), returnValues.get(3), returnValues.get(4),
 			((RBMKRod)this.getBlockType()).moderated, xCoord, yCoord, zCoord
 		};
 	}
@@ -520,5 +549,32 @@ public class TileEntityRBMKRod extends TileEntityRBMKSlottedBase implements IRBM
 			data.setDouble(CompatEnergyControl.D_CORE_C, ItemRBMKRod.getCoreHeat(slots[0]));
 			data.setDouble(CompatEnergyControl.D_MELT_C, ((ItemRBMKRod) slots[0].getItem()).meltingPoint);
 		}
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "columnheat",
+				PREFIX_VALUE + "rodheat",
+				PREFIX_VALUE + "depletion",
+				PREFIX_VALUE + "xenon",
+				PREFIX_VALUE + "fastflux",
+				PREFIX_VALUE + "slowflux",
+				PREFIX_VALUE + "flux"
+		};
+	}
+
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "columnheat").equals(name))		return "" + (int) this.heat;
+		if(slots[0] != null && slots[0].getItem() instanceof ItemRBMKRod) {
+			if((PREFIX_VALUE + "rodheat").equals(name))		return "" + (int) ItemRBMKRod.getHullHeat(slots[0]);
+			if((PREFIX_VALUE + "depletion").equals(name))	return "" + (int) (100 - ItemRBMKRod.getEnrichment(slots[0]) * 100);
+			if((PREFIX_VALUE + "xenon").equals(name))		return "" + (int) (ItemRBMKRod.getPoison(slots[0]));
+		}
+		if((PREFIX_VALUE + "fastflux").equals(name))		return "" + (int) (lastFluxQuantity * lastFluxRatio);
+		if((PREFIX_VALUE + "slowflux").equals(name))		return "" + (int) (lastFluxQuantity * (1 - lastFluxRatio));
+		if((PREFIX_VALUE + "flux").equals(name))			return "" + ((int) (lastFluxQuantity * lastFluxRatio) + (int) (lastFluxQuantity * (1 - lastFluxRatio)));
+		return null;
 	}
 }

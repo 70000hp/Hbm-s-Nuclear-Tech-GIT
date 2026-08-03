@@ -70,6 +70,34 @@ public class ColorUtil {
 			return 0xFFFFFF;
 		}
 	}
+	
+	public static int color(int r, int g, int b) {
+		return ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
+	}
+	
+	public static int ir(int color) {
+		return (color & 0xff0000) >> 16;
+	}
+	
+	public static int ig(int color) {
+		return (color & 0x00ff00) >> 8;
+	}
+	
+	public static int ib(int color) {
+		return (color & 0x0000ff) >> 0;
+	}
+	
+	public static float fr(int color) {
+		return ir(color) / 255F;
+	}
+	
+	public static float fg(int color) {
+		return ig(color) / 255F;
+	}
+	
+	public static float fb(int color) {
+		return ib(color) / 255F;
+	}
 
 	@SideOnly(Side.CLIENT)
 	public static int getMedianBrightnessColorFromStack(ItemStack stack) {
@@ -193,11 +221,12 @@ public class ColorUtil {
 		put("purple", 8073150);
 		put("cyan", 2651799);
 		put("silver", 11250603);
+		put("lightgray", 11250603);
 		put("gray", 4408131);
 		put("pink", 14188952);
 		put("lime", 4312372);
 		put("yellow", 14602026);
-		put("lightBlue", 6719955);
+		put("lightblue", 6719955);
 		put("magenta", 12801229);
 		put("orange", 15435844);
 		put("white", 15790320);

@@ -13,13 +13,14 @@ import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIOreSlopper;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
-import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.items.special.ItemBedrockOreNew;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
+import com.hbm.items.special.ItemBedrockOreNew.ProcessingGrade;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.tileentity.IGUIProvider;
@@ -129,7 +130,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 					progress -= 1F;
 
 					for(BedrockOreType type : BedrockOreType.values()) {
-						ores[type.ordinal()] += (ItemBedrockOreBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
+						ores[type.ordinal()] += (ItemBedrockFormationBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
 					}
 
 					this.decrStackSize(2, 1);
@@ -152,7 +153,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 						vdat.setInteger("cDiv", 5);
 						PacketThreading.createAllAroundThreadedPacket(new AuxParticlePacketNT(vdat, e.posX, e.posY + e.height * 0.5, e.posZ), new TargetPoint(e.dimension, e.posX, e.posY + e.height * 0.5, e.posZ, 150));
 
-						worldObj.playSoundEffect(e.posX, e.posY, e.posZ, "mob.zombie.woodbreak", 2.0F, 0.95F + worldObj.rand.nextFloat() * 0.2F);
+						worldObj.playSoundEffect(e.posX, e.posY, e.posZ, NTMSounds.VANILLA_GIB, 2.0F, 0.95F + worldObj.rand.nextFloat() * 0.2F);
 					}
 				}
 
@@ -161,7 +162,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 			}
 
 			for(BedrockOreType type : BedrockOreType.values()) {
-				ItemStack output = ItemBedrockOreNew.make(BedrockOreGrade.BASE, type);
+				ItemStack output = ItemBedrockOreNew.make(ProcessingGrade.BASE, type);
 				outer: while(ores[type.ordinal()] >= 1) {
 					for(int i = 3; i <= 8; i++) if(slots[i] != null && slots[i].getItem() == output.getItem() && slots[i].getItemDamage() == output.getItemDamage() && slots[i].stackSize < output.getMaxStackSize()) {
 						slots[i].stackSize++; ores[type.ordinal()] -= 1F; continue outer;

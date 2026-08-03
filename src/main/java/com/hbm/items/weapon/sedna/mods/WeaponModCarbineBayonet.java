@@ -9,10 +9,11 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.factory.Orchestras;
 import com.hbm.items.weapon.sedna.factory.XFactory44;
 import com.hbm.items.weapon.sedna.factory.XFactory762mm;
+import com.hbm.main.NTMSounds;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 import com.hbm.util.EntityDamageUtil;
 
 import net.minecraft.block.Block;
@@ -36,15 +37,15 @@ public class WeaponModCarbineBayonet extends WeaponModBase {
 		if(key == GunConfig.I_INSPECTCANCEL) return cast(false, base);
 		return base;
 	}
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_CARBINE = (stack, ctx) -> {
 		EntityLivingBase entity = ctx.entity;
 		if(entity.worldObj.isRemote) return;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 
-		if(type == AnimType.INSPECT) {
-			
+		if(type == GunAnimation.INSPECT) {
+
 			if(timer == 15 && ctx.getPlayer() != null) {
 				MovingObjectPosition mop = EntityDamageUtil.getMouseOver(ctx.getPlayer(), 3.0D);
 				if(mop != null) {
@@ -53,7 +54,7 @@ public class WeaponModCarbineBayonet extends WeaponModBase {
 						mop.entityHit.attackEntityFrom(DamageSource.causePlayerDamage(ctx.getPlayer()), damage);
 						mop.entityHit.motionX *= 2;
 						mop.entityHit.motionZ *= 2;
-						entity.worldObj.playSoundAtEntity(mop.entityHit, "hbm:weapon.fire.stab", 1F, 0.9F + entity.getRNG().nextFloat() * 0.2F);
+						entity.worldObj.playSoundAtEntity(mop.entityHit, NTMSounds.GUN_STAB_A_FUCKER, 1F, 0.9F + entity.getRNG().nextFloat() * 0.2F);
 					}
 					if(mop.typeOfHit == mop.typeOfHit.BLOCK) {
 						Block b = entity.worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
@@ -63,16 +64,16 @@ public class WeaponModCarbineBayonet extends WeaponModBase {
 			}
 			return;
 		}
-		
+
 		Orchestras.ORCHESTRA_CARBINE.accept(stack, ctx);
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_CARBINE_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_CARBINE_ANIMS = (stack, type) -> {
 		switch(type) {
 		case INSPECT: return new BusAnimation()
 				.addBus("STAB", new BusAnimationSequence().addPos(0, 1, -2, 250, IType.SIN_DOWN).hold(250).addPos(0, 1, 5, 250, IType.SIN_UP).hold(250).addPos(0, 0, 0, 500, IType.SIN_FULL));
 		}
-		
+
 		return XFactory762mm.LAMBDA_CARBINE_ANIMS.apply(stack, type);
 	};
 }

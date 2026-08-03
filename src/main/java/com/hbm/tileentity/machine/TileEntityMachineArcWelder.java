@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.hbm.handler.threading.PacketThreading;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.inventory.UpgradeManagerNT;
@@ -39,11 +40,12 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineArcWelder extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IConditionalInvAccess, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
+public class TileEntityMachineArcWelder extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IConditionalInvAccess, IControlReceiver, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
 
 	public long power;
 	public long maxPower = 2_000;
 	public long consumption;
+	public boolean collisionPrevention = false;
 
 	public int progress;
 	public int processTime = 1;
@@ -150,6 +152,7 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 		buf.writeLong(consumption);
 		buf.writeInt(progress);
 		buf.writeInt(processTime);
+		buf.writeBoolean(this.collisionPrevention);
 
 		tank.serialize(buf);
 
@@ -171,6 +174,7 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 		consumption = buf.readLong();
 		progress = buf.readInt();
 		processTime = buf.readInt();
+		this.collisionPrevention = buf.readBoolean();
 
 		tank.deserialize(buf);
 
@@ -188,6 +192,8 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 			if(this.tank.getTankType() != recipe.fluid.type) return false;
 			if(this.tank.getFill() < recipe.fluid.fill) return false;
 		}
+
+		if(collisionPrevention && recipe.fluid == null && this.tank.getFill() > 0) return false;
 
 		if(slots[3] != null) {
 			if(slots[3].getItem() != recipe.output.getItem()) return false;
@@ -243,6 +249,7 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 		this.maxPower = nbt.getLong("maxPower");
 		this.progress = nbt.getInteger("progress");
 		this.processTime = nbt.getInteger("processTime");
+		this.collisionPrevention = nbt.getBoolean("collisionPrevention");
 		tank.readFromNBT(nbt, "t");
 	}
 
@@ -254,6 +261,7 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 		nbt.setLong("maxPower", maxPower);
 		nbt.setInteger("progress", progress);
 		nbt.setInteger("processTime", processTime);
+		nbt.setBoolean("collisionPrevention", collisionPrevention);
 		tank.writeToNBT(nbt, "t");
 	}
 
@@ -403,5 +411,16 @@ public class TileEntityMachineArcWelder extends TileEntityMachineBase implements
 	@Override
 	public FluidTank getTankToPaste() {
 		return tank;
+	}
+
+	@Override
+	public boolean hasPermission(EntityPlayer player) {
+		return this.isUseableByPlayer(player);
+	}
+
+	@Override
+	public void receiveControl(NBTTagCompound data) {
+		this.collisionPrevention = !this.collisionPrevention;
+		this.markDirty();
 	}
 }

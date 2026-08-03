@@ -7,7 +7,8 @@ import java.util.Random;
 import com.hbm.blocks.BlockEnums.LightType;
 import com.hbm.blocks.ISpotlight;
 import com.hbm.main.ResourceManager;
-import com.hbm.world.gen.INBTTransformable;
+import com.hbm.render.loader.HFRWavefrontObject;
+import com.hbm.world.gen.nbt.INBTBlockTransformable;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -23,10 +24,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class Spotlight extends Block implements ISpotlight, INBTTransformable {
+public class Spotlight extends Block implements ISpotlight, INBTBlockTransformable {
+
+	public static final int META_YELLOW = 0;
+	public static final int META_GREEN = 1;
+	public static final int META_BLUE = 2;
 
 	public static boolean disableOnGeneration = true;
 
@@ -57,11 +61,11 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 		return renderID;
 	}
 
-	public WavefrontObject getModel() {
+	public HFRWavefrontObject getModel() {
 		switch(type) {
-		case FLUORESCENT: return (WavefrontObject) ResourceManager.fluorescent_lamp;
-		case HALOGEN: return (WavefrontObject) ResourceManager.flood_lamp;
-		default: return (WavefrontObject) ResourceManager.cage_lamp;
+		case FLUORESCENT: return (HFRWavefrontObject) ResourceManager.fluorescent_lamp;
+		case HALOGEN: return (HFRWavefrontObject) ResourceManager.flood_lamp;
+		default: return (HFRWavefrontObject) ResourceManager.cage_lamp;
 		}
 	}
 
@@ -223,7 +227,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 		if(!isOn) return;
 
 		ForgeDirection dir = getDirection(world, x, y, z);
-		propagateBeam(world, x, y, z, dir, beamLength);
+		propagateBeam(world, x, y, z, dir, beamLength, META_YELLOW);
 	}
 
 	public ForgeDirection getDirection(IBlockAccess world, int x, int y, int z) {
@@ -281,7 +285,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 	}
 
 	// Recursively add beam blocks, updating any that already exist with new incoming light directions
-	public static void propagateBeam(World world, int x, int y, int z, ForgeDirection dir, int distance) {
+	public static void propagateBeam(World world, int x, int y, int z, ForgeDirection dir, int distance, int meta) {
 		distance--;
 		if(distance <= 0)
 			return;
@@ -295,7 +299,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 			return;
 
 		if(!(block instanceof SpotlightBeam)) {
-			world.setBlock(x, y, z, ModBlocks.spotlight_beam);
+			world.setBlock(x, y, z, ModBlocks.spotlight_beam, meta, 3);
 		}
 
 		// If we encounter an existing beam, add a new INCOMING direction to the
@@ -303,7 +307,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 		if (SpotlightBeam.setDirection(world, x, y, z, dir, true) == 0)
 			return;
 
-		propagateBeam(world, x, y, z, dir, distance);
+		propagateBeam(world, x, y, z, dir, distance, meta);
 	}
 
 	// Recursively delete beam blocks, if they aren't still illuminated from a different direction
@@ -326,7 +330,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 	}
 
 	// Travels back through a beam to the source, and if found, repropagates the beam
-	public static void backPropagate(World world, int x, int y, int z, ForgeDirection dir) {
+	public static void backPropagate(World world, int x, int y, int z, ForgeDirection dir, int meta) {
 		x -= dir.offsetX;
 		y -= dir.offsetY;
 		z -= dir.offsetZ;
@@ -334,12 +338,12 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 		Block block = world.getBlock(x, y, z);
 		if(block instanceof ISpotlight) {
 			ISpotlight spot = (ISpotlight) block;
-			propagateBeam(world, x, y, z, dir, spot.getBeamLength());
+			propagateBeam(world, x, y, z, dir, spot.getBeamLength(), meta);
 		} else if(!(block instanceof SpotlightBeam)) {
 			return;
 		}
 
-		backPropagate(world, x, y, z, dir);
+		backPropagate(world, x, y, z, dir, meta);
 	}
 
 	protected Block getOff() {
@@ -367,7 +371,7 @@ public class Spotlight extends Block implements ISpotlight, INBTTransformable {
 	public int transformMeta(int meta, int coordBaseMode) {
 		// +1 to set as broken, won't turn on until broken and replaced
 		int disabled = disableOnGeneration ? 1 : 0;
-		return (INBTTransformable.transformMetaDeco(meta >> 1, coordBaseMode) << 1) + disabled;
+		return (INBTBlockTransformable.transformMetaDeco(meta >> 1, coordBaseMode) << 1) + disabled;
 	}
 
 	@Override

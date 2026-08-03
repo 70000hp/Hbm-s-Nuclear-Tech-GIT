@@ -17,15 +17,16 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.main.ResourceManager;
 import com.hbm.particle.SpentCasing;
 import com.hbm.particle.SpentCasing.CasingType;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 import com.hbm.util.EntityDamageUtil;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 
@@ -53,41 +54,41 @@ public class XFactory9mm {
 		ModItems.gun_greasegun = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(3_000).draw(20).inspect(31).crosshair(Crosshair.L_CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(3F).delay(4).dry(40).auto(true).spread(0.015F).reload(60).jam(55).sound("hbm:weapon.fire.greaseGun", 1.0F, 1.0F)
+						.dmg(3F).delay(4).dry(40).auto(true).spread(0.015F).reload(60).jam(55).sound(NTMSounds.GUN_GREASEGUN_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 30).addConfigs(p9_sp, p9_fmj, p9_jhp, p9_ap))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_GREASEGUN))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_GREASEGUN_ANIMS).orchestra(Orchestras.ORCHESTRA_GREASEGUN)
-				).setNameMutator(LAMBDA_NAME_GREASEGUN)
+				).setDefaultAmmo(EnumAmmo.P9_SP, 30).setNameMutator(LAMBDA_NAME_GREASEGUN)
 				.setUnlocalizedName("gun_greasegun");
 
 		ModItems.gun_lag = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(1_700).draw(7).inspect(31).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(25F).delay(4).dry(10).spread(0.005F).reload(53).jam(44).sound("hbm:weapon.fire.pistol", 1.0F, 1.0F)
+						.dmg(25F).delay(4).dry(10).spread(0.005F).reload(53).jam(44).sound(NTMSounds.GUN_PISTOL_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 17).addConfigs(p9_sp, p9_fmj, p9_jhp, p9_ap))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().fire(LAMBDA_FIRE_LAG).recoil(LAMBDA_RECOIL_LAG))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_LAG_ANIMS).orchestra(Orchestras.ORCHESTRA_LAG)
-				).setUnlocalizedName("gun_lag");
+				).setDefaultAmmo(EnumAmmo.P9_JHP, 17).setUnlocalizedName("gun_lag");
 
 		ModItems.gun_uzi = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(3_000).draw(15).inspect(31).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(3F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound("hbm:weapon.fire.uzi", 1.0F, 1.0F)
+						.dmg(3F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound(NTMSounds.GUN_UZI_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 30).addConfigs(p9_sp, p9_fmj, p9_jhp, p9_ap))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_UZI))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_UZI_ANIMS).orchestra(Orchestras.ORCHESTRA_UZI)
-				).setNameMutator(LAMBDA_NAME_UZI)
+				).setDefaultAmmo(EnumAmmo.P9_SP, 30).setNameMutator(LAMBDA_NAME_UZI)
 				.setUnlocalizedName("gun_uzi");
 		ModItems.gun_uzi_akimbo = new ItemGunBaseNT(WeaponQuality.B_SIDE,
 				new GunConfig().dura(3_000).draw(15).inspect(31).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(3F).spreadHipfire(0F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound("hbm:weapon.fire.uzi", 1.0F, 1.0F)
+						.dmg(3F).spreadHipfire(0F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound(NTMSounds.GUN_UZI_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 30).addConfigs(p9_sp, p9_fmj, p9_jhp, p9_ap))
 						.offset(1, -0.0625 * 2.5, 0.375D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_UZI))
@@ -96,38 +97,38 @@ public class XFactory9mm {
 				.anim(LAMBDA_UZI_ANIMS).orchestra(Orchestras.ORCHESTRA_UZI_AKIMBO),
 				new GunConfig().dura(3_000).draw(15).inspect(31).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(3F).spreadHipfire(0F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound("hbm:weapon.fire.uzi", 1.0F, 1.0F)
+						.dmg(3F).spreadHipfire(0F).delay(2).dry(25).auto(true).spread(0.005F).reload(55).jam(50).sound(NTMSounds.GUN_UZI_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(1, 30).addConfigs(p9_sp, p9_fmj, p9_jhp, p9_ap))
 						.offset(1, -0.0625 * 2.5, -0.375D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_UZI))
 				.ps(Lego.LAMBDA_STANDARD_CLICK_PRIMARY).pr(Lego.LAMBDA_STANDARD_RELOAD)
 				.decider(LAMBDA_SECOND_UZI)
 				.anim(LAMBDA_UZI_ANIMS).orchestra(Orchestras.ORCHESTRA_UZI_AKIMBO)
-				).setUnlocalizedName("gun_uzi_akimbo");
+				).setDefaultAmmo(EnumAmmo.P9_SP, 60).setUnlocalizedName("gun_uzi_akimbo");
 	}
-	
+
 	public static Function<ItemStack, String> LAMBDA_NAME_GREASEGUN = (stack) -> {
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_GREASEGUN_CLEAN)) return stack.getUnlocalizedName() + "_m3";
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_GREASEGUN_CLEAN)) return stack.getUnlocalizedName() + "_m3";
 		return null;
 	};
-	
+
 	public static Function<ItemStack, String> LAMBDA_NAME_UZI = (stack) -> {
-		if(WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SILENCER)) return stack.getUnlocalizedName() + "_richter";
+		if(XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SILENCER)) return stack.getUnlocalizedName() + "_richter";
 		return null;
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_GREASEGUN = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(2, (float) (ctx.getPlayer().getRNG().nextGaussian() * 0.5));
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_LAG = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(5, (float) (ctx.getPlayer().getRNG().nextGaussian() * 1.5));
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_UZI = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(1, (float) (ctx.getPlayer().getRNG().nextGaussian() * 0.25));
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_SECOND_UZI = (stack, ctx) -> {
 		int index = ctx.configIndex;
 		GunState lastState = ItemGunBaseNT.getState(stack, index);
@@ -136,12 +137,12 @@ public class XFactory9mm {
 		GunStateDecider.deciderStandardReload(stack, ctx, lastState, 0, index);
 		GunStateDecider.deciderAutoRefire(stack, ctx, lastState, 0, index, () -> { return ItemGunBaseNT.getSecondary(stack, index) && ItemGunBaseNT.getMode(stack, ctx.configIndex) == 0; });
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_FIRE_LAG = (stack, ctx) -> {
-		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		EntityPlayer player = ctx.getPlayer();
-		if(player != null && type == AnimType.INSPECT && timer > 20 && timer < 60) {
+		if(player != null && type == GunAnimation.INSPECT && timer > 20 && timer < 60) {
 			int index = ctx.configIndex;
 			Receiver primary = ctx.config.getReceivers(stack)[0];
 			IMagazine mag = primary.getMagazine(stack);
@@ -154,15 +155,15 @@ public class XFactory9mm {
 			ItemGunBaseNT.setTimer(stack, index, primary.getDelayAfterFire(stack));
 			EntityDamageUtil.attackEntityFromNT(player, BulletConfig.getDamage(player, player, DamageClass.PHYSICAL), 1_000F, true, false, 1D, 5F, 0F);
 		} else {
-			Lego.doStandardFire(stack, ctx, AnimType.CYCLE, true);
+			Lego.doStandardFire(stack, ctx, GunAnimation.CYCLE, 0, true);
 		}
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_SMOKE = (stack, ctx) -> {
 		Lego.handleStandardSmoke(ctx.entity, stack, 2000, 0.05D, 1.1D, ctx.configIndex);
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_GREASEGUN_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_GREASEGUN_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(80, 0, 0, 0).addPos(80, 0, 0, 500).addPos(0, 0, 0, 500, IType.SIN_FULL))
@@ -190,11 +191,11 @@ public class XFactory9mm {
 				.addBus("TURN", new BusAnimationSequence().addPos(0, 0, -45, 150).addPos(0, 0, 45, 150).addPos(0, 0, 45, 50).addPos(0, 0, 0, 250).addPos(0, 0, 0, 500).addPos(0, 0, 45, 150).addPos(0, 0, -45, 150).addPos(0, 0, 0, 150))
 				.addBus("FLAP", new BusAnimationSequence().addPos(0, 0, 0, 300).addPos(0, 0, 180, 150).addPos(0, 0, 180, 850).addPos(0, 0, 0, 150));
 		}
-		
+
 		return null;
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_LAG_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_LAG_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(-90, 0, 0, 0).addPos(0, 0, 0, 350, IType.SIN_DOWN));
@@ -207,11 +208,11 @@ public class XFactory9mm {
 				.addBus("ADD_TRANS", new BusAnimationSequence().addPos(-4, 0, -3, 500).addPos(-4, 0, -3, 2000).addPos(0, 0, 0, 500))
 				.addBus("ADD_ROT", new BusAnimationSequence().addPos(0, -2, 5, 500).addPos(0, -2, 5, 2000).addPos(0, 0, 0, 500));
 		}
-		
+
 		return null;
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_UZI_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_UZI_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(80, 0, 0, 0).addPos(80, 0, 0, 500).addPos(0, 0, 0, 500, IType.SIN_FULL))

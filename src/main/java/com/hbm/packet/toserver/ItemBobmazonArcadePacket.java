@@ -1,9 +1,10 @@
 package com.hbm.packet.toserver;
 
 import com.hbm.entity.missile.EntityBobmazon;
-import com.hbm.inventory.RecipesCommon.*;
 import com.hbm.inventory.recipes.BobmazonArcadeOffers;
+import static com.hbm.inventory.recipes.BobmazonArcadeOffers.*;
 import com.hbm.items.ModItems;
+import com.hbm.items.tool.ItemBobmazonArcade;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.util.InventoryUtil;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -12,8 +13,8 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -64,12 +65,13 @@ public class ItemBobmazonArcadePacket implements IMessage {
 			if(p.capabilities.isCreativeMode || InventoryUtil.doesPlayerHaveAStacks(p, Arrays.asList(offer.cost), true)) {
 				Random rand = world.rand;
 				EntityBobmazon bob = new EntityBobmazon(world);
-				bob.posX = p.posX + rand.nextGaussian() * 10;
+				bob.posX = p.posX + rand.nextGaussian() * 5;
 				bob.posY = 300;
-				bob.posZ = p.posZ + rand.nextGaussian() * 10;
+				bob.posZ = p.posZ + rand.nextGaussian() * 5;
 				bob.payload = stack.copy();
 
 				world.spawnEntityInWorld(bob);
+
 			} else {
 				p.addChatMessage(new ChatComponentText("[BOBMAZON] Not enough resources!"));
 			}

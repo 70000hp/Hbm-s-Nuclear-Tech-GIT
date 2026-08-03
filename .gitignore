@@ -1,3 +1,4 @@
+
 .gradle
 .settings
 /.idea/
@@ -37,3 +38,39 @@ addon.local.gradle.kts
 addon.late.local.gradle
 addon.late.local.gradle.kts
 layout.json
+
+# eclipse
+/eclipse
+/bin
+/*.launch
+/.settings
+/.metadata
+/.classpath
+/.project
+
+# idea
+/out
+/*.ipr
+/*.iws
+/*.iml
+/.idea
+
+# gradle
+/build
+/.gradle
+
+# vscode
+/.vscode
+
+# other
+/run
+
+# CurseForge configuration
+/curseforge.properties
+
+# Maven configuration
+/maven.properties
+
+# Changelog backup
+/changelog.bak
+

@@ -18,12 +18,13 @@ import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.mags.MagazineBelt;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.particle.SpentCasing;
 import com.hbm.particle.SpentCasing.CasingType;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 
 import net.minecraft.item.ItemStack;
@@ -41,7 +42,7 @@ public class XFactory762mm {
 	public static BulletConfig energy_lacunae;
 	public static BulletConfig energy_lacunae_overcharge;
 	public static BulletConfig energy_lacunae_ir;
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_TINY_EXPLODE = (bullet, mop) -> {
 		if(mop.typeOfHit == mop.typeOfHit.ENTITY && bullet.ticksExisted < 3 && mop.entityHit == bullet.getThrower()) return;
 		Lego.tinyExplode(bullet, mop, 1.5F); bullet.setDead();
@@ -61,7 +62,7 @@ public class XFactory762mm {
 				.setCasing(casing762.clone().setColor(SpentCasing.COLOR_CASE_44).register("r762du"));
 		r762_he = new BulletConfig().setItem(EnumAmmo.R762_HE).setCasing(EnumCasingType.SMALL_STEEL, 6).setWear(3F).setDamage(1.75F).setOnImpact(LAMBDA_TINY_EXPLODE)
 				.setCasing(casing762.clone().setColor(SpentCasing.COLOR_CASE_44).register("r762he"));
-		
+
 		energy_lacunae = new BulletConfig().setItem(EnumAmmo.CAPACITOR).setCasing(new ItemStack(ModItems.ingot_polymer, 2), 4 * 40).setupDamageClass(DamageClass.LASER).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5).setRenderRotations(false).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
 		energy_lacunae_overcharge = new BulletConfig().setItem(EnumAmmo.CAPACITOR_OVERCHARGE).setCasing(new ItemStack(ModItems.ingot_polymer, 2), 4 * 40).setupDamageClass(DamageClass.LASER).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5).setRenderRotations(false).setDoesPenetrate(true).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
 		energy_lacunae_ir = new BulletConfig().setItem(EnumAmmo.CAPACITOR_IR).setCasing(new ItemStack(ModItems.ingot_polymer, 2), 4 * 40).setupDamageClass(DamageClass.FIRE).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5).setRenderRotations(false).setOnBeamImpact(XFactoryEnergy.LAMBDA_IR_HIT);
@@ -69,39 +70,39 @@ public class XFactory762mm {
 		ModItems.gun_carbine = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(3_000).draw(10).inspect(31).reloadSequential(true).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(15F).delay(5).dry(15).spread(0.0F).reload(30, 0, 15, 0).jam(60).sound("hbm:weapon.fire.blackPowder", 1.0F, 1.0F)
+						.dmg(15F).delay(5).dry(15).spread(0.0F).reload(30, 0, 15, 0).jam(60).sound(NTMSounds.GUN_POWDER_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 14).addConfigs(r762_sp, r762_fmj, r762_jhp, r762_ap, r762_du, r762_he))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_CARBINE))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_CARBINE_ANIMS).orchestra(Orchestras.ORCHESTRA_CARBINE)
-				).setUnlocalizedName("gun_carbine");
+				).setDefaultAmmo(EnumAmmo.R762_SP, 14).setUnlocalizedName("gun_carbine");
 
 		ModItems.gun_minigun = new ItemGunBaseNT(WeaponQuality.A_SIDE, new GunConfig()
 				.dura(50_000).draw(20).inspect(20).crosshair(Crosshair.L_CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound("hbm:weapon.calShoot", 1.0F, 1.0F)
+						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound(NTMSounds.GUN_MINIGUN_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineBelt().addConfigs(r762_sp, r762_fmj, r762_jhp, r762_ap, r762_du, r762_he))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_MINIGUN))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_MINIGUN_ANIMS).orchestra(Orchestras.ORCHESTRA_MINIGUN)
-				).setUnlocalizedName("gun_minigun");
+				).setDefaultAmmo(EnumAmmo.R762_FMJ, 30).setUnlocalizedName("gun_minigun");
 		ModItems.gun_minigun_lacunae = new ItemGunBaseNT(WeaponQuality.LEGENDARY, new GunConfig()
 				.dura(50_000).draw(20).inspect(20).crosshair(Crosshair.L_CIRCLE)
 				.rec(new Receiver(0)
-						.dmg(12F).delay(1).auto(true).dry(15).reload(15).spread(0.01F).sound("hbm:weapon.fire.laserGatling", 1.0F, 1.0F)
+						.dmg(12F).delay(1).auto(true).dry(15).reload(15).spread(0.01F).sound(NTMSounds.GUN_LASER_GATLING_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 200).addConfigs(energy_lacunae, energy_lacunae_overcharge, energy_lacunae_ir))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_LACUNAE))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_MINIGUN_ANIMS).orchestra(Orchestras.ORCHESTRA_MINIGUN)
-				).setUnlocalizedName("gun_minigun_lacunae");
+				).setDefaultAmmo(EnumAmmo.CAPACITOR, 15).setUnlocalizedName("gun_minigun_lacunae");
 		ModItems.gun_minigun_dual = new ItemGunBaseNT(WeaponQuality.DEBUG,
 				new GunConfig()
 				.dura(50_000).draw(20).inspect(20).crosshair(Crosshair.L_CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound("hbm:weapon.calShoot", 1.0F, 1.0F)
+						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound(NTMSounds.GUN_MINIGUN_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineBelt().addConfigs(r762_sp, r762_fmj, r762_jhp, r762_ap, r762_du, r762_he))
 						.offset(1, -0.0625 * 2.5, 0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_MINIGUN))
@@ -111,27 +112,27 @@ public class XFactory762mm {
 				new GunConfig()
 				.dura(50_000).draw(20).inspect(20).crosshair(Crosshair.L_CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound("hbm:weapon.calShoot", 1.0F, 1.0F)
+						.dmg(6F).delay(1).auto(true).dry(15).spread(0.01F).sound(NTMSounds.GUN_MINIGUN_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineBelt().addConfigs(r762_sp, r762_fmj, r762_jhp, r762_ap, r762_du, r762_he))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_MINIGUN))
 				.ps(Lego.LAMBDA_STANDARD_CLICK_PRIMARY).pr(Lego.LAMBDA_STANDARD_RELOAD)
 				.decider(LAMBDA_SECOND_MINIGUN)
 				.anim(LAMBDA_MINIGUN_ANIMS).orchestra(Orchestras.ORCHESTRA_MINIGUN_DUAL)
-				).setUnlocalizedName("gun_minigun_dual");
+				).setDefaultAmmo(EnumAmmo.R762_SP, 50).setUnlocalizedName("gun_minigun_dual");
 
 		ModItems.gun_mas36 = new ItemGunBaseNT(WeaponQuality.LEGENDARY, new GunConfig()
 				.dura(5_000).draw(20).inspect(31).reloadSequential(true).crosshair(Crosshair.CIRCLE).smoke(LAMBDA_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(30F).delay(25).dry(25).spread(0.0F).reload(43).jam(43).sound("hbm:weapon.fire.rifleHeavy", 1.0F, 1.0F)
+						.dmg(30F).delay(25).dry(25).spread(0.0F).reload(43).jam(43).sound(NTMSounds.GUN_HEAVY_RIFLE_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 7).addConfigs(r762_sp, r762_fmj, r762_jhp, r762_ap, r762_du, r762_he))
 						.offset(1, -0.0625 * 1.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_CARBINE))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_MAS36_ANIMS).orchestra(Orchestras.ORCHESTRA_MAS36)
-				).setUnlocalizedName("gun_mas36");
+				).setDefaultAmmo(EnumAmmo.R762_AP, 14).setUnlocalizedName("gun_mas36");
 	}
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_SECOND_MINIGUN = (stack, ctx) -> {
 		int index = ctx.configIndex;
 		GunState lastState = ItemGunBaseNT.getState(stack, index);
@@ -140,22 +141,22 @@ public class XFactory762mm {
 		GunStateDecider.deciderStandardReload(stack, ctx, lastState, 0, index);
 		GunStateDecider.deciderAutoRefire(stack, ctx, lastState, 0, index, () -> { return ItemGunBaseNT.getSecondary(stack, index) && ItemGunBaseNT.getMode(stack, ctx.configIndex) == 0; });
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_SMOKE = (stack, ctx) -> {
 		Lego.handleStandardSmoke(ctx.entity, stack, 1500, 0.075D, 1.1D, 0);
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_CARBINE = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(5, (float) (ctx.getPlayer().getRNG().nextGaussian() * 0.5));
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_MINIGUN = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil((float) (ctx.getPlayer().getRNG().nextGaussian() * 0.5), (float) (ctx.getPlayer().getRNG().nextGaussian() * 0.5));
 	};
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_LACUNAE = (stack, ctx) -> { };
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_CARBINE_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_CARBINE_ANIMS = (stack, type) -> {
 		int ammo = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, MainRegistry.proxy.me().inventory);
 		switch(type) {
 		case EQUIP: return new BusAnimation()
@@ -183,11 +184,11 @@ public class XFactory762mm {
 				.addBus("SLIDE", new BusAnimationSequence().addPos(0, 0, 0, 500).addPos(0, 0, -0.75, 150, IType.SIN_DOWN).addPos(0, 0, -0.75, 1000).addPos(0, 0, 0, 100, IType.SIN_UP))
 				.addBus(ammo == 0 ? "NULL" : "REL", new BusAnimationSequence().addPos(0, 0.125, 1.25, 0).addPos(0, 0.125, 1.25, 500).addPos(0, 0.125, 0.5, 150, IType.SIN_DOWN).addPos(0, 0.125, 0.5, 1000).addPos(0, 0.125, 1.25, 100, IType.SIN_UP));
 		}
-		
+
 		return null;
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_MINIGUN_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_MINIGUN_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(45, 0, 0, 0).addPos(0, 0, 0, 1000, IType.SIN_FULL));
@@ -203,11 +204,11 @@ public class XFactory762mm {
 				.addBus("EQUIP", new BusAnimationSequence().addPos(3, 0, 0, 150, IType.SIN_DOWN).addPos(0, 0, 0, 100, IType.SIN_FULL))
 				.addBus("ROTATE", new BusAnimationSequence().addPos(0, 0, -720, 1000, IType.SIN_DOWN));
 		}
-		
+
 		return null;
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_MAS36_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_MAS36_ANIMS = (stack, type) -> {
 		int mag = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, MainRegistry.proxy.me().inventory);
 		double turn = -90;
 		double pullAmount = ItemGunBaseNT.getIsAiming(stack) ? -1F : -1.5D;
@@ -244,7 +245,7 @@ public class XFactory762mm {
 				.addBus("BOLT_PULL", new BusAnimationSequence().hold(100).addPos(0, 0, -1D, 250, IType.SIN_UP).hold(500).addPos(0, 0, 0, 200, IType.LINEAR))
 				.addBus("BULLET", mag == 0 ? new BusAnimationSequence().setPos(-100, 0, 0) : new BusAnimationSequence().setPos(0, 0.1875, 1.5).hold(100).addPos(0, 0.125, 0.5, 250, IType.SIN_UP).hold(500).addPos(0, 0.1875, 1.5, 200, IType.LINEAR));
 		}
-		
+
 		return null;
 	};
 }

@@ -11,13 +11,13 @@ import com.hbm.inventory.container.ContainerMachineAssemblyMachine;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIMachineAssemblyMachine;
-import com.hbm.inventory.recipes.AssemblyMachineRecipes;
 import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.module.machine.ModuleMachineAssembler;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
@@ -29,6 +29,8 @@ import com.hbm.util.i18n.I18nUtil;
 
 import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
+import api.hbm.redstoneoverradio.IRORInteractive;
+import api.hbm.redstoneoverradio.IRORValueProvider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -40,7 +42,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
-public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, IUpgradeInfoProvider, IControlReceiver, IGUIProvider {
+public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, IUpgradeInfoProvider, IControlReceiver, IGUIProvider, IRORValueProvider, IRORInteractive {
 
 	public FluidTank inputTank;
 	public FluidTank outputTank;
@@ -87,7 +89,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 		
 		if(!worldObj.isRemote) {
 			
-			GenericRecipe recipe = AssemblyMachineRecipes.INSTANCE.recipeNameMap.get(assemblerModule.recipe);
+			GenericRecipe recipe = assemblerModule.getRecipe();
 			if(recipe != null) {
 				this.maxPower = recipe.power * 100;
 			}
@@ -156,7 +158,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 				}
 				
 				if(!this.muffled && arm.prevAngles[3] != arm.angles[3] && arm.angles[3] == -0.75) {
-					MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, "hbm:block.assemblerStrike", this.getVolume(0.5F), 1F);
+					MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, NTMSounds.ASSEMBLER_STRIKE, this.getVolume(0.5F), 1F);
 				}
 			}
 			
@@ -169,25 +171,18 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 					if(this.ringTarget > this.ring) this.ring += this.ringSpeed;
 					if(this.ringTarget < this.ring) this.ring -= this.ringSpeed;
 					if(this.ringTarget == this.ring) {
-						if(ringTarget >= 360) {
-							this.ringTarget -= 360D;
-							this.ring -= 360D;
-							this.prevRing -= 360D;
-						}
-						if(ringTarget <= -360) {
-							this.ringTarget += 360D;
-							this.ring += 360D;
-							this.prevRing += 360D;
-						}
+						double sub = ringTarget >= 360 ? -360D : 360D;
+						this.ringTarget += sub;
+						this.ring += sub;
+						this.prevRing += sub;
 						this.ringDelay = 20 + worldObj.rand.nextInt(21);
-						//MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, "hbm:block.assemblerStop", this.getVolume(0.25F), 1.5F);
 					}
 				} else {
 					if(this.ringDelay > 0) this.ringDelay--;
 					if(this.ringDelay <= 0) {
 						this.ringTarget += (worldObj.rand.nextDouble() * 2 - 1) * 135;
 						this.ringSpeed = 10D + worldObj.rand.nextDouble() * 5D;
-						if(!this.muffled) MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, "hbm:block.assemblerStart", this.getVolume(0.25F), 1.25F + worldObj.rand.nextFloat() * 0.25F);
+						if(!this.muffled) MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, NTMSounds.ASSEMBLER_START, this.getVolume(0.25F), 1.25F + worldObj.rand.nextFloat() * 0.25F);
 					}
 				}
 			}
@@ -195,7 +190,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 	}
 
 	@Override public AudioWrapper createAudioLoop() {
-		return MainRegistry.proxy.getLoopedSound("hbm:block.motor", xCoord, yCoord, zCoord, 0.5F, 15F, 0.75F, 20);
+		return MainRegistry.proxy.getLoopedSound(NTMSounds.ELECTRIC_MOTOR_LOOP, xCoord, yCoord, zCoord, 0.5F, 15F, 0.75F, 20);
 	}
 
 	@Override public void onChunkUnload() {
@@ -247,7 +242,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 		this.assemblerModule.deserialize(buf);
 		
 		if(wasProcessing && !didProcess) {
-			MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, "hbm:block.assemblerStop", this.getVolume(0.25F), 1.5F);
+			MainRegistry.proxy.playSoundClient(xCoord, yCoord, zCoord, NTMSounds.ASSEMBLER_STOP, this.getVolume(0.25F), 1.5F);
 		}
 	}
 	
@@ -282,7 +277,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 
 	@Override
 	public boolean canExtractItem(int i, ItemStack itemStack, int j) {
-		return i == 16;
+		return i == 16 || this.assemblerModule.isSlotClogged(i);
 	}
 
 	@Override
@@ -309,7 +304,7 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 			int index = data.getInteger("index");
 			String selection = data.getString("selection");
 			if(index == 0) {
-				this.assemblerModule.recipe = selection;
+				this.assemblerModule.setRecipe(selection, false);
 				this.markChanged();
 			}
 		}
@@ -487,5 +482,35 @@ public class TileEntityMachineAssemblyMachine extends TileEntityMachineBase impl
 					BobMathUtil.interp(this.prevAngles[3], this.angles[3], interp)
 			};
 		}
+	}
+
+	@Override
+	public String[] getFunctionInfo() {
+		return new String[] {
+				PREFIX_VALUE + "progress",
+				PREFIX_VALUE + "recipe",
+				PREFIX_VALUE + "active",
+				PREFIX_FUNCTION + "setrecipe" + NAME_SEPARATOR + "name",
+		};
+	}
+
+	@Override
+	public String provideRORValue(String name) {
+		if((PREFIX_VALUE + "progress").equals(name))	return "" + (int) Math.round(this.assemblerModule.progress * 100);
+		if((PREFIX_VALUE + "recipe").equals(name))		return this.assemblerModule.getRecipeName();
+		if((PREFIX_VALUE + "active").equals(name))		return "" + (this.didProcess ? 1 : 0);
+		return null;
+	}
+
+	@Override
+	public String runRORFunction(String name, String[] params) {
+
+		if((PREFIX_FUNCTION + "setrecipe").equals(name) && params.length == 1) {
+			this.assemblerModule.setRecipe(params[0], true);
+			this.markChanged();
+			return null;
+		}
+		
+		return null;
 	}
 }

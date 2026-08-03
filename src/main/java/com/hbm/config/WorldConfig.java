@@ -34,7 +34,6 @@ public class WorldConfig {
 	public static int bedrockOilSpawn = 200;
 	public static int meteoriteSpawn = 500;
 
-	public static boolean newBedrockOres = true;
 	public static int bedrockIronSpawn = 100;
 	public static int bedrockCopperSpawn = 200;
 	public static int bedrockBoraxSpawn = 50;
@@ -55,8 +54,13 @@ public class WorldConfig {
 	public static int bedrockBauxiteSpawn = 100;
 	public static int bedrockEmeraldSpawn = 50;
 	public static int bedrockGlowstoneSpawn = 100;
+	public static int bedrockNetherColtanSpawn = 100;
 	public static int bedrockPhosphorusSpawn = 50;
 	public static int bedrockQuartzSpawn = 100;
+
+	public static int bedrockNetherHematiteSpawn = 90;
+	public static int bedrockInfernalCoalSpawn = 100;
+
 
 	public static int ironClusterSpawn = 4;
 	public static int titaniumClusterSpawn = 2;
@@ -83,19 +87,15 @@ public class WorldConfig {
 	public static boolean enableSulfurCave = true;
 	public static boolean enableAsbestosCave = true;
 
-	public static int radioStructure = 500;
 	public static int antennaStructure = 250;
 	public static int atomStructure = 500;
 	public static int dungeonStructure = 64;
-	public static int relayStructure = 500;
 	public static int satelliteStructure = 500;
-	public static int factoryStructure = 1000;
 	public static int dudStructure = 500;
 	public static int spaceshipStructure = 1000;
 	public static int barrelStructure = 5000;
-	public static int geyserWater = 3000;
 	public static int geyserChlorine = 3000;
-	public static int geyserVapor = 500;
+	public static int geyserVapor = 250;
 	public static int capsuleStructure = 100;
 	public static int arcticStructure = 500;
 	public static int jungleStructure = 2000;
@@ -158,7 +158,6 @@ public class WorldConfig {
 		bedrockOilSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.22_bedrockOilSpawnRate", "Spawns a bedrock oil node every nTH chunk", 200);
 		meteoriteSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.23_meteoriteSpawnRate", "Spawns a fallen meteorite every nTH chunk", 200);
 
-		newBedrockOres = CommonConfig.createConfigBool(config, CATEGORY_OREGEN, "2.NB_newBedrockOres", "Enables the newer genreric bedrock ores", true);
 		bedrockIronSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.B00_bedrockIronWeight", "Spawn weight for iron bedrock ore", 100);
 		bedrockCopperSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.B01_bedrockCopperWeight", "Spawn weight for copper bedrock ore", 200);
 		bedrockBoraxSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.B02_bedrockBoraxWeight", "Spawn weight for borax bedrock ore", 50);
@@ -180,8 +179,12 @@ public class WorldConfig {
 		bedrockEmeraldSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.B18_bedrockEmeraldWeight", "Spawn weight for emerald bedrock ore", 50);
 
 		bedrockGlowstoneSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN00_bedrockGlowstoneWeight", "Spawn weight for glowstone bedrock ore", 100);
-		bedrockPhosphorusSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN01_bedrockPhosphorusWeight", "Spawn weight for phosphorus bedrock ore", 50);
-		bedrockQuartzSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN01_bedrockQuartzWeight", "Spawn weight for quartz bedrock ore", 100);
+		bedrockPhosphorusSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN01_bedrockPhosphorusWeight", "Spawn weight for phosphorus bedrock ore", 60);
+		bedrockQuartzSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN02_bedrockQuartzWeight", "Spawn weight for quartz bedrock ore", 100);
+		bedrockNetherColtanSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN03_bedrockGlowstoneWeight", "Spawn weight for coltan bedrock ore in the nether", 90);
+
+		bedrockInfernalCoalSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN03_bedrockInfernalCoalWeight", "Spawn weight for infernal coal bedrock ore in the nether", 90);
+		bedrockNetherHematiteSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.BN04_bedrockNetherHematiteWeight", "Spawn weight for hematite bedrock ore in the nether", 90);
 
 		ironClusterSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.C00_ironClusterSpawn", "Amount of iron cluster veins per chunk", 4);
 		titaniumClusterSpawn = CommonConfig.createConfigInt(config, CATEGORY_OREGEN, "2.C01_titaniumClusterSpawn", "Amount of titanium cluster veins per chunk", 2);
@@ -208,13 +211,10 @@ public class WorldConfig {
 		enableAsbestosCave = CommonConfig.createConfigBool(config, CATEGORY_OREGEN, "2.C01_enableAsbestosCave", "Toggles asbestos caves", true);
 
 		final String CATEGORY_DUNGEON = CommonConfig.CATEGORY_DUNGEONS;
-		radioStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.00_radioSpawn", "Spawn radio station on every nTH chunk", 500);
 		antennaStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.01_antennaSpawn", "Spawn antenna on every nTH chunk", 250);
 		atomStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.02_atomSpawn", "Spawn power plant on every nTH chunk", 500);
 		dungeonStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.04_dungeonSpawn", "Spawn library dungeon on every nTH chunk", 64);
-		relayStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.05_relaySpawn", "Spawn relay on every nTH chunk", 500);
 		satelliteStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.06_satelliteSpawn", "Spawn satellite dish on every nTH chunk", 500);
-		factoryStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.09_factorySpawn", "Spawn factory on every nTH chunk", 1000);
 		dudStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.10_dudSpawn", "Spawn dud on every nTH chunk", 500);
 		spaceshipStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.11_spaceshipSpawn", "Spawn spaceship on every nTH chunk", 1000);
 		barrelStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.12_barrelSpawn", "Spawn waste tank on every nTH chunk", 5000);
@@ -222,9 +222,8 @@ public class WorldConfig {
 		minefreq = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.14_landmineSpawn", "Spawn AP landmine on every nTH chunk", 64);
 		radfreq = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.15_radHotspotSpawn", "Spawn radiation hotspot on every nTH chunk", 5000);
 		vaultfreq = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.16_vaultSpawn", "Spawn locked safe on every nTH chunk", 2500);
-		geyserWater = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.17_geyserWaterSpawn", "Spawn water geyser on every nTH chunk", 3000);
 		geyserChlorine = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.18_geyserChlorineSpawn", "Spawn poison geyser on every nTH chunk", 3000);
-		geyserVapor = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.19_geyserVaporSpawn", "Spawn vapor geyser on every nTH chunk", 500);
+		geyserVapor = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.19_geyserVaporSpawn", "Spawn vapor geyser on every nTH chunk", 250);
 		capsuleStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.21_capsuleSpawn", "Spawn landing capsule on every nTH chunk", 100);
 		arcticStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.22_arcticVaultSpawn", "Spawn arctic code vault on every nTH chunk", 500);
 		jungleStructure = CommonConfig.createConfigInt(config, CATEGORY_DUNGEON, "4.23_jungleDungeonSpawn", "Spawn jungle dungeon on every nTH chunk", 2000);
@@ -249,17 +248,13 @@ public class WorldConfig {
 		craterBiomeOuterRad = (float) CommonConfig.createConfigDouble(config, CATEGORY_BIOMES, "17.R02_craterBiomeOuterRad", "RAD/s for the outer crater biome", 0.5D);
 		craterBiomeWaterMult = (float) CommonConfig.createConfigDouble(config, CATEGORY_BIOMES, "17.R03_craterBiomeWaterMult", "Multiplier for RAD/s in crater biomes when in water", 5D);
 
-		radioStructure = CommonConfig.setDefZero(radioStructure, 1000);
 		antennaStructure = CommonConfig.setDefZero(antennaStructure, 1000);
 		atomStructure = CommonConfig.setDefZero(atomStructure, 1000);
 		dungeonStructure = CommonConfig.setDefZero(dungeonStructure, 1000);
-		relayStructure = CommonConfig.setDefZero(relayStructure, 1000);
 		satelliteStructure = CommonConfig.setDefZero(satelliteStructure, 1000);
-		factoryStructure = CommonConfig.setDefZero(factoryStructure, 1000);
 		dudStructure = CommonConfig.setDefZero(dudStructure, 1000);
 		spaceshipStructure = CommonConfig.setDefZero(spaceshipStructure, 1000);
 		barrelStructure = CommonConfig.setDefZero(barrelStructure, 1000);
-		geyserWater = CommonConfig.setDefZero(geyserWater, 1000);
 		geyserChlorine = CommonConfig.setDefZero(geyserChlorine, 1000);
 		geyserVapor = CommonConfig.setDefZero(geyserVapor, 1000);
 		broadcaster = CommonConfig.setDefZero(broadcaster, 1000);

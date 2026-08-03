@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockNTMSand.EnumSandType;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorBulkie;
@@ -27,11 +28,12 @@ import com.hbm.items.weapon.sedna.impl.ItemGunChargeThrower;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.particle.helper.ExplosionCreator;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 import com.hbm.tileentity.IRepairable;
 import com.hbm.tileentity.IRepairable.EnumExtinguishType;
 import com.hbm.util.CompatExternal;
@@ -52,15 +54,15 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class XFactoryTool {
 
 	public static final ResourceLocation scope = new ResourceLocation(RefStrings.MODID, "textures/misc/scope_tool.png");
-	
+
 	public static BulletConfig fext_water;
 	public static BulletConfig fext_foam;
 	public static BulletConfig fext_sand;
-	
+
 	public static BulletConfig ct_hook;
 	public static BulletConfig ct_mortar;
 	public static BulletConfig ct_mortar_charge;
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_WATER_HIT = (bullet, mop) -> {
 		if(!bullet.worldObj.isRemote) {
 			int ix = mop.blockX;
@@ -76,11 +78,11 @@ public class XFactoryTool {
 			}
 			TileEntity core = CompatExternal.getCoreFromPos(bullet.worldObj, ix, iy, iz);
 			if(core instanceof IRepairable) ((IRepairable) core).tryExtinguish(bullet.worldObj, ix, iy, iz, EnumExtinguishType.WATER);
-			if(fizz) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, "random.fizz", 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
+			if(fizz) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, NTMSounds.VANILLA_HISS, 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
 			bullet.setDead();
 		}
 	};
-	
+
 	public static Consumer<Entity> LAMBDA_WATER_UPDATE = (bullet) -> {
 		if(bullet.worldObj.isRemote) {
 			NBTTagCompound data = new NBTTagCompound();
@@ -102,7 +104,7 @@ public class XFactoryTool {
 			}
 		}
 	};
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_FOAM_HIT = (bullet, mop) -> {
 		if(!bullet.worldObj.isRemote) {
 			int ix = mop.blockX;
@@ -132,10 +134,10 @@ public class XFactoryTool {
 					else bullet.worldObj.setBlock(ix, iy, iz, ModBlocks.block_foam);
 				}
 			}
-			if(fizz) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, "random.fizz", 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
+			if(fizz) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, NTMSounds.VANILLA_HISS, 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
 		}
 	};
-	
+
 	public static Consumer<Entity> LAMBDA_FOAM_UPDATE = (bullet) -> {
 		if(bullet.worldObj.isRemote) {
 			NBTTagCompound data = new NBTTagCompound();
@@ -149,7 +151,7 @@ public class XFactoryTool {
 			MainRegistry.proxy.effectNT(data);
 		}
 	};
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_SAND_HIT = (bullet, mop) -> {
 		if(!bullet.worldObj.isRemote) {
 			int ix = mop.blockX;
@@ -168,19 +170,20 @@ public class XFactoryTool {
 				} else {
 					int meta = bullet.worldObj.getBlockMetadata(ix, iy, iz);
 					if(meta < 6) bullet.worldObj.setBlockMetadataWithNotify(ix, iy, iz, meta + 1, 3);
-					else bullet.worldObj.setBlock(ix, iy, iz, ModBlocks.sand_boron);
+					else bullet.worldObj.setBlock(ix, iy, iz, ModBlocks.sand_mix, EnumSandType.BORON.ordinal(), 3);
 				}
-				if(b.getMaterial() == Material.fire) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, "random.fizz", 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
+				if(b.getMaterial() == Material.fire) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, NTMSounds.VANILLA_HISS, 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
 			}
 		}
 	};
-	
+
 	public static Consumer<Entity> LAMBDA_SAND_UPDATE = (bullet) -> {
 		if(bullet.worldObj.isRemote) {
 			NBTTagCompound data = new NBTTagCompound();
 			data.setString("type", "vanillaExt");
 			data.setString("mode", "blockdust");
-			data.setInteger("block", Block.getIdFromBlock(ModBlocks.sand_boron));
+			data.setInteger("block", Block.getIdFromBlock(ModBlocks.sand_mix));
+			data.setInteger("meta", EnumSandType.BORON.ordinal());
 			data.setDouble("posX", bullet.posX); data.setDouble("posY", bullet.posY); data.setDouble("posZ", bullet.posZ);
 			data.setDouble("mX", bullet.motionX + bullet.worldObj.rand.nextGaussian() * 0.1);
 			data.setDouble("mY", bullet.motionY - 0.2 + bullet.worldObj.rand.nextGaussian() * 0.1);
@@ -199,7 +202,7 @@ public class XFactoryTool {
 		}
 		bullet.ignoreFrustumCheck = true;
 	};
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_HOOK = (bullet, mop) -> {
 		if(mop.typeOfHit == mop.typeOfHit.BLOCK) {
 			Vec3NT vec = new Vec3NT(-bullet.motionX, -bullet.motionY, -bullet.motionZ).normalizeSelf().multiply(0.05);
@@ -207,7 +210,7 @@ public class XFactoryTool {
 			bullet.getStuck(mop.blockX, mop.blockY, mop.blockZ, mop.sideHit);
 		}
 	};
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_MORTAR = (bullet, mop) -> {
 		if(mop.typeOfHit == mop.typeOfHit.ENTITY && bullet.ticksExisted < 3 && mop.entityHit == bullet.getThrower()) return;
 		ExplosionVNT vnt = new ExplosionVNT(bullet.worldObj, mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord, 5, bullet.getThrower());
@@ -219,7 +222,7 @@ public class XFactoryTool {
 		vnt.explode();
 		bullet.setDead();
 	};
-	
+
 	public static BiConsumer<EntityBulletBaseMK4, MovingObjectPosition> LAMBDA_MORTAR_CHARGE = (bullet, mop) -> {
 		if(mop.typeOfHit == mop.typeOfHit.ENTITY && bullet.ticksExisted < 3 && mop.entityHit == bullet.getThrower()) return;
 		ExplosionVNT vnt = new ExplosionVNT(bullet.worldObj, mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord, 15, bullet.getThrower());
@@ -246,42 +249,42 @@ public class XFactoryTool {
 				.setOnUpdate(LAMBDA_SAND_UPDATE)
 				.setOnEntityHit((bulletEntity, target) -> { if(target.entityHit != null) target.entityHit.extinguish(); })
 				.setOnRicochet(LAMBDA_SAND_HIT);
-		
+
 		ct_hook = new BulletConfig().setItem(EnumAmmo.CT_HOOK).setRenderRotations(false).setLife(6_000).setVel(3F).setGrav(0.035D).setDoesPenetrate(true).setDamageFalloffByPen(false)
 				.setOnUpdate(LAMBDA_SET_HOOK).setOnImpact(LAMBDA_HOOK);
 		ct_mortar = new BulletConfig().setItem(EnumAmmo.CT_MORTAR).setDamage(2.5F).setLife(200).setVel(3F).setGrav(0.035D)
 				.setOnImpact(LAMBDA_MORTAR);
 		ct_mortar_charge = new BulletConfig().setItem(EnumAmmo.CT_MORTAR_CHARGE).setDamage(5F).setLife(200).setVel(3F).setGrav(0.035D)
 				.setOnImpact(LAMBDA_MORTAR_CHARGE);
-		
+
 		ModItems.gun_fireext = new ItemGunBaseNT(WeaponQuality.UTILITY, new GunConfig()
 				.dura(5_000).draw(10).inspect(55).reloadChangeType(true).hideCrosshair(false).crosshair(Crosshair.L_CIRCLE)
 				.rec(new Receiver(0)
-						.dmg(0F).delay(1).dry(0).auto(true).spread(0F).spreadHipfire(0F).reload(20).jam(0).sound("hbm:weapon.extinguisher", 1.0F, 1.0F)
+						.dmg(0F).delay(1).dry(0).auto(true).spread(0F).spreadHipfire(0F).reload(20).jam(0).sound(NTMSounds.GUN_EXTINGUISHER_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 300).addConfigs(fext_water, fext_foam, fext_sand))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire())
 				.setupStandardConfiguration()
 				.orchestra(Orchestras.ORCHESTRA_FIREEXT)
 				).setUnlocalizedName("gun_fireext");
-		
+
 		ModItems.gun_charge_thrower = new ItemGunChargeThrower(WeaponQuality.UTILITY, new GunConfig()
 				.dura(3_000).draw(10).inspect(55).reloadChangeType(true).hideCrosshair(false).crosshair(Crosshair.L_CIRCUMFLEX)
 				.rec(new Receiver(0)
-						.dmg(10F).delay(4).dry(10).auto(true).spread(0F).spreadHipfire(0F).reload(60).jam(0).sound("hbm:weapon.fire.grenade", 1.0F, 1.0F)
+						.dmg(10F).delay(4).dry(10).auto(true).spread(0F).spreadHipfire(0F).reload(60).jam(0).sound(NTMSounds.GUN_CHARGE_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 1).addConfigs(ct_hook, ct_mortar, ct_mortar_charge))
 						.offset(1, -0.0625 * 2.5, -0.25D)
 						.setupStandardFire().recoil(LAMBDA_RECOIL_CT))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_CT_ANIMS).orchestra(Orchestras.ORCHESTRA_CHARGE_THROWER)
-				).setUnlocalizedName("gun_charge_thrower");
+				).setDefaultAmmo(EnumAmmo.CT_MORTAR, 3).setUnlocalizedName("gun_charge_thrower");
 	}
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_CT = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(10, (float) (ctx.getPlayer().getRNG().nextGaussian() * 1.5));
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_CT_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_CT_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(-45, 0, 0, 0).addPos(0, 0, 0, 500, IType.SIN_DOWN));
@@ -295,7 +298,7 @@ public class XFactoryTool {
 				.addBus("TURN", new BusAnimationSequence().addPos(0, 60, 0, 500, IType.SIN_FULL).hold(1750).addPos(0, 0, 0, 500, IType.SIN_FULL))
 				.addBus("ROLL", new BusAnimationSequence().hold(750).addPos(0, 0, -90, 500, IType.SIN_FULL).hold(1000).addPos(0, 0, 0, 500, IType.SIN_FULL));
 		}
-		
+
 		return null;
 	};
 }

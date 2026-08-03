@@ -4,10 +4,12 @@ import com.hbm.config.ItemPoolConfigJSON;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.recipes.loader.SerializableRecipe;
-import com.hbm.particle.helper.SkeletonCreator;
 import com.hbm.util.ChatBuilder;
 import com.hbm.util.DamageResistanceHandler;
 
+import com.hbm.world.gen.util.LogicBlockActions;
+import com.hbm.world.gen.util.LogicBlockConditions;
+import com.hbm.world.gen.util.LogicBlockInteractions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -34,7 +36,11 @@ public class CommandReloadRecipes extends CommandBase {
 			SerializableRecipe.initialize();
 			ItemPoolConfigJSON.initialize();
 			DamageResistanceHandler.init();
-			SkeletonCreator.init();
+
+			LogicBlockActions.initialize();
+			LogicBlockConditions.initialize();
+			LogicBlockInteractions.initialize();
+
 
 			sender.addChatMessage(new ChatComponentText(EnumChatFormatting.YELLOW + "Reload complete :)"));
 		} catch(Exception ex) {

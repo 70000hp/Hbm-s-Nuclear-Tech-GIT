@@ -33,6 +33,8 @@ public class ServerProxy {
 	public static final int ID_FAN_MODE = 10;
 	public static final int ID_TOOLABILITY = 11;
 	public static final int ID_GAS_HAZARD = 12;
+	public static final int ID_WRENCH = 13;
+	public static final int ID_PAGER_DYN = 1000;
 	
 	public ITranslate getI18n() { return I18N; }
 
@@ -70,6 +72,8 @@ public class ServerProxy {
 	public EntityPlayer me() {
 		return null;
 	}
+	
+	public boolean advancedTooltips() { return false; }
 
 	public boolean isVanished(Entity e) {
 		return false;

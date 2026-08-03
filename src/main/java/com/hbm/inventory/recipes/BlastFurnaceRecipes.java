@@ -16,7 +16,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
-import com.hbm.blocks.ModBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.handler.imc.IMCBlastFurnace;
 import com.hbm.inventory.RecipesCommon.AStack;
@@ -37,6 +36,7 @@ import net.minecraft.item.ItemStack;
  * 
  * @author UFFR
  */
+@Deprecated
 public class BlastFurnaceRecipes extends SerializableRecipe {
 
 	private static final ArrayList<Triplet<Object, Object, ItemStack>> blastFurnaceRecipes = new ArrayList();
@@ -52,17 +52,13 @@ public class BlastFurnaceRecipes extends SerializableRecipe {
 		addRecipe(IRON.ore(),	new ComparableStack(ModItems.powder_flux),	new ItemStack(ModItems.ingot_steel, 3));
 		
 		addRecipe(CU,									REDSTONE,										new ItemStack(ModItems.ingot_red_copper, 2));
-		addRecipe(STEEL,								MINGRADE,										new ItemStack(ModItems.ingot_advanced_alloy, 2));
-		addRecipe(W,									COAL,											new ItemStack(ModItems.neutron_reflector, 2));
-		addRecipe(W,									ANY_COKE,										new ItemStack(ModItems.neutron_reflector, 2));
 		addRecipe(new ComparableStack(ModItems.canister_full, 1, Fluids.GASOLINE.getID()), "slimeball",	new ItemStack(ModItems.canister_napalm));
 		addRecipe(W,									SA326.nugget(),									new ItemStack(ModItems.ingot_magnetized_tungsten));
 		addRecipe(STEEL,								TC99.nugget(),									new ItemStack(ModItems.ingot_tcalloy));
 		addRecipe(GOLD.plate(),							ModItems.plate_mixed,							new ItemStack(ModItems.plate_paa, 2));
-		addRecipe(BIGMT,								ModItems.powder_meteorite,						new ItemStack(ModItems.ingot_starmetal, 2));
-		addRecipe(CO,									ModBlocks.block_meteor,							new ItemStack(ModItems.ingot_meteorite));
+		addRecipe(BIGMT,								ModItems.ingot_meteorite,						new ItemStack(ModItems.ingot_starmetal, 2));
+		addRecipe(CO,									ModItems.powder_meteorite,						new ItemStack(ModItems.ingot_meteorite));
 		addRecipe(ModItems.meteorite_sword_hardened,	CO,												new ItemStack(ModItems.meteorite_sword_alloyed));
-		addRecipe(ModBlocks.block_meteor,				CO,												new ItemStack(ModItems.ingot_meteorite));
 
 		if(GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSimpleChemsitry) {
 			addRecipe(ModItems.canister_empty, COAL, new ItemStack(ModItems.canister_full, 1, Fluids.OIL.getID()));
@@ -154,7 +150,7 @@ public class BlastFurnaceRecipes extends SerializableRecipe {
 					else {
 						in1.remove(nothing);
 						in1.addAll(stack.extractForNEI());
-						break;
+						continue;
 					}
 				}
 				if(in1.contains(nothing)) {
@@ -166,7 +162,7 @@ public class BlastFurnaceRecipes extends SerializableRecipe {
 					} else {
 						in2.remove(nothing);
 						in2.addAll(stack.extractForNEI());
-						break;
+						continue;
 					}
 				}
 				if(in2.contains(nothing)) {
@@ -192,7 +188,7 @@ public class BlastFurnaceRecipes extends SerializableRecipe {
 
 	@Override
 	public String getFileName() {
-		return "hbmBlastFurnace.json";
+		return "hbmBlastFurnaceLegacy.json";
 	}
 	
 	@Override

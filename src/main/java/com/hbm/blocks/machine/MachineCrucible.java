@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ICustomBlockHighlight;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.inventory.material.Mats.MaterialStack;
 import com.hbm.items.machine.ItemScraps;
 import com.hbm.main.MainRegistry;
@@ -27,7 +28,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class MachineCrucible extends BlockDummyable implements ICrucibleAcceptor {
+public class MachineCrucible extends BlockDummyable implements ICrucibleAcceptor, ITooltipProvider {
 
 	public MachineCrucible() {
 		super(Material.rock);
@@ -148,9 +149,6 @@ public class MachineCrucible extends BlockDummyable implements ICrucibleAcceptor
 		float exp = 0.002F;
 
 		ICustomBlockHighlight.setup();
-		/*event.context.drawOutlinedBoundingBox(AxisAlignedBB.getBoundingBox(x - 1, y, z - 1, x + 2, y + 0.5, z + 2).expand(exp, exp, exp).getOffsetBoundingBox(-dX, -dY, -dZ), -1);
-		event.context.drawOutlinedBoundingBox(AxisAlignedBB.getBoundingBox(x - 0.75, y + 0.5, z - 0.75, x + 1.75, y + 1.5, z + 1.75).expand(exp, exp, exp).getOffsetBoundingBox(-dX, -dY, -dZ), -1);
-		event.context.drawOutlinedBoundingBox(AxisAlignedBB.getBoundingBox(x - 0.5, y + 0.75, z - 0.5, x + 1.5, y + 1.5, z + 1.5).expand(exp, exp, exp).getOffsetBoundingBox(-dX, -dY, -dZ), -1);*/
 		for(AxisAlignedBB aabb : this.bounding) event.context.drawOutlinedBoundingBox(aabb.expand(exp, exp, exp).getOffsetBoundingBox(x - dX + 0.5, y - dY, z - dZ + 0.5), -1);
 		ICustomBlockHighlight.cleanup();
 	}
@@ -181,4 +179,9 @@ public class MachineCrucible extends BlockDummyable implements ICrucibleAcceptor
 
 	@Override public boolean canAcceptPartialFlow(World world, int x, int y, int z, ForgeDirection side, MaterialStack stack) { return false; }
 	@Override public MaterialStack flow(World world, int x, int y, int z, ForgeDirection side, MaterialStack stack) { return null; }
+
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean ext) {
+		this.addStandardInfo(stack, player, list, ext);
+	}
 }

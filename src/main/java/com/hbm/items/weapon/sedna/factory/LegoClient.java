@@ -12,6 +12,7 @@ import com.hbm.items.weapon.sedna.hud.HUDComponentDurabilityBar;
 import com.hbm.items.weapon.sedna.impl.ItemGunChargeThrower;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.ResourceManager;
+import com.hbm.render.entity.projectile.RenderRBMKDebris;
 import com.hbm.render.item.weapon.sedna.ItemRenderFatMan;
 import com.hbm.render.tileentity.RenderArcFurnace;
 import com.hbm.render.util.BeamPronter;
@@ -35,6 +36,7 @@ public class LegoClient {
 	public static HUDComponentAmmoCounter HUD_COMPONENT_AMMO = new HUDComponentAmmoCounter(0);
 	public static HUDComponentAmmoCounter HUD_COMPONENT_AMMO_MIRROR = new HUDComponentAmmoCounter(0).mirror();
 	public static HUDComponentAmmoCounter HUD_COMPONENT_AMMO_NOCOUNTER = new HUDComponentAmmoCounter(0).noCounter();
+	public static HUDComponentAmmoCounter HUD_COMPONENT_AMMO_SECOND = new HUDComponentAmmoCounter(1);
 	
 	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_STANDARD_BULLET = (bullet, interp) -> {
 		double length = bullet.prevVelocity + (bullet.velocity - bullet.prevVelocity) * interp;
@@ -52,6 +54,12 @@ public class LegoClient {
 		double length = bullet.prevVelocity + (bullet.velocity - bullet.prevVelocity) * interp;
 		if(length <= 0) return;
 		renderBulletStandard(Tessellator.instance, 0xFF6A00, 0xFFE28D, length, false);
+	};
+	
+	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_FRAGMENTATION = (bullet, interp) -> {
+		double length = bullet.prevVelocity + (bullet.velocity - bullet.prevVelocity) * interp;
+		if(length <= 0) return;
+		renderBulletStandard(Tessellator.instance, 0xFF6A00, 0xFFE28D, length, true);
 	};
 	
 	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_EXPRESS_BULLET = (bullet, interp) -> {
@@ -202,6 +210,14 @@ public class LegoClient {
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
 	}
+	
+	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_GRAPHITE = (bullet, interp) -> {
+		GL11.glScalef(2F, 2F, 2F);
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(RenderRBMKDebris.tex_graphite);
+		ResourceManager.deb_graphite.renderAll();
+		GL11.glShadeModel(GL11.GL_FLAT);
+	};
 	
 	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_GRENADE = (bullet, interp) -> {
 		GL11.glScalef(0.25F, 0.25F, 0.25F);
@@ -397,6 +413,25 @@ public class LegoClient {
 		GL11.glPopMatrix();
 		RenderArcFurnace.fullbright(false);
 	};
+	
+	public static BiConsumer<EntityBulletBeamBase, Float> RENDER_NI4NI_BOLT = (bullet, interp) -> {
+
+		RenderArcFurnace.fullbright(true);
+		double age = MathHelper.clamp_double(1D - ((double) bullet.ticksExisted - 2 + interp) / (double) bullet.getBulletConfig().expires, 0, 1);
+		
+		GL11.glPushMatrix();
+		GL11.glRotatef(180 - bullet.rotationYaw, 0, 1F, 0);
+		GL11.glRotatef(-bullet.rotationPitch - 90, 1F, 0, 0);
+
+		double scale = 5D;
+		GL11.glScaled(age * scale, 1, age * scale);
+		GL11.glTranslated(0, bullet.beamLength, 0);
+		GL11.glRotatef(-90, 0, 0, 1);
+		renderBulletStandard(Tessellator.instance, 0xAAD2E5, 0xffffff, bullet.beamLength, true);
+		
+		GL11.glPopMatrix();
+		RenderArcFurnace.fullbright(false);
+	};
 
 	public static BiConsumer<EntityBulletBeamBase, Float> RENDER_LASER_RED = (bullet, interp) -> {
 		renderStandardLaser(bullet, interp, 0x80, 0x15, 0x15);
@@ -424,7 +459,7 @@ public class LegoClient {
 		double age = MathHelper.clamp_double(1D - ((double) bullet.ticksExisted - 2 + interp) / (double) bullet.getBulletConfig().expires, 0, 1);
 		GL11.glScaled(age / 2 + 0.5, 1, age / 2 + 0.5);
 		int colorInner = ((int)(r * age) << 16) | ((int)(g * age) << 8) | (int) (b * age);
-		BeamPronter.prontBeam(delta, EnumWaveType.RANDOM, EnumBeamType.SOLID, colorInner, colorInner, bullet.ticksExisted / 3, (int)(bullet.beamLength / 2 + 1), 0F, 8, 0.0625F);
+		BeamPronter.prontBeam(delta, EnumWaveType.RANDOM, EnumBeamType.SOLID, colorInner, colorInner, bullet.ticksExisted / 3, (int)(bullet.beamLength / 2 + 1), 0F, 4, 0.025F);
 		GL11.glPopMatrix();
 		RenderArcFurnace.fullbright(false);
 	}
@@ -462,6 +497,19 @@ public class LegoClient {
 		GL11.glTranslatef(0, -1, 1F);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(ResourceManager.fatman_mininuke_tex);
+		ResourceManager.fatman.renderPart("MiniNuke");
+		GL11.glShadeModel(GL11.GL_FLAT);
+		GL11.glPopMatrix();
+	};
+	
+	public static BiConsumer<EntityBulletBaseMK4, Float> RENDER_BOMB = (bullet, interp) -> {
+
+		GL11.glPushMatrix();
+		GL11.glScalef(0.0625F, 0.0625F, 0.0625F);
+		GL11.glRotated(-90, 0, 1, 0);
+		GL11.glTranslatef(0, -1, 1F);
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(ResourceManager.cluster_submunition_tex);
 		ResourceManager.fatman.renderPart("MiniNuke");
 		GL11.glShadeModel(GL11.GL_FLAT);
 		GL11.glPopMatrix();

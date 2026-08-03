@@ -2,7 +2,6 @@ package com.hbm.crafting;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.config.GeneralConfig;
-import com.hbm.inventory.OreDictManager;
 import com.hbm.inventory.fluid.Fluids;
 
 import static com.hbm.inventory.OreDictManager.*;
@@ -37,10 +36,6 @@ public class ArmorRecipes {
 		addChest(	TI.ingot(), ModItems.titanium_plate);
 		addLegs(	TI.ingot(), ModItems.titanium_legs);
 		addBoots(	TI.ingot(), ModItems.titanium_boots);
-		addHelmet(	ALLOY.ingot(), ModItems.alloy_helmet);
-		addChest(	ALLOY.ingot(), ModItems.alloy_plate);
-		addLegs(	ALLOY.ingot(), ModItems.alloy_legs);
-		addBoots(	ALLOY.ingot(), ModItems.alloy_boots);
 		addHelmet(	CMB.ingot(), ModItems.cmb_helmet);
 		addChest(	CMB.ingot(), ModItems.cmb_plate);
 		addLegs(	CMB.ingot(), ModItems.cmb_legs);
@@ -64,14 +59,14 @@ public class ArmorRecipes {
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.zirconium_legs, 1), new Object[] { "EEE", "E E", "E E", 'E', ZR.ingot() });
 
 		//Power armor
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t45_helmet, 1), new Object[] { "PPC", "PBP", "IXI", 'P', ModItems.plate_armor_titanium, 'C', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.BASIC), 'I', ANY_RUBBER.ingot(), 'X', ModItems.gas_mask_m65, 'B', ModItems.titanium_helmet });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t45_plate, 1), new Object[] { "MPM", "TBT", "PPP", 'M', ModItems.motor, 'P', ModItems.plate_armor_titanium, 'T', ModItems.gas_empty, 'B', ModItems.titanium_plate });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t45_legs, 1), new Object[] { "MPM", "PBP", "P P", 'M', ModItems.motor, 'P', ModItems.plate_armor_titanium, 'B', ModItems.titanium_legs });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t45_boots, 1), new Object[] { "P P", "PBP", 'P', ModItems.plate_armor_titanium, 'B', ModItems.titanium_boots });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_helmet, 1), new Object[] { "PPC", "PBP", "IXI", 'P', ModItems.plate_armor_ajr, 'C', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.BASIC), 'I', ANY_PLASTIC.ingot(), 'X', ModItems.gas_mask_m65, 'B', ModItems.alloy_helmet });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_plate, 1), new Object[] { "MPM", "TBT", "PPP", 'M', ModItems.motor_desh, 'P', ModItems.plate_armor_ajr, 'T', ModItems.gas_empty, 'B', ModItems.alloy_plate });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_legs, 1), new Object[] { "MPM", "PBP", "P P", 'M', ModItems.motor_desh, 'P', ModItems.plate_armor_ajr, 'B', ModItems.alloy_legs });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_boots, 1), new Object[] { "P P", "PBP", 'P', ModItems.plate_armor_ajr, 'B', ModItems.alloy_boots });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t51_helmet, 1), new Object[] { "PPC", "PBP", "IXI", 'P', ModItems.plate_armor_titanium, 'C', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.BASIC), 'I', ANY_RUBBER.ingot(), 'X', ModItems.gas_mask_m65, 'B', ModItems.titanium_helmet });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t51_plate, 1), new Object[] { "MPM", "TBT", "PPP", 'M', ModItems.motor, 'P', ModItems.plate_armor_titanium, 'T', ModItems.gas_empty, 'B', ModItems.titanium_plate });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t51_legs, 1), new Object[] { "MPM", "PBP", "P P", 'M', ModItems.motor, 'P', ModItems.plate_armor_titanium, 'B', ModItems.titanium_legs });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.t51_boots, 1), new Object[] { "P P", "PBP", 'P', ModItems.plate_armor_titanium, 'B', ModItems.titanium_boots });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_helmet, 1), new Object[] { "PPC", "PBP", "IXI", 'P', ModItems.plate_armor_ajr, 'C', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.BASIC), 'I', ANY_PLASTIC.ingot(), 'X', ModItems.gas_mask_m65, 'B', ModItems.titanium_helmet });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_plate, 1), new Object[] { "MPM", "TBT", "PPP", 'M', ModItems.motor_desh, 'P', ModItems.plate_armor_ajr, 'T', ModItems.gas_empty, 'B', ModItems.titanium_plate });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_legs, 1), new Object[] { "MPM", "PBP", "P P", 'M', ModItems.motor_desh, 'P', ModItems.plate_armor_ajr, 'B', ModItems.titanium_legs });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ajr_boots, 1), new Object[] { "P P", "PBP", 'P', ModItems.plate_armor_ajr, 'B', ModItems.titanium_boots });
 		CraftingManager.addShapelessAuto(new ItemStack(ModItems.ajro_helmet, 1), new Object[] { ModItems.ajr_helmet, KEY_RED, KEY_BLACK });
 		CraftingManager.addShapelessAuto(new ItemStack(ModItems.ajro_plate, 1), new Object[] { ModItems.ajr_plate, KEY_RED, KEY_BLACK });
 		CraftingManager.addShapelessAuto(new ItemStack(ModItems.ajro_legs, 1), new Object[] { ModItems.ajr_legs, KEY_RED, KEY_BLACK });
@@ -149,9 +144,9 @@ public class ArmorRecipes {
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.hazmat_paa_plate, 1), new Object[] { "E E", "EEE", "EEE", 'E', ModItems.plate_paa });
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.hazmat_paa_legs, 1), new Object[] { "EEE", "E E", "E E", 'E', ModItems.plate_paa });
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.hazmat_paa_boots, 1), new Object[] { "E E", "E E", 'E', ModItems.plate_paa });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_plate, 1), new Object[] { "E E", "NEN", "ENE", 'E', ModItems.plate_paa, 'N', OreDictManager.getReflector() });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_legs, 1), new Object[] { "EEE", "N N", "E E", 'E', ModItems.plate_paa, 'N', OreDictManager.getReflector() });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_boots, 1), new Object[] { "E E", "N N", 'E', ModItems.plate_paa, 'N', OreDictManager.getReflector() });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_plate, 1), new Object[] { "E E", "NEN", "ENE", 'E', ModItems.plate_paa, 'N', ModItems.neutron_reflector });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_legs, 1), new Object[] { "EEE", "N N", "E E", 'E', ModItems.plate_paa, 'N', ModItems.neutron_reflector });
+		CraftingManager.addRecipeAuto(new ItemStack(ModItems.paa_boots, 1), new Object[] { "E E", "N N", 'E', ModItems.plate_paa, 'N', ModItems.neutron_reflector });
 		
 		//Liquidator Suit
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.liquidator_helmet, 1), new Object[] { "III", "CBC", "III", 'I', ANY_RUBBER.ingot(), 'C', ModItems.cladding_lead, 'B', ModItems.hazmat_helmet_grey });
@@ -169,11 +164,6 @@ public class ArmorRecipes {
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.ashglasses, 1), new Object[] { "I I", "GPG", 'I', ANY_RUBBER.ingot(), 'G', ModBlocks.glass_ash, 'P', ANY_PLASTIC.ingot() });
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.mask_rag, 1), new Object[] { "RRR", 'R', ModItems.rag_damp });
 		CraftingManager.addRecipeAuto(new ItemStack(ModItems.mask_piss, 1), new Object[] { "RRR", 'R', ModItems.rag_piss });
-		
-		//Capes
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.cape_radiation, 1), new Object[] { "W W", "WIW", "WDW", 'W', new ItemStack(Blocks.wool, 1, 11), 'D', KEY_YELLOW, 'I', ModItems.nuclear_waste });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.cape_gasmask, 1), new Object[] { "W W", "WIW", "WDW", 'W', new ItemStack(Blocks.wool, 1, 4), 'D', KEY_BLACK, 'I', ModItems.gas_mask });
-		CraftingManager.addRecipeAuto(new ItemStack(ModItems.cape_schrabidium, 1), new Object[] { "W W", "WIW", "WDW", 'W', SA326.ingot(), 'D', KEY_BLACK, 'I', DictFrame.fromOne(ModItems.circuit, EnumCircuitType.CHIP) });
 		
 		//Configged
 		if(GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSimpleArmorRecipes) {

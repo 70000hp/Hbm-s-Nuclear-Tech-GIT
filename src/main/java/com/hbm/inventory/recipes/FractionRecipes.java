@@ -23,9 +23,8 @@ public class FractionRecipes extends SerializableRecipe {
 
 	@Override
 	public void registerDefaults() {
-		fractions.put(Fluids.HEAVYOIL,			new Pair(new FluidStack(Fluids.BITUMEN,					30),		new FluidStack(Fluids.SMEAR,				70)));
-		fractions.put(Fluids.HEAVYOIL_VACUUM,	new Pair(new FluidStack(Fluids.SMEAR,					40),		new FluidStack(Fluids.HEATINGOIL_VACUUM,	60)));
-		fractions.put(Fluids.SMEAR,				new Pair(new FluidStack(Fluids.HEATINGOIL,				60),		new FluidStack(Fluids.LUBRICANT,			40)));
+		fractions.put(Fluids.HEAVYOIL,			new Pair(new FluidStack(Fluids.BITUMEN,					30),		new FluidStack(Fluids.HEATINGOIL,				70)));
+		fractions.put(Fluids.HEAVYOIL_VACUUM,	new Pair(new FluidStack(Fluids.BITUMEN,					40),		new FluidStack(Fluids.HEATINGOIL_VACUUM,	60)));
 		fractions.put(Fluids.NAPHTHA,			new Pair(new FluidStack(Fluids.HEATINGOIL,				40),		new FluidStack(Fluids.DIESEL,				60)));
 		fractions.put(Fluids.NAPHTHA_DS,		new Pair(new FluidStack(Fluids.XYLENE,					60),		new FluidStack(Fluids.DIESEL_REFORM,		40)));
 		fractions.put(Fluids.NAPHTHA_CRACK,		new Pair(new FluidStack(Fluids.HEATINGOIL,				30),		new FluidStack(Fluids.DIESEL_CRACK,			70)));
@@ -39,7 +38,7 @@ public class FractionRecipes extends SerializableRecipe {
 		fractions.put(Fluids.EGG,				new Pair(new FluidStack(Fluids.CHOLESTEROL,				50),		new FluidStack(Fluids.RADIOSOLVENT,			50)));
 		fractions.put(Fluids.OIL_COKER,			new Pair(new FluidStack(Fluids.CRACKOIL,				30),		new FluidStack(Fluids.HEATINGOIL,			70)));
 		fractions.put(Fluids.NAPHTHA_COKER,		new Pair(new FluidStack(Fluids.NAPHTHA_CRACK,			75),		new FluidStack(Fluids.LIGHTOIL_CRACK,		25)));
-		fractions.put(Fluids.GAS_COKER,			new Pair(new FluidStack(Fluids.AROMATICS,				25),		new FluidStack(Fluids.CARBONDIOXIDE,		75)));
+		fractions.put(Fluids.GAS_COKER,			new Pair(new FluidStack(Fluids.UNSATURATEDS,				25),		new FluidStack(Fluids.CARBONDIOXIDE,		75)));
 		fractions.put(Fluids.CHLOROCALCITE_MIX,	new Pair(new FluidStack(Fluids.CHLOROCALCITE_CLEANED,	50),		new FluidStack(Fluids.COLLOID,				50)));
 		fractions.put(Fluids.BAUXITE_SOLUTION,	new Pair(new FluidStack(Fluids.REDMUD,					50),		new FluidStack(Fluids.SODIUM_ALUMINATE,		50)));
 	}

@@ -66,17 +66,13 @@ public class EntityMaskMan extends EntityMob implements IBossDisplayData, IRadia
 			return true;
 		}
 
-		if(source.isFireDamage())
-			amount = 0;
-		if(source.isMagicDamage())
-			amount = 0;
-		if(source.isProjectile())
-			amount *= 0.25F;
-		if(source.isExplosion())
-			amount *= 0.5F;
+		if(source.isFireDamage()) amount = 0;
+		if(source.isMagicDamage()) amount = 0;
+		if(source.isProjectile()) amount *= 0.5F;
+		if(source.isExplosion()) amount *= 0.5F;
 
 		if(amount > 50) {
-			amount = 50 + (amount - 50) * 0.25F;
+			amount = 50 + (amount - 50) * 0.5F;
 		}
 
 		return super.attackEntityFrom(source, amount);
@@ -96,25 +92,18 @@ public class EntityMaskMan extends EntityMob implements IBossDisplayData, IRadia
 	}
 
 	@Override
-	public void onDeath(DamageSource p_70645_1_) {
-		super.onDeath(p_70645_1_);
+	public void onDeath(DamageSource source) {
+		super.onDeath(source);
 
-		List<EntityPlayer> players = worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.boundingBox.expand(50, 50, 50));
+		List<EntityPlayer> players = worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.boundingBox.expand(100, 100, 100));
 
 		for(EntityPlayer player : players) {
 			player.triggerAchievement(MainRegistry.bossMaskman);
 		}
 	}
 
-	@Override
-	public boolean isAIEnabled() {
-		return true;
-	}
-
-	@Override
-	protected boolean canDespawn() {
-		return false;
-	}
+	@Override public boolean isAIEnabled() { return true; }
+	@Override protected boolean canDespawn() { return false; }
 
 	@Override
 	protected void dropFewItems(boolean bool, int i) {

@@ -16,12 +16,13 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmoSecret;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
+import com.hbm.main.NTMSounds;
 import com.hbm.particle.SpentCasing;
 import com.hbm.particle.SpentCasing.CasingType;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,7 +33,7 @@ public class XFactory35800 {
 
 	public static BulletConfig p35800;
 	public static BulletConfig p35800_bl;
-	
+
 	public static BiConsumer<EntityBulletBeamBase, MovingObjectPosition> LAMBDA_BLACK_IMPACT = (bullet, mop) -> {
 		if(mop.typeOfHit == mop.typeOfHit.ENTITY) {
 			Entity hit = mop.entityHit;
@@ -45,10 +46,10 @@ public class XFactory35800 {
 			fire.setPosition(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
 			bullet.worldObj.spawnEntityInWorld(fire);
 		}
-		
+
 		BulletConfig.LAMBDA_STANDARD_BEAM_HIT.accept(bullet, mop);
 	};
-	
+
 	public static void init() {
 
 		p35800 = new BulletConfig().setItem(EnumAmmoSecret.P35_800).setArmorPiercing(0.5F).setThresholdNegation(50F).setBeam().setSpread(0.0F).setLife(3).setRenderRotations(false)
@@ -59,18 +60,18 @@ public class XFactory35800 {
 		ModItems.gun_aberrator = new ItemGunBaseNT(WeaponQuality.SECRET, new GunConfig()
 				.dura(2_000).draw(10).inspect(26).crosshair(Crosshair.CIRCLE).smoke(Lego.LAMBDA_STANDARD_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(100F).delay(13).dry(21).reload(51).sound("hbm:weapon.fire.aberrator", 1.0F, 1.0F)
+						.dmg(100F).delay(13).dry(21).reload(51).sound(NTMSounds.GUN_ABERRATOR_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 5).addConfigs(p35800, p35800_bl))
 						.offset(0.75, -0.0625 * 1.5, -0.1875)
 						.canFire(Lego.LAMBDA_STANDARD_CAN_FIRE).fire(Lego.LAMBDA_NOWEAR_FIRE).recoil(LAMBDA_RECOIL_ABERRATOR))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_ABERRATOR).orchestra(Orchestras.ORCHESTRA_ABERRATOR)
 				).setUnlocalizedName("gun_aberrator");
-		
+
 		ModItems.gun_aberrator_eott = new ItemGunBaseNT(WeaponQuality.SECRET,
 				new GunConfig().dura(2_000).draw(10).inspect(26).crosshair(Crosshair.CIRCLE).smoke(Lego.LAMBDA_STANDARD_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(100F).spreadHipfire(0F).delay(13).dry(21).reload(51).sound("hbm:weapon.fire.aberrator", 1.0F, 1.0F)
+						.dmg(100F).spreadHipfire(0F).delay(13).dry(21).reload(51).sound(NTMSounds.GUN_ABERRATOR_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(0, 5).addConfigs(p35800, p35800_bl))
 						.offset(0.75, -0.0625 * 1.5, 0.1875)
 						.canFire(Lego.LAMBDA_STANDARD_CAN_FIRE).fire(Lego.LAMBDA_NOWEAR_FIRE).recoil(LAMBDA_RECOIL_ABERRATOR))
@@ -79,7 +80,7 @@ public class XFactory35800 {
 				.anim(LAMBDA_ABERRATOR).orchestra(Orchestras.ORCHESTRA_ABERRATOR),
 				new GunConfig().dura(2_000).draw(10).inspect(26).crosshair(Crosshair.CIRCLE).smoke(Lego.LAMBDA_STANDARD_SMOKE)
 				.rec(new Receiver(0)
-						.dmg(100F).spreadHipfire(0F).delay(13).dry(21).reload(51).sound("hbm:weapon.fire.aberrator", 1.0F, 1.0F)
+						.dmg(100F).spreadHipfire(0F).delay(13).dry(21).reload(51).sound(NTMSounds.GUN_ABERRATOR_FIRE, 1.0F, 1.0F)
 						.mag(new MagazineFullReload(1, 5).addConfigs(p35800, p35800_bl))
 						.offset(0.75, -0.0625 * 1.5, -0.1875)
 						.canFire(Lego.LAMBDA_STANDARD_CAN_FIRE).fire(Lego.LAMBDA_NOWEAR_FIRE).recoil(LAMBDA_RECOIL_ABERRATOR))
@@ -88,12 +89,12 @@ public class XFactory35800 {
 				.anim(LAMBDA_ABERRATOR).orchestra(Orchestras.ORCHESTRA_ABERRATOR)
 				).setUnlocalizedName("gun_aberrator_eott");
 	}
-	
+
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_ABERRATOR = (stack, ctx) -> {
 		ItemGunBaseNT.setupRecoil(10, (float) (ctx.getPlayer().getRNG().nextGaussian() * 1.5));
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_ABERRATOR = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_ABERRATOR = (stack, type) -> {
 		boolean aim = ItemGunBaseNT.getIsAiming(stack);
 		int ammo = ((ItemGunBaseNT) stack.getItem()).getConfig(stack, 0).getReceivers(stack)[0].getMagazine(stack).getAmount(stack, null);
 		switch(type) {
@@ -122,7 +123,7 @@ public class XFactory35800 {
 		case INSPECT: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(0, 0, 0, 0).addPos(-720, 0, 0, 1000, IType.SIN_FULL).addPos(-720, 0, 0, 250).addPos(0, 0, 0, 1000, IType.SIN_FULL));
 		}
-		
+
 		return null;
 	};
 }

@@ -21,11 +21,12 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmoSecret;
 import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
+import com.hbm.main.NTMSounds;
 import com.hbm.packet.toclient.AuxParticlePacketNT;
+import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.render.anim.BusAnimation;
 import com.hbm.render.anim.BusAnimationSequence;
 import com.hbm.render.anim.BusAnimationKeyframe.IType;
-import com.hbm.render.anim.HbmAnimations.AnimType;
 import com.hbm.util.ContaminationUtil;
 import com.hbm.util.EntityDamageUtil;
 import com.hbm.util.Vec3NT;
@@ -36,6 +37,7 @@ import com.hbm.util.DamageResistanceHandler.DamageClass;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -106,7 +108,7 @@ public class XFactoryFolly {
 		ModItems.gun_folly = new ItemGunBaseNT(WeaponQuality.SECRET, new GunConfig()
 				.dura(0).draw(40).crosshair(Crosshair.NONE)
 				.rec(new Receiver(0)
-						.dmg(1_000F).delay(26).dryfire(false).reload(160).jam(0).sound("hbm:weapon.fire.loudestNoiseOnEarth", 100.0F, 1.0F)
+						.dmg(1_000F).delay(26).dryfire(false).reload(160).jam(0).sound(NTMSounds.GUN_PLEASE_REMOVE_MY_EARDRUMS_THANKS, 100.0F, 1.0F)
 						.mag(new MagazineSingleReload(0, 1).addConfigs(folly_sm, folly_nuke))
 						.offset(0.75, -0.0625, -0.1875D).offsetScoped(0.75, -0.0625, -0.125D)
 						.canFire(LAMBDA_CAN_FIRE).fire(LAMBDA_FIRE).recoil(LAMBDA_RECOIL_FOLLY))
@@ -119,18 +121,20 @@ public class XFactoryFolly {
 		if(ItemGunBaseNT.getState(stack, ctx.configIndex) == GunState.IDLE) {
 			boolean wasAiming = ItemGunBaseNT.getIsAiming(stack);
 			ItemGunBaseNT.setIsAiming(stack, !wasAiming);
-			if(!wasAiming) ItemGunBaseNT.playAnimation(ctx.getPlayer(), stack, AnimType.SPINUP, ctx.configIndex);
+			if(!wasAiming) ItemGunBaseNT.playAnimation(ctx.getPlayer(), stack, GunAnimation.SPINUP, ctx.configIndex);
 		}
 	};
 
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_FIRE = (stack, ctx) -> {
-		Lego.doStandardFire(stack, ctx, AnimType.CYCLE, false);
+		Lego.doStandardFire(stack, ctx, GunAnimation.CYCLE, 0, false);
 	};
 
 	public static BiFunction<ItemStack, LambdaContext, Boolean> LAMBDA_CAN_FIRE = (stack, ctx) -> {
-		if(!ItemGunBaseNT.getIsAiming(stack)) return false;
-		if(ItemGunBaseNT.getLastAnim(stack, ctx.configIndex) != AnimType.SPINUP) return false;
-		if(ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex) < 100) return false;
+		if(ctx.entity instanceof EntityPlayer) {
+			if(!ItemGunBaseNT.getIsAiming(stack)) return false;
+			if(ItemGunBaseNT.getLastAnim(stack, ctx.configIndex) != GunAnimation.SPINUP) return false;
+			if(ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex) < 100) return false;
+		}
 		return ctx.config.getReceivers(stack)[0].getMagazine(stack).getAmount(stack, ctx.inventory) > 0;
 	};
 
@@ -138,7 +142,7 @@ public class XFactoryFolly {
 		ItemGunBaseNT.setupRecoil(25, (float) (ctx.getPlayer().getRNG().nextGaussian() * 1.5));
 	};
 
-	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, AnimType, BusAnimation> LAMBDA_FOLLY_ANIMS = (stack, type) -> {
+	@SuppressWarnings("incomplete-switch") public static BiFunction<ItemStack, GunAnimation, BusAnimation> LAMBDA_FOLLY_ANIMS = (stack, type) -> {
 		switch(type) {
 		case EQUIP: return new BusAnimation()
 				.addBus("EQUIP", new BusAnimationSequence().addPos(-60, 0, 0, 0).addPos(5, 0, 0, 1500, IType.SIN_DOWN).addPos(0, 0, 0, 500, IType.SIN_FULL));

@@ -1,7 +1,11 @@
 package com.hbm.blocks.network;
 
 import api.hbm.block.IToolable;
+
+import java.util.List;
+
 import com.hbm.blocks.IBlockMultiPass;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.interfaces.ICopiable;
 import com.hbm.lib.RefStrings;
 import com.hbm.render.block.RenderBlockMultipass;
@@ -13,6 +17,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,7 +29,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockCablePaintable extends BlockContainer implements IToolable, IBlockMultiPass {
+public class BlockCablePaintable extends BlockContainer implements IToolable, IBlockMultiPass, ITooltipProvider {
 
 	@SideOnly(Side.CLIENT) protected IIcon overlay;
 
@@ -53,7 +58,7 @@ public class BlockCablePaintable extends BlockContainer implements IToolable, IB
 			TileEntityCablePaintable pipe = (TileEntityCablePaintable) tile;
 
 			if(pipe.block != null) {
-				if(RenderBlockMultipass.currentPass == 1) {
+				if(RenderBlockMultipass.currentPass == 1 && pipe.getBlockMetadata() == 0) {
 					return this.overlay;
 				} else {
 					return pipe.block.getIcon(side, pipe.meta);
@@ -73,7 +78,7 @@ public class BlockCablePaintable extends BlockContainer implements IToolable, IB
 			ItemBlock ib = (ItemBlock) stack.getItem();
 			Block block = ib.field_150939_a;
 
-			if(block.renderAsNormalBlock() && block != this) {
+			if(allowedPaint(block, this)) {
 
 				TileEntity tile = world.getTileEntity(x, y, z);
 
@@ -93,23 +98,36 @@ public class BlockCablePaintable extends BlockContainer implements IToolable, IB
 
 		return super.onBlockActivated(world, x, y, z, player, side, fX, fY, fZ);
 	}
+	
+	public static boolean allowedPaint(Block paint, Block that) {
+		if(paint == Blocks.grass) return false;
+		return paint.renderAsNormalBlock() && paint != that;
+	}
 
 	@Override
 	public boolean onScrew(World world, EntityPlayer player, int x, int y, int z, int side, float fX, float fY, float fZ, ToolType tool) {
 
-		if(tool != ToolType.SCREWDRIVER) return false;
-
-		TileEntity tile = world.getTileEntity(x, y, z);
-
-		if(tile instanceof TileEntityCablePaintable) {
-			TileEntityCablePaintable pipe = (TileEntityCablePaintable) tile;
-
-			if(pipe.block != null) {
-				pipe.block = null;
-				world.markBlockForUpdate(x, y, z);
-				pipe.markDirty();
-				return true;
+		if(tool == ToolType.SCREWDRIVER) {
+	
+			TileEntity tile = world.getTileEntity(x, y, z);
+	
+			if(tile instanceof TileEntityCablePaintable) {
+				TileEntityCablePaintable pipe = (TileEntityCablePaintable) tile;
+	
+				if(pipe.block != null) {
+					pipe.block = null;
+					world.markBlockForUpdate(x, y, z);
+					pipe.markDirty();
+					return true;
+				}
 			}
+		}
+		
+		if(tool == ToolType.DEFUSER) {
+			int meta = world.getBlockMetadata(x, y, z);
+			if(meta == 0) world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+			else world.setBlockMetadataWithNotify(x, y, z, 0, 3);
+			return true;
 		}
 
 		return false;
@@ -187,5 +205,10 @@ public class BlockCablePaintable extends BlockContainer implements IToolable, IB
 				this.meta = nbt.getInteger("paintmeta");
 			}
 		}
+	}
+
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean ext) {
+		this.addStandardInfo(stack, player, list, ext);
 	}
 }

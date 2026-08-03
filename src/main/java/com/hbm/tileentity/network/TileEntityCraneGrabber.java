@@ -99,6 +99,7 @@ public class TileEntityCraneGrabber extends TileEntityCraneBase implements IGUIP
 					List<EntityMovingItem> items = worldObj.getEntitiesWithinAABB(EntityMovingItem.class, AxisAlignedBB.getBoundingBox(x + 0.1875D, y + 0.1875D, z + 0.1875D, x + 0.8125D, y + 0.8125D, z + 0.8125D));
 
 					for(EntityMovingItem item : items) {
+						if(item.isDead) continue;
 						ItemStack stack = item.getItemStack();
 						boolean match = this.matchesFilter(stack);
 						if(this.isWhitelist && !match || !this.isWhitelist && match) continue;
@@ -107,7 +108,11 @@ public class TileEntityCraneGrabber extends TileEntityCraneBase implements IGUIP
 
 						Vec3 pos = Vec3.createVectorHelper(xCoord + 0.5 + outputSide.offsetX * 0.55, yCoord + 0.5 + outputSide.offsetY * 0.55, zCoord + 0.5 + outputSide.offsetZ * 0.55);
 						Vec3 snap = belt.getClosestSnappingPosition(worldObj, xCoord + outputSide.offsetX, yCoord + outputSide.offsetY, zCoord + outputSide.offsetZ, pos);
-						item.setPosition(snap.xCoord, snap.yCoord, snap.zCoord);
+						EntityMovingItem newItem = new EntityMovingItem(worldObj);
+						newItem.setItemStack(item.getItemStack().copy());
+						newItem.setPosition(snap.xCoord, snap.yCoord, snap.zCoord);
+						item.setDead();
+						worldObj.spawnEntityInWorld(newItem);
 						break;
 					}
 

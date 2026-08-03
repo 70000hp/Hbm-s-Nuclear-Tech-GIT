@@ -23,12 +23,15 @@ import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.main.NTMSounds;
 import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.util.BobMathUtil;
 import com.hbm.util.CrucibleUtil;
+import com.hbm.util.ItemStackUtil;
 import com.hbm.util.fauxpointtwelve.DirPos;
 import com.hbm.util.i18n.I18nUtil;
 
@@ -82,7 +85,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 	public List<MaterialStack> liquids = new ArrayList();
 
 	public TileEntityMachineArcFurnaceLarge() {
-		super(25);
+		super(30);
 	}
 
 	@Override
@@ -95,7 +98,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 		super.setInventorySlotContents(i, stack);
 
 		if(stack != null && stack.getItem() instanceof ItemMachineUpgrade && i == 4) {
-			worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "hbm:item.upgradePlug", 1.0F, 1.0F);
+			worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, NTMSounds.UPGRADE_PLUG, 1.0F, 1.0F);
 		}
 	}
 
@@ -111,6 +114,8 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 			this.isProgressing = false;
 
 			for(DirPos pos : getConPos()) this.trySubscribe(worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+
+			if(lid > 0) loadIngredients();
 
 			if(power > 0) {
 
@@ -143,7 +148,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 				} else {
 					if(this.delay > 0) delay--;
 					this.progress = 0;
-					if(lid < 1 && this.electrodes[0] != 0 && this.electrodes[1] != 0 && this.electrodes[2] != 0) {
+					if(lid < 1) {
 						lid += 1F / (60F / (upgrade * 0.5 + 1));
 						if(lid > 1) lid = 1;
 					}
@@ -208,7 +213,7 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 
 			if(this.isProgressing) {
 				if(this.audioProgress == null || !this.audioProgress.isPlaying()) {
-					this.audioProgress = MainRegistry.proxy.getLoopedSound("hbm:block.electricHum", xCoord, yCoord, zCoord, this.getVolume(1.5F), 15F, 0.75F, 5);
+					this.audioProgress = MainRegistry.proxy.getLoopedSound(NTMSounds.ELECTRIC_HUM_LOOP, xCoord, yCoord, zCoord, this.getVolume(1.5F), 15F, 0.75F, 5);
 					this.audioProgress.startSound();
 				}
 				this.audioProgress.updatePitch(0.75F);
@@ -238,20 +243,6 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 			}
 
 			if(this.lid != this.prevLid && this.lid < this.prevLid && this.lid > 0.5F && this.hasMaterial && MainRegistry.proxy.me().getDistance(xCoord + 0.5, yCoord + 4, zCoord + 0.5) < 50) {
-				/*NBTTagCompound data = new NBTTagCompound();
-				data.setString("type", "tower");
-				data.setFloat("lift", 0.01F);
-				data.setFloat("base", 0.5F);
-				data.setFloat("max", 2F);
-				data.setInteger("life", 50 + worldObj.rand.nextInt(20));
-				data.setDouble("posX", xCoord + 0.5 + worldObj.rand.nextGaussian() * 0.25);
-				data.setDouble("posZ", zCoord + 0.5 + worldObj.rand.nextGaussian() * 0.25);
-				data.setDouble("posY", yCoord + 4);
-				data.setBoolean("noWind", true);
-				data.setFloat("alphaMod", prevLid / lid);
-				data.setInteger("color", 0x808080);
-				data.setFloat("strafe", 0.15F);
-				MainRegistry.proxy.effectNT(data);*/
 
 				if(worldObj.rand.nextInt(5) == 0) {
 					NBTTagCompound flame = new NBTTagCompound();
@@ -264,6 +255,47 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 				}
 			}
 		}
+	}
+
+	/** Moves items from the input queue to the main grid */
+	public void loadIngredients() {
+
+		boolean markDirty = false;
+
+		for(int q /* queue */ = 25; q < 30; q++) {
+			if(slots[q] == null) continue;
+			ArcFurnaceRecipe recipe = ArcFurnaceRecipes.getOutput(slots[q], this.liquidMode);
+			if(recipe == null) continue;
+			int max = this.getMaxInputSize();
+			int recipeMax = this.liquidMode ? max : slots[q].getMaxStackSize() / recipe.solidOutput.stackSize;
+			max = Math.min(max, recipeMax);
+
+			// add to existing stacks
+			for(int i /* ingredient */ = 5; i < 25; i++) {
+				if(slots[i] == null) continue;
+				if(!slots[q].isItemEqual(slots[i]) || !ItemStack.areItemStackTagsEqual(slots[q], slots[i])) continue;
+				int toMove = BobMathUtil.min(slots[i].getMaxStackSize() - slots[i].stackSize, slots[q].stackSize, max - slots[i].stackSize);
+				if(toMove > 0) {
+					this.decrStackSize(q, toMove);
+					slots[i].stackSize += toMove;
+					markDirty = true;
+				}
+				if(slots[q] == null) break;
+			}
+
+			// add to empty slot
+			if(slots[q] != null) for(int i /* ingredient */ = 5; i < 25; i++) {
+				if(slots[i] != null) continue;
+				int toMove = Math.min(max, slots[q].stackSize);
+				slots[i] = slots[q].copy();
+				slots[i].stackSize = toMove;
+				this.decrStackSize(q, toMove);
+				markDirty = true;
+				if(slots[q] == null) break;
+			}
+		}
+
+		if(markDirty) this.markDirty();
 	}
 
 	public void decideElectrodeState() {
@@ -341,27 +373,19 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[] { 0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+		return new int[] {
+				0, 1, 2,
+				5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+				25, 26, 27, 28, 29};
 	}
 
 	@Override
 	public boolean canInsertItem(int slot, ItemStack stack, int side) {
-		if(lid <= 0) return false;
 		if(slot < 3) return stack.getItem() == ModItems.arc_electrode;
-		if(slot > 4) {
+		if(slot >= 25) {
 			ArcFurnaceRecipe recipe = ArcFurnaceRecipes.getOutput(stack, this.liquidMode);
 			if(recipe == null) return false;
-			if(liquidMode) {
-				if(recipe.fluidOutput == null) return false;
-				int sta = slots[slot] != null ? slots[slot].stackSize : 0;
-				sta += stack.stackSize;
-				return sta <= getMaxInputSize();
-			} else {
-				if(recipe.solidOutput == null) return false;
-				int sta = slots[slot] != null ? slots[slot].stackSize : 0;
-				sta += stack.stackSize;
-				return sta * recipe.solidOutput.stackSize <= recipe.solidOutput.getMaxStackSize() && sta <= getMaxInputSize();
-			}
+			return true;
 		}
 		return false;
 	}
@@ -384,7 +408,8 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 	@Override
 	public boolean canExtractItem(int slot, ItemStack stack, int side) {
 		if(slot < 3) return lid >= 1 && stack.getItem() != ModItems.arc_electrode;
-		if(slot > 4) return lid > 0 && ArcFurnaceRecipes.getOutput(stack, this.liquidMode) == null;
+		if(slot > 4 && slot < 25) return lid > 0 && ArcFurnaceRecipes.getOutput(stack, this.liquidMode) == null;
+		if(slot >= 25) return ArcFurnaceRecipes.getOutput(stack, this.liquidMode) == null;
 		return false;
 	}
 
@@ -398,6 +423,111 @@ public class TileEntityMachineArcFurnaceLarge extends TileEntityMachineBase impl
 		}
 
 		liquids.add(matStack.copy());
+	}
+
+	//Returns what is unused, or null if used up
+	public ItemStack distributeInput(ItemStack is, boolean modulate) {
+		if(is.stackSize == 0) return null;
+		ItemStack split;
+
+		//Slots 0,1,2
+		if(is.getItem() == ModItems.arc_electrode) {
+			for(int i = 0; i < 3; i++) {
+				if(slots[i] == null) {
+					split = is.splitStack(1);
+					if(modulate) this.setInventorySlotContents(i, split);
+				}
+				if (is.stackSize == 0) return null;
+			}
+			//Don't tell me you're gonna add an arc furnace recipe smelting electrodes
+			return is;
+		}
+
+		//Slots 5-24
+		ArcFurnaceRecipe recipe = ArcFurnaceRecipes.getOutput(is, this.liquidMode);
+		if(recipe != null) {
+			int maxStackSize = this.liquidMode ? 64 : recipe.solidOutput.getMaxStackSize() / recipe.solidOutput.stackSize;
+			maxStackSize = Math.min(maxStackSize, Math.min(is.getMaxStackSize(), getMaxInputSize()));
+
+			//Scan
+			for(int i = 5; i < 25; i++){
+				if(slots[i] == null) {
+					if(is.stackSize > maxStackSize) {
+						split = is.splitStack(maxStackSize);
+						if(modulate) slots[i] = split;
+					} else {
+						if(modulate) slots[i] = is;
+						return null;
+					}
+				} else if(ItemStackUtil.areStacksCompatible(is, slots[i]) && slots[i].stackSize < maxStackSize) {
+					if(is.stackSize > maxStackSize - slots[i].stackSize) {
+						is.splitStack(maxStackSize - slots[i].stackSize);
+						if(modulate) slots[i].stackSize = maxStackSize;
+					} else {
+						if(modulate) slots[i].stackSize += is.stackSize;
+						return null;
+					}
+				}
+			}
+		}
+		return is;
+	}
+
+	//Returns requested ItemStack
+	public ItemStack collectRequested(ItemStack is, boolean modulate) {
+		int req = is.stackSize;
+		if(req == 0) return null;
+
+		//Slots 0,1,2
+		if(is.getItem() != ModItems.arc_electrode) {
+			for(int i = 0; i < 3; i++) {
+				if(slots[i] == null) continue;
+				if(ItemStackUtil.areStacksCompatible(is, slots[i])) {
+					if(req > slots[i].stackSize) {
+						req -= slots[i].stackSize;
+						if(modulate) slots[i] = null;
+					} else if(req < slots[i].stackSize) {
+						if(modulate) slots[i].stackSize -= req;
+						return is;
+					} else {
+						if(modulate) slots[i] = null;
+						return is;
+					}
+				}
+			}
+		}
+
+		//Slots 5-24
+		if(ArcFurnaceRecipes.getOutput(is, this.liquidMode) == null) {
+			for(int i = 5; i < 25; i++) {
+				if(slots[i] == null) continue;
+				if(ItemStackUtil.areStacksCompatible(is, slots[i])) {
+					if(req > slots[i].stackSize) {
+						req -= slots[i].stackSize;
+						if(modulate) slots[i] = null;
+					} else if(req < slots[i].stackSize) {
+						if(modulate) slots[i].stackSize -= req;
+						return is;
+					} else {
+						if(modulate) slots[i] = null;
+						return is;
+					}
+				}
+			}
+		}
+
+		is.stackSize -= req;
+		if(is.stackSize == 0) return null;
+		return is;
+	}
+
+	//Return ItemStack in slot, null if unavailable
+	public ItemStack getAvailableItemFromSlot(int slot) {
+		if(slots[slot] == null) return null;
+		if(slot < 3 && slots[slot].getItem() == ModItems.arc_electrode) return null;
+		else if(slot > 4 && ArcFurnaceRecipes.getOutput(slots[slot], this.liquidMode) != null) return null;
+		else if(slot == 3 || slot == 4) return null;
+		else return slots[slot];
 	}
 
 	public static int getStackAmount(List<MaterialStack> stack) {

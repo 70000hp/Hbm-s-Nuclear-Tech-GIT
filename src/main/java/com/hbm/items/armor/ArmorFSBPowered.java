@@ -26,7 +26,6 @@ public class ArmorFSBPowered extends ArmorFSB implements IBatteryItem {
 		this.chargeRate = chargeRate;
 		this.consumption = consumption;
 		this.drain = drain;
-		this.setMaxDamage(1);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -117,12 +116,12 @@ public class ArmorFSBPowered extends ArmorFSB implements IBatteryItem {
 	}
 
 	@Override
-	public long getChargeRate() {
+	public long getChargeRate(ItemStack stack) {
 		return chargeRate;
 	}
 
 	@Override
-	public long getDischargeRate() {
+	public long getDischargeRate(ItemStack stack) {
 		return 0;
 	}
 

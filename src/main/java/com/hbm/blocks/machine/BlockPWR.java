@@ -62,7 +62,7 @@ public class BlockPWR extends BlockContainer implements IBlockCT {
 	}
 
 	@Override
-	public IIcon[] getFragments(IBlockAccess world, int x, int y, int z) {
+	public IIcon[] getFragments(IBlockAccess world, int x, int y, int z, int side) {
 		int meta = world.getBlockMetadata(x, y, z);
 		if(meta == 1) return recPort.fragCache;
 		return rec.fragCache;
@@ -342,10 +342,7 @@ public class BlockPWR extends BlockContainer implements IBlockCT {
 
 		@Override
 		public String[] getFunctionInfo() {
-			if(this.getBlockMetadata() != 1) return new String[0];
-			TileEntityPWRController controller = this.getCore();
-			if(controller != null) return controller.getFunctionInfo();
-			return new String[0];
+			return TileEntityPWRController.ROR;
 		}
 
 		@Override
@@ -353,7 +350,7 @@ public class BlockPWR extends BlockContainer implements IBlockCT {
 			if(this.getBlockMetadata() != 1) return "";
 			TileEntityPWRController controller = this.getCore();
 			if(controller != null) return controller.provideRORValue(name);
-			return "";
+			return null;
 		}
 
 		@Override
@@ -361,7 +358,7 @@ public class BlockPWR extends BlockContainer implements IBlockCT {
 			if(this.getBlockMetadata() != 1) return "";
 			TileEntityPWRController controller = this.getCore();
 			if(controller != null) return controller.runRORFunction(name, params);
-			return "";
+			return null;
 		}
 	}
 }
