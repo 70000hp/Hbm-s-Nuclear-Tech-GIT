@@ -69,6 +69,7 @@ public class OreDictManager {
 	public static final String KEY_LEAVES = "treeLeaves";
 	public static final String KEY_SAPLING = "treeSapling";
 	public static final String KEY_SAND = "sand";
+	public static final String KEY_STONE = "stone";
 	public static final String KEY_COBBLESTONE = "cobblestone";
 
 	public static final String KEY_BLACK = "dyeBlack";
@@ -447,7 +448,7 @@ public class OreDictManager {
 		HEMATITE																														.ore(fromOne(stone_resource, EnumStoneType.HEMATITE));
 		MALACHITE						.ingot(DictFrame.fromOne(chunk_ore, EnumChunkType.MALACHITE))									.ore(fromOne(stone_resource, EnumStoneType.MALACHITE));
 		LIMESTONE																		.dust(powder_limestone)							.ore(fromOne(stone_resource, EnumStoneType.LIMESTONE));
-		BAUXITE																															.gem(fromOne(stone_resource, EnumStoneType.BAUXITE));
+		BAUXITE																								.ore(fromOne(stone_resource, EnumStoneType.BAUXITE))							.gem(fromOne(stone_resource, EnumStoneType.BAUXITE));
 		CRYOLITE	.crystal(fromOne(chunk_ore, EnumChunkType.CRYOLITE))			.gem(fromOne(chunk_ore, EnumChunkType.CRYOLITE));
 		SLAG																									.block(block_slag);
 

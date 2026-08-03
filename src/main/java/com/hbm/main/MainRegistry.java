@@ -34,7 +34,7 @@ import com.hbm.lib.HbmWorld;
 import com.hbm.lib.RefStrings;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.potion.HbmPotion;
-import com.hbm.saveddata.satellites.Satellite;
+import com.hbm.saveddata.satellites.XSatelliteRegistry;
 import com.hbm.tileentity.TileMappings;
 import com.hbm.tileentity.bomb.TileEntityLaunchPadBase;
 import com.hbm.tileentity.bomb.TileEntityNukeCustom;
@@ -272,7 +272,7 @@ public class MainRegistry {
 		GameRegistry.registerFuelHandler(new FuelHandler());
 		BulletConfigSyncingUtil.loadConfigsForSync();
 		CellularDungeonFactory.init();
-		Satellite.register();
+		XSatelliteRegistry.register();
 		HTTPHandler.loadStats();
 		CraftingManager.mainRegistry();
 		SiegeTier.registerTiers();
@@ -730,7 +730,7 @@ public class MainRegistry {
 		remapItems.clear();
 
 		/// IGNORE ///
-		for(int i = 1; i <= 8; i++) ignoreMappings.add("hbm:item.gasflame" + i);
+
 		/// REMAP ///
 		remapItems.put("hbm:item.gadget_explosive8", ModItems.early_explosive_lenses);
 		remapItems.put("hbm:item.man_explosive8", ModItems.explosive_lenses);
