@@ -7,6 +7,7 @@ import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.items.tool.ItemOreDensityScanner;
 import com.hbm.main.MainRegistry;
 
+import com.hbm.world.noise.VoronoiNoiseGen;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,15 +32,25 @@ public class ItemBedrockFormationBase extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
-		for(int i = 0; i < BedrockFormationType.values().length; i++) {
-			BedrockFormationType type = BedrockFormationType.values()[i];
-			BedrockOreType[] composition = type.composition;
 
-			ItemStack ore = new ItemStack(item);
-			EntityPlayer player = MainRegistry.proxy.me();
-			if (player != null) setOreAmount(ore, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), 1D, composition);
-			list.add(ore);
+		BedrockFormationType type = BedrockFormationType.values()[i];
+		BedrockOreType[] composition = type.composition;
+
+		ItemStack ore = new ItemStack(item);
+		EntityPlayer player = MainRegistry.proxy.me();
+		if (player != null){
+			setOreAmount(ore, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), 1D, composition);
 		}
+		list.add(ore);
+
+	}
+
+	public static void setFormationType(ItemStack stack, int x, int z) {
+		if(!stack.hasTagCompound()) stack.stackTagCompound = new NBTTagCompound();
+		NBTTagCompound data = stack.getTagCompound();
+
+		data.setDouble("formation", getFormation(x, z));
+
 	}
 
 	public static double getOreAmount(ItemStack stack, BedrockOreType type) {
@@ -67,7 +78,11 @@ public class ItemBedrockFormationBase extends Item {
 		}
 	}
 
-	private static NoiseGeneratorPerlin[] ores = new NoiseGeneratorPerlin[BedrockOreType.values().length];
+	/**at most 8 distinct richness maps, different ore formations use the same map
+	 * if there are ever more than 8 ores per single formation feel free to bonk me in the head**/
+	private static final int max_bedrock_ores = 8;
+	private static VoronoiNoiseGen formations;
+	private static NoiseGeneratorPerlin[] ores = new NoiseGeneratorPerlin[max_bedrock_ores];
 	private static NoiseGeneratorPerlin level;
 
 	public static double getOreLevel(int x, int z, BedrockOreType type) {
@@ -78,6 +93,13 @@ public class ItemBedrockFormationBase extends Item {
 		double scale = 0.01D;
 
 		return MathHelper.clamp_double(Math.abs(level.func_151601_a(x * scale, z * scale) * ores[type.ordinal()].func_151601_a(x * scale, z * scale)) * 0.05, 0, 2);
+	}
+
+	public static int getFormation(int x, int z) {
+
+		if(formations == null) formations  = new VoronoiNoiseGen(8, 2114043);
+		double[] noiseInfo = formations.sampleVoronoi(x,z);
+		return (int) (Math.abs(noiseInfo[0] + noiseInfo[1] * 4) % (BedrockFormationType.values().length - 1));
 	}
 
 	public enum BedrockFormationType {

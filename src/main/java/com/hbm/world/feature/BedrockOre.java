@@ -3,6 +3,7 @@ package com.hbm.world.feature;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hbm.blocks.BlockEnums;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.generic.BlockBedrockOreTE.TileEntityBedrockOre;
 import com.hbm.config.WorldConfig;
@@ -56,7 +57,7 @@ public class BedrockOre {
 
 
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.coal_infernal, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
-		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(DictFrame.fromOne(ModBlocks.stone_resource, EnumStoneType.HEMATITE, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
+		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(DictFrame.fromOne(ModBlocks.stone_resource, BlockEnums.EnumStoneType.HEMATITE, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
 	}
 
 	public static void registerBedrockOre(List list, BedrockOreDefinition def, int weight) {
@@ -73,11 +74,11 @@ public class BedrockOre {
 		for(BedrockOreType type : BedrockOreType.values()) {
 			totalLevel += ItemBedrockOreBase.getOreLevel(x, z, type);
 		}
-		
+
 		totalLevel /= BedrockOreType.values().length;
 		FluidStack acid = getBoreFluid(totalLevel);
 		int tier = getTier(totalLevel);
-		
+
 		generate(world, x, z, new ItemStack(ModItems.bedrock_ore_base), acid, 0xD78A16, tier, ModBlocks.stone_depth);
 	}
 
