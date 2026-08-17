@@ -26,6 +26,7 @@ import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.util.Tuple;
 import com.hbm.util.fauxpointtwelve.DirPos;
 import com.hbm.util.i18n.I18nUtil;
 
@@ -118,8 +119,9 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 			int speed = upgradeManager.getLevel(UpgradeType.SPEED);
 			int efficiency = upgradeManager.getLevel(UpgradeType.EFFECT);
 
-			this.consumption = this.consumptionBase + (this.consumptionBase * speed) / 2 + (this.consumptionBase * efficiency);
+			this.consumption = consumptionBase + (consumptionBase * speed) / 2 + (consumptionBase * efficiency);
 
+			ItemBedrockFormationBase.BedrockFormationType formationType = ItemBedrockFormationBase.getFormationType(slots[2]);
 			if(canSlop()) {
 				this.power -= this.consumption;
 				this.progress += 1F / (600 - speed * 150);
@@ -129,8 +131,8 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 				while(progress >= 1F && canSlop()) {
 					progress -= 1F;
 
-					for(BedrockOreType type : BedrockOreType.values()) {
-						ores[type.ordinal()] += (ItemBedrockFormationBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
+					for(Tuple.Pair<BedrockOreType, Double> type : formationType.composition) {
+						ores[type.key.ordinal()] += (ItemBedrockFormationBase.getOreAmount(slots[2], type.key) * (1D + efficiency * 0.1));
 					}
 
 					this.decrStackSize(2, 1);
@@ -161,14 +163,14 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 				this.progress = 0;
 			}
 
-			for(BedrockOreType type : BedrockOreType.values()) {
+			for(Tuple.Pair<BedrockOreType, Double> type : formationType.composition) {
 				ItemStack output = ItemBedrockOreNew.make(ProcessingGrade.BASE, type);
-				outer: while(ores[type.ordinal()] >= 1) {
+				outer: while(ores[type.key.ordinal()] >= 1) {
 					for(int i = 3; i <= 8; i++) if(slots[i] != null && slots[i].getItem() == output.getItem() && slots[i].getItemDamage() == output.getItemDamage() && slots[i].stackSize < output.getMaxStackSize()) {
-						slots[i].stackSize++; ores[type.ordinal()] -= 1F; continue outer;
+						slots[i].stackSize++; ores[type.key.ordinal()] -= 1F; continue outer;
 					}
 					for(int i = 3; i <= 8; i++) if(slots[i] == null) {
-						slots[i] = output; ores[type.ordinal()] -= 1F; continue outer;
+						slots[i] = output; ores[type.key.ordinal()] -= 1F; continue outer;
 					}
 					break outer;
 				}

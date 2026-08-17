@@ -11,7 +11,7 @@ import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.OreDictManager.DictFrame;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ModItems;
-import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.items.special.ItemBedrockFormationBase;
 import com.hbm.items.special.ItemBedrockOre.EnumBedrockOre;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
 import com.hbm.util.WeightedRandomGeneric;
@@ -54,8 +54,6 @@ public class BedrockOre {
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(Items.quartz, 4),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.fragment_coltan, 4),				2,	0xF0EFDD,	new FluidStack(Fluids.CHLORINE, 100)),		WorldConfig.bedrockNetherColtanSpawn);
 
-
-
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(new ItemStack(ModItems.coal_infernal, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
 		registerBedrockOre(weightedOresNether, new BedrockOreDefinition(DictFrame.fromOne(ModBlocks.stone_resource, BlockEnums.EnumStoneType.HEMATITE, 8),				1,	0xF0EFDD),							WorldConfig.bedrockQuartzSpawn);
 	}
@@ -72,7 +70,7 @@ public class BedrockOre {
 	public static void generateAuto(World world, int x, int z) {
 		double totalLevel = 0;
 		for(BedrockOreType type : BedrockOreType.values()) {
-			totalLevel += ItemBedrockOreBase.getOreLevel(x, z, type);
+			totalLevel += ItemBedrockFormationBase.getOreLevel(x, z, type);
 		}
 
 		totalLevel /= BedrockOreType.values().length;

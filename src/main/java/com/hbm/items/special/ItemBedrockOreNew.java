@@ -236,7 +236,7 @@ public class ItemBedrockOreNew extends Item {
 	}
 
 	public enum ProcessingGrade {
-		NONE(none, "none", MISC),//from the slopper
+		BASE(none, "base", MISC),//from the slopper
 		CRUSHED(none, "crush", CRUSH),
 		FINE(none, "fine", CENTRIFUGE),
 		FROTHED(none, "frothed", FROTH),
@@ -245,8 +245,7 @@ public class ItemBedrockOreNew extends Item {
 		LEACHED_NAOH(leached, "leached", "fine", LEACH_NAOH),
 		CONCENTRATE(washed, "concentrate", MISC),
 		SPECIAL(washed, "special", MISC);
-						//endpoint for primary, recycling
-				//rad endpoint
+
 
 		public int tint;
 		public String prefix;
